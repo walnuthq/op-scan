@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# 🔎 OP Scan
 
-## Getting Started
+OP Scan is a transaction explorer tailored specifically for the [OP Stack](https://docs.optimism.io/builders/chain-operators/tutorials/create-l2-rollup) and the [Superchain vision](https://www.youtube.com/watch?v=O6vYNgrQ1LE).
+You can use it locally to explore and monitor transactions on your own rollup developed with the OP Stack.
 
-First, run the development server:
+![screenshot](screenshot.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 🙋‍♀️ Collaborate with us on OP Scan v1
+
+OP Scan is built for teams working on their own rollup with the OP Stack.
+If you are interested in monitoring your rollup locally and you want to submit a feature request of a bug, feel free by opening an issue in this repository.
+
+# ⚙️ Installation
+
+The app requires the following dependencies:
+
+NodeJS >= 18
+pnpm
+
+# 👩‍💻 Local Development
+
+For contributing to the project, you can quickly get the application running by following these steps:
+
+Clone this repository:
+
+```
+git clone git@github.com:walnuthq/op-scan
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install the dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+You will need to create a `.env.local` file in the root of your repository and populate it with `NEXT_PUBLIC_L1_RPC_URL` and `NEXT_PUBLIC_L2_RPC_URL`.
 
-## Learn More
+```
+NEXT_PUBLIC_L1_RPC_URL="https://eth-mainnet.g.alchemy.com/v2/..."
+NEXT_PUBLIC_L2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/..."
+```
 
-To learn more about Next.js, take a look at the following resources:
+You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/) or [Infura](https://www.infura.io/).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Start up the app and see it running at `http://localhost:3000`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+pnpm dev
+```
 
-## Deploy on Vercel
+# 🚀 Deploying
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deployments are handled automatically by [Vercel](https://www.vercel.com/), as soon as your PR is merged to main.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 🤗 Contributing
+
+Head on to the issues tab to find a list of open contributions. Before making your first contribution, get familiar with our [contributor guidelines](https://github.com/walnuthq/op-scan/issues/1).
+
+## Contributor's chat
+
+Join us on Telegram [here](https://t.me/+DYI4FMia43I1NDI8). Do not hesitate to ask any question, we will do our best to answer in the best way we can.
+
+## Coding conventions
+
+The project is already pre-configured with Eslint, TypeScript, and Prettier.
+
+Check for any linting issues:
+
+```
+pnpm lint
+```
+
+Run prettier before committing:
+
+```
+pnpm prettier
+```
