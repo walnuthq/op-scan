@@ -8,7 +8,7 @@ You can use it locally to explore and monitor transactions on your own rollup de
 # 🙋‍♀️ Collaborate with us on OP Scan v1
 
 OP Scan is built for teams working on their own rollup with the OP Stack.
-If you are interested in monitoring your rollup locally and you want to submit a feature request of a bug, feel free by opening an issue in this repository.
+If you are interested in monitoring your rollup locally and you want to submit a feature request or a bug, feel free by opening an issue in this repository.
 
 # ⚙️ Installation
 
