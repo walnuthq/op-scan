@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Search from "@/components/lib/navbar/search";
 import ModeToggle from "@/components/lib/navbar/mode-toggle";
 import UserMenu from "@/components/lib/navbar/user-menu";
-import logoImg from "@/img/logo.webp";
+import logoImg from "@/img/logo.png";
 
 const Navbar = () => (
   <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -15,7 +15,7 @@ const Navbar = () => (
         href="/"
         className="flex size-10 items-center gap-2 text-lg font-semibold md:text-base"
       >
-        <Image src={logoImg} alt="OP Scan logo" className="size-10" />
+        <Image src={logoImg} alt="OP Scan logo" className="size-8" />
         <span className="sr-only">OP Scan</span>
       </Link>
       <Link
@@ -38,7 +38,7 @@ const Navbar = () => (
             href="/"
             className="flex items-center gap-2 text-lg font-semibold"
           >
-            <Image src={logoImg} alt="OP Scan logo" className="size-10" />
+            <Image src={logoImg} alt="OP Scan logo" className="size-8" />
             <span className="sr-only">OP Scan</span>
           </Link>
           <Link href="/" className="hover:text-foreground">
