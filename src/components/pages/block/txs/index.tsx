@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatTimestamp } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 const BlckTxs = async ({ number }: { number: bigint }) => {
   const block = l2PublicClient.getBlock({
@@ -35,7 +36,7 @@ const BlckTxs = async ({ number }: { number: bigint }) => {
           {number.toString()}
         </Link>
       </p>
-      <div className="w-full overflow-x-auto">
+      <Card className="relative pl-8">
         <Table className="w-full table-auto">
           <TableCaption>
             List of transactions for block {number.toString()}
@@ -92,7 +93,7 @@ const BlckTxs = async ({ number }: { number: bigint }) => {
             ))}
           </TableBody>
         </Table>
-      </div>
+      </Card>
     </main>
   );
 };
