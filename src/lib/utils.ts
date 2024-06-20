@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { subDays, formatISO } from "date-fns";
+import { subDays, formatISO, fromUnixTime, formatDistance } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { formatEther as viemFormatEther } from "viem";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
@@ -26,13 +27,16 @@ export const fetchL2LatestBlocks = async (): Promise<
     number,
     hash,
     timestamp,
-    transactions: transactions.map(({ hash, from, to, value }) => ({
-      hash,
-      from,
-      to,
-      value,
-      timestamp,
-    })),
+    transactions: transactions.map(
+      ({ hash, blockNumber, from, to, value }) => ({
+        hash,
+        blockNumber,
+        from,
+        to,
+        value,
+        timestamp,
+      }),
+    ),
   }));
 };
 
@@ -79,7 +83,9 @@ export const fetchTokensPrices = async () => {
   };
 };
 
-export const fetchL1L2Transactions = async (): Promise<L1L2Transaction[]> =>
+export const fetchLatestL1L2Transactions = async (): Promise<
+  L1L2Transaction[]
+> =>
   Array.from({ length: 6 }, (_, i) => i).map((i) => ({
     l1BlockNumber: BigInt(20105119 - i),
     l1Hash:
@@ -106,3 +112,19 @@ export const formatPercent = (percent: number) =>
     maximumSignificantDigits: 3,
     signDisplay: "always",
   }).format(percent);
+
+export const formatTimestamp = (timestamp: bigint, withDate = true) => {
+  const timestampDate = fromUnixTime(Number(timestamp));
+  const timestampDistance = formatDistance(timestampDate, new Date(), {
+    includeSeconds: true,
+    addSuffix: true,
+  });
+  const timestampDateFormatted = formatInTimeZone(
+    timestampDate,
+    "UTC",
+    "MMM-dd-yyyy hh:mm:ss aa +z",
+  );
+  return withDate
+    ? `${timestampDistance} (${timestampDateFormatted})`
+    : timestampDistance;
+};

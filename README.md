@@ -14,8 +14,8 @@ If you are interested in monitoring your rollup locally and you want to submit a
 
 The app requires the following dependencies:
 
-NodeJS >= 18
-pnpm
+NodeJS >= 20
+pnpm >= 9
 
 # 👩‍💻 Local Development
 

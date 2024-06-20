@@ -42,4 +42,6 @@ const RootLayout = ({
   </html>
 );
 
+export const dynamic = "force-dynamic";
+
 export default RootLayout;
