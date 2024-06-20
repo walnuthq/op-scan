@@ -5,6 +5,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { formatEther as viemFormatEther } from "viem";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
+import { Address } from "viem";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -127,4 +128,15 @@ export const formatTimestamp = (timestamp: bigint, withDate = true) => {
   return withDate
     ? `${timestampDistance} (${timestampDateFormatted})`
     : timestampDistance;
+};
+
+export const isContract = async (address: Address | null) => {
+  if (address) {
+    const bytecode = await l2PublicClient.getCode({ address });
+    if (bytecode) {
+      return "Contract";
+    } else {
+      return "EOA";
+    }
+  }
 };
