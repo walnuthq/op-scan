@@ -4,9 +4,11 @@ export type Block = { number: bigint; hash: Hash; timestamp: bigint };
 
 export type Transaction = {
   hash: Hash;
+  blockNumber: bigint;
   from: Address;
   to: Address | null;
   value: bigint;
+  gasPrice?: bigint;
   timestamp: bigint;
 };
 

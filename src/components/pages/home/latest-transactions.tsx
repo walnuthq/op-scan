@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { formatEther } from "@/lib/utils";
-import { fromUnixTime, formatDistance } from "date-fns";
 import { Transaction } from "@/lib/types";
 import { ReceiptText } from "lucide-react";
 import {
@@ -11,6 +10,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatTimestamp } from "@/lib/utils";
 
 const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
   <div className="flex items-center gap-4 pt-6">
@@ -49,14 +49,7 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
       </div>
       <div className="flex items-center gap-1 text-sm">
         <span className="pr-2 text-muted-foreground">
-          {formatDistance(
-            fromUnixTime(Number(transaction.timestamp)),
-            new Date(),
-            {
-              includeSeconds: true,
-              addSuffix: true,
-            },
-          )}
+          {formatTimestamp(transaction.timestamp, false)}
         </span>
         <Badge variant="outline">{formatEther(transaction.value)} ETH</Badge>
       </div>
