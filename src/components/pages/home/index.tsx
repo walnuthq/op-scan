@@ -8,11 +8,11 @@ import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
 import EthPrice from "@/components/pages/home/eth-price";
 import OpPrice from "@/components/pages/home/op-price";
 import LatestBlockAndTxs from "@/components/pages/home/latest-block-and-txs";
-import LatestL1TxBatch from "@/components/pages/home/latest-l1-tx-batch";
+import LatestL1TxBatch from "@/components/pages/home/latest-l1-l2-transactions/latest-l1-tx-batch";
 import TransactionHistory from "@/components/pages/home/transaction-history";
 import LatestBlocks from "@/components/pages/home/latest-blocks";
-import LatestTransactions from "@/components/pages/home/latest-transactions";
-import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions";
+import LatestTransactions from "@/components/pages/home/latest-transactions/latest-transactions";
+import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions/latest-l1-l2-transactions";
 
 const Home = async () => {
   const [tokensPrices, latestBlocks, l2BlockTime, latestL1L2Transactions] =
