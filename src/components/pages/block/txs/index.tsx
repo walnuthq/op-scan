@@ -13,6 +13,11 @@ import { formatTimestamp } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 
 const BlckTxs = async ({ number }: { number: bigint }) => {
+  async function getGasUsed(hash: any, gasPrice: bigint) { 
+    let txr = l2PublicClient.getTransactionReceipt({hash: hash})
+    return (gasPrice * (await txr).gasUsed).toString()
+  }
+
   const block = l2PublicClient.getBlock({
     blockNumber: number,
     includeTransactions: true,
@@ -87,7 +92,7 @@ const BlckTxs = async ({ number }: { number: bigint }) => {
                   {transaction.value.toString()}
                 </TableCell>
                 <TableCell className="max-w-[8rem] truncate">
-                  0.{(transaction.gasPrice * transaction.gas).toString()}
+                  0.{getGasUsed(transaction.hash, transaction.gasPrice)}
                 </TableCell>
               </TableRow>
             ))}
