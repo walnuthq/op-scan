@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { subDays, formatISO, fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { formatEther as viemFormatEther } from "viem";
+import { formatEther as viemFormatEther, Log } from "viem";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
 
@@ -128,3 +128,31 @@ export const formatTimestamp = (timestamp: bigint, withDate = true) => {
     ? `${timestampDistance} (${timestampDateFormatted})`
     : timestampDistance;
 };
+
+
+const ERC20_TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+
+export interface TokenTransfer {
+  from: string;
+  to: string;
+  tokenAddress: string;
+  amount: bigint;
+}
+
+export function parseTokenTransfers(logs: Log[]): TokenTransfer[] {
+  return logs
+    .filter(log => log.topics[0] === ERC20_TRANSFER_EVENT_TOPIC)
+    .map(log => {
+      const [, fromTopic, toTopic] = log.topics;
+      const from = `0x${fromTopic?.slice(26)}`;
+      const to = `0x${toTopic?.slice(26)}`;
+      const amount = BigInt(log.data);
+      
+      return {
+        from,
+        to,
+        tokenAddress: log.address,
+        amount
+      };
+    });
+}
