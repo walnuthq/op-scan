@@ -1,18 +1,5 @@
 import { l2PublicClient } from "@/lib/chains";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatEther, formatTimestamp } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
-import EthereumIcon from "@/components/lib/ethereum-icon";
-import { Transaction } from "@/lib/types";
 import BlockTransactionsTable from "./block-transactions-table";
 
 const BlckTxs = async ({ number }: { number: bigint }) => {
@@ -52,8 +39,6 @@ const BlckTxs = async ({ number }: { number: bigint }) => {
   );
 
   const transactions = transactions_arr[0];
-
-  const ts = formatTimestamp(block.timestamp, false);
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
