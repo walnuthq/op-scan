@@ -10,6 +10,7 @@ export type Transaction = {
   value: bigint;
   gasPrice?: bigint;
   timestamp: bigint;
+  isContractInteraction?: boolean;
 };
 
 export type BlockWithTransactions = Block & { transactions: Transaction[] };
