@@ -7,22 +7,9 @@ import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Card, CardContent } from "@/components/ui/card";
 import { Transaction } from "@/lib/types";
 import { formatGwei, formatEther } from "viem";
-import { useEffect, useState } from "react";
-import { l2PublicClient } from "@/lib/chains";
 
 const TransactionDetails = ({ transaction }: { transaction: Transaction }) => {
-  const [isContract, setIsContract] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkIfContract = async () => {
-      if (transaction.to) {
-        const code = await l2PublicClient.getCode({ address: transaction.to });
-        setIsContract(code !== "0x");
-      }
-    };
-    checkIfContract();
-  }, [transaction.to]);
-
+const isContract = transaction.isContractInteraction
   return (
     <Card>
       <CardContent className="p-4">
@@ -50,18 +37,14 @@ const TransactionDetails = ({ transaction }: { transaction: Transaction }) => {
               {transaction.from}
             </Link>
           </DescriptionListItem>
-          <DescriptionListItem border title="To">
+          
+          <DescriptionListItem border title={isContract ? "Interacted With (To)" : "To"}>
             <Link
               className="text-primary hover:brightness-150"
               href={`/address/${transaction.to}`}
             >
               {transaction.to}
             </Link>
-            {isContract !== null && (
-              <span className="ml-2">
-                ({isContract ? "Contract Interaction" : "EOA Transfer"})
-              </span>
-            )}
           </DescriptionListItem>
           <DescriptionListItem border title="Value">
             <EthereumIcon className="mr-1 size-4" />
