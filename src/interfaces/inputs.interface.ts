@@ -1,4 +1,4 @@
 export interface SearchInputResult {
-    category: string, 
-    values: string[]
+  category: string;
+  values: string[];
 }
