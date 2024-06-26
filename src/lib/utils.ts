@@ -2,13 +2,128 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { subDays, formatISO, fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { formatEther as viemFormatEther } from "viem";
+import {
+  encodeFunctionData,
+  keccak256,
+  formatEther as viemFormatEther,
+} from "viem";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
 import l2CrossDomainMessenger from "./contracts/l2-cross-domain-messenger/contract";
+import abi from "./contracts/l2-cross-domain-messenger/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+interface MessageArgs {
+  target: `0x${string}`;
+  sender: `0x${string}`;
+  message: `0x${string}`;
+  value: bigint;
+  messageNonce: bigint;
+  gasLimit: bigint;
+}
+
+function hexToBytes(hex: string): Uint8Array {
+  if (hex.startsWith("0x")) {
+    hex = hex.slice(2);
+  }
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
+  return bytes;
+}
+
+function encodeL1Args(args: MessageArgs): Uint8Array {
+  const { target, sender, message, value, messageNonce, gasLimit } = args;
+
+  const encodedMessage = encodeFunctionData({
+    abi: abi,
+    functionName: "relayMessage",
+    args: [messageNonce, sender, target, value, gasLimit, message],
+  });
+
+  return hexToBytes(encodedMessage);
+}
+
+export const searchHashInLogs = async (hash: string): Promise<any | null> => {
+  try {
+    const logs = await fetchL2RelayedMessageLatestLogs();
+
+    // const log = logs.find(log => log.args.msgHash === hash);
+
+    const log = logs.find((log) => {
+      console.log("log.args.msgHash:", log.args.msgHash);
+      return log.args.msgHash === hash;
+    });
+
+    console.log("LOG:", log);
+    return log;
+  } catch (error) {
+    console.error("Error searching for hash in logs:", error);
+    throw error;
+  }
+};
+
+export const calculateHash = async (args: MessageArgs): Promise<string> => {
+  const encodedMessage = encodeL1Args(args);
+  const calculatedHash = keccak256(encodedMessage);
+
+  return calculatedHash;
+};
+
+export const searchHashMsg = async (): Promise<any[]> => {
+  try {
+    const sentMessageLogs = await fetchL1SentMessageLatestLogs();
+    const matchedMessages: any[] = [];
+
+    for (const log of sentMessageLogs) {
+      let messageValue = await messageExtension1ArgsBySender(log.args.sender);
+      let args: MessageArgs = {
+        target: log.args.target,
+        sender: log.args.sender,
+        message: log.args.message,
+        messageNonce: log.args.messageNonce,
+        value: messageValue,
+        gasLimit: log.args.gasLimit,
+      };
+      let calculatedHash = await calculateHash(args);
+      let l2Message = searchHashInLogs(calculatedHash);
+
+      if (l2Message) {
+        matchedMessages.push(l2Message);
+      }
+    }
+    return matchedMessages;
+  } catch (error) {
+    console.error("Error fetching or matching logs:", error);
+    throw error;
+  }
+};
+
+export const messageExtension1ArgsBySender = async (
+  transactionHash: string,
+): Promise<any> => {
+  try {
+    const sentMessageExtension1Logs =
+      await fetchL1SentMessageExtension1LatestLogs();
+
+    const matchedLog = sentMessageExtension1Logs.find(
+      (log) => log.args.sender === transactionHash,
+    );
+
+    if (!matchedLog) {
+      console.error(`No log found with transactionHash: ${transactionHash}`);
+      return null;
+    }
+
+    return matchedLog.args.value;
+  } catch (error) {
+    console.error("Error fetching or matching logs:", error);
+    throw error;
+  }
+};
 
 export const fetchL2RelayedMessageLatestLogs = async (): Promise<any[]> => {
   try {
@@ -149,10 +264,8 @@ export const fetchLatestL1L2Transactions = async (): Promise<
 > =>
   Array.from({ length: 6 }, (_, i) => i).map((i) => ({
     l1BlockNumber: BigInt(20105119 - i),
-    l1Hash:
-      "0xc9f6566bfc6ff30a4d97dde51d011c47259268c8b7051f5ef0d23f407aece9a4",
-    l2Hash:
-      "0x8d721b30143b799d4b207bbea88cbf187862654357e7ddc318d6616f409045ae",
+    l1Hash: "0xte",
+    l2Hash: "0xteteo",
   }));
 
 export const formatEther = (ether: bigint, precision = 5) =>
