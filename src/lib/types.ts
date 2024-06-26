@@ -18,6 +18,11 @@ export type Transaction = {
   method?: string;
 };
 
+export type AddressDetails = {
+  addressType: "Contract" | "Address";
+  balance: bigint;
+};
+
 export type BlockWithTransactions = Block & { transactions: Transaction[] };
 
 export type L1L2Transaction = {
