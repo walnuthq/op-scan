@@ -2,9 +2,10 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { subDays, formatISO, fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { formatEther as viemFormatEther, Log } from "viem";
+import { formatEther as viemFormatEther, Log, formatUnits } from "viem";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
+import { getERC20Contract } from "./contracts/erc-20/contract";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -136,11 +137,12 @@ export interface TokenTransfer {
   from: string;
   to: string;
   tokenAddress: string;
-  amount: bigint;
+  amount: string;  
+  decimals: number;
 }
 
-export function parseTokenTransfers(logs: Log[]): TokenTransfer[] {
-  return logs
+export async function parseTokenTransfers(logs: Log[]): Promise<TokenTransfer[]> {
+  const transfers = logs
     .filter(log => log.topics[0] === ERC20_TRANSFER_EVENT_TOPIC)
     .map(log => {
       const [, fromTopic, toTopic] = log.topics;
@@ -155,4 +157,28 @@ export function parseTokenTransfers(logs: Log[]): TokenTransfer[] {
         amount
       };
     });
+
+  const transfersWithDecimals = await Promise.all(
+    transfers.map(async (transfer) => {
+      try {
+        const contract = getERC20Contract(transfer.tokenAddress);
+        const decimals = await contract.read.decimals();
+        const formattedAmount = formatUnits(transfer.amount, decimals);
+        return { 
+          ...transfer, 
+          amount: formattedAmount,  
+          decimals 
+        };
+      } catch (error) {
+        console.error(`Error processing transfer for ${transfer.tokenAddress}:`, error);
+        const defaultDecimals = 18;
+        return { 
+          ...transfer, 
+          amount: formatUnits(transfer.amount, defaultDecimals),
+          decimals: defaultDecimals 
+        };
+      }
+    })
+  );
+  return transfersWithDecimals;
 }
