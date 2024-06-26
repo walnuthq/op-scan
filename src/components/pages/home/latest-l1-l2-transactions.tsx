@@ -77,7 +77,7 @@ const LatestL1L2Transactions = ({
     </CardContent>
     <CardFooter className="flex justify-center border-t">
       <Link
-        href="/l1-l2-txs"
+        href="/txs-enqueued"
         className="pt-6 text-primary hover:brightness-150"
       >
         View all L1→L2 transactions →

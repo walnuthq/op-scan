@@ -18,4 +18,8 @@ export type L1L2Transaction = {
   l1BlockNumber: bigint;
   l1Hash: Hash;
   l2Hash: Hash;
+  timestamp: bigint;
+  l1TxHash: string;
+  l1TxOrigin: string;
+  gasLimit: number;
 };
