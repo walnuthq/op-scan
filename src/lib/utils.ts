@@ -2,92 +2,67 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { subDays, formatISO, fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import {
-  formatEther as viemFormatEther,
-  decodeEventLog,
-  parseAbiItem,
-} from "viem";
+import { formatEther as viemFormatEther } from "viem";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
-import abiL1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/abi";
-import abiL2CrossDomainMessenger from "@/lib/contracts/l2-cross-domain-messenger/abi";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
 import l2CrossDomainMessenger from "./contracts/l2-cross-domain-messenger/contract";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-export const fetchL2LatestLogs = async (): Promise<any[]> => {
+export const fetchL2RelayedMessageLatestLogs = async (): Promise<any[]> => {
   try {
     const latestBlock = await l2PublicClient.getBlockNumber();
 
     const startBlock = latestBlock - BigInt(1000);
-    const endBlock = latestBlock;
 
-    const logs = await l2PublicClient.getLogs({
+    const logs = l2CrossDomainMessenger.getEvents.RelayedMessage(undefined, {
       fromBlock: startBlock,
-      toBlock: endBlock,
-      address: l2CrossDomainMessenger.address,
-      event: parseAbiItem("event RelayedMessage(bytes32 msgHash)"),
+      toBlock: latestBlock,
     });
 
-    const decodedLogs = logs.map((log) =>
-      decodeEventLog({
-        abi: abiL2CrossDomainMessenger,
-        data: log.data,
-        topics: log.topics,
-      }),
-    );
-
-    return decodedLogs;
+    return logs;
   } catch (error) {
     console.error("Error fetching logs:", error);
     throw error;
   }
 };
 
-export const fetchL1LatestLogs = async (): Promise<any[]> => {
+export const fetchL1SentMessageExtension1LatestLogs = async (): Promise<
+  any[]
+> => {
   try {
     const latestBlock = await l1PublicClient.getBlockNumber();
 
     const startBlock = latestBlock - BigInt(1000);
-    const endBlock = latestBlock;
 
-    const SentMessageLogs = await l1PublicClient.getLogs({
-      fromBlock: startBlock,
-      toBlock: endBlock,
-      address: l1CrossDomainMessenger.address,
-      event: parseAbiItem(
-        "event SentMessage(address indexed target, address indexed sender, bytes message, uint256 messageNonce, uint256 minGasLimit)",
-      ),
-    });
-
-    const sentMessageExtension1Logs = await l1PublicClient.getLogs({
-      fromBlock: startBlock,
-      toBlock: endBlock,
-      address: l1CrossDomainMessenger.address,
-      event: parseAbiItem(
-        "event SentMessageExtension1(address indexed sender, uint256 value)",
-      ),
-    });
-
-    const decodedSentMessageLogs = SentMessageLogs.map((log) =>
-      decodeEventLog({
-        abi: abiL1CrossDomainMessenger,
-        data: log.data,
-        topics: log.topics,
-      }),
+    const logs = await l1CrossDomainMessenger.getEvents.SentMessageExtension1(
+      undefined,
+      {
+        fromBlock: startBlock,
+        toBlock: latestBlock,
+      },
     );
 
-    const decodedSentMessageExtension1Logs = sentMessageExtension1Logs.map(
-      (log) =>
-        decodeEventLog({
-          abi: abiL1CrossDomainMessenger,
-          data: log.data,
-          topics: log.topics,
-        }),
-    );
+    return logs;
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    throw error;
+  }
+};
 
-    return [...decodedSentMessageLogs, ...decodedSentMessageExtension1Logs];
+export const fetchL1SentMessageLatestLogs = async (): Promise<any[]> => {
+  try {
+    const latestBlock = await l1PublicClient.getBlockNumber();
+
+    const startBlock = latestBlock - BigInt(1000);
+
+    const logs = await l1CrossDomainMessenger.getEvents.SentMessage(undefined, {
+      fromBlock: startBlock,
+      toBlock: latestBlock,
+    });
+
+    return logs;
   } catch (error) {
     console.error("Error fetching logs:", error);
     throw error;
