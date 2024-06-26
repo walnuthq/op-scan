@@ -67,7 +67,7 @@ const LatestL1L2Transactions = ({
     <CardHeader className="border-b">
       <CardTitle>Latest L1→L2 Transactions</CardTitle>
     </CardHeader>
-    <CardContent className="grid gap-6 divide-y">
+    <CardContent className="grid max-h-[557px] gap-6 divide-y overflow-x-hidden overflow-y-scroll">
       {transactions.map((transaction) => (
         <LatestL1L2Transaction
           key={transaction.l1Hash}
