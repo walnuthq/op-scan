@@ -23,8 +23,17 @@ export type Transaction = {
   value: bigint;
   gasPrice?: bigint;
   timestamp: bigint;
-  effectiveGasUsed?: bigint;
-  method?: string;
+};
+
+export type TransactionReceipt = {
+  transactionHash: Hash;
+  from: Address;
+  to: Address | null;
+  effectiveGasPrice: bigint;
+};
+
+export type TransactionWithReceipt = Transaction & {
+  transactionReceipt: TransactionReceipt;
 };
 
 export type AddressDetails = {

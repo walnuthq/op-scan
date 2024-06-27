@@ -1,9 +1,9 @@
-import BlckTxs from "@/components/pages/block/txs";
+import BlockTxs from "@/components/pages/block-txs";
 
-const BlckTxsPage = ({
+const BlockTxsPage = ({
   params: { number },
 }: {
-  params: { number: bigint };
-}) => <BlckTxs number={number} />;
+  params: { number: string };
+}) => <BlockTxs number={BigInt(number)} />;
 
-export default BlckTxsPage;
+export default BlockTxsPage;

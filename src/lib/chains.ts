@@ -13,10 +13,16 @@ export const l2Chain = optimism;
 
 export const l1PublicClient = createPublicClient({
   chain: l1Chain,
-  transport: http(process.env.NEXT_PUBLIC_L1_RPC_URL),
+  transport: http(process.env.NEXT_PUBLIC_L1_RPC_URL, {
+    batch: true,
+    fetchOptions: { cache: "no-store" },
+  }),
 });
 
 export const l2PublicClient = createPublicClient({
   chain: l2Chain,
-  transport: http(process.env.NEXT_PUBLIC_L2_RPC_URL),
+  transport: http(process.env.NEXT_PUBLIC_L2_RPC_URL, {
+    batch: true,
+    fetchOptions: { cache: "no-store" },
+  }),
 });
