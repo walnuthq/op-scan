@@ -1,6 +1,10 @@
-const AddressPage = ({ params: { address } }: { params: { address: string } }) => (
-    <h1>{address}</h1>
-  );
-  
-  export default AddressPage;
-  
+import AddressComponent from "@/components/pages/address";
+import { Address } from "viem";
+
+const AddressPage = ({
+  params: { address },
+}: {
+  params: { address: Address };
+}) => <AddressComponent address={address} />;
+
+export default AddressPage;
