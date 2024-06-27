@@ -1,10 +1,4 @@
-import { Transaction } from "@/lib/types";
-import {
-  fetchTokensPrices,
-  fetchL2LatestBlocks,
-  fetchLatestL1L2Transactions,
-} from "@/lib/utils";
-import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
+import { fetchHomePageData } from "@/lib/fetch-data";
 import EthPrice from "@/components/pages/home/eth-price";
 import OpPrice from "@/components/pages/home/op-price";
 import LatestBlockAndTxs from "@/components/pages/home/latest-block-and-txs";
@@ -15,18 +9,13 @@ import LatestTransactions from "@/components/pages/home/latest-transactions";
 import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions";
 
 const Home = async () => {
-  const [tokensPrices, latestBlocks, l2BlockTime, latestL1L2Transactions] =
-    await Promise.all([
-      fetchTokensPrices(),
-      fetchL2LatestBlocks(),
-      l2OutputOracle.read.l2BlockTime(),
-      fetchLatestL1L2Transactions(),
-    ]);
-  const latestTransactions = latestBlocks
-    .reduce<
-      Transaction[]
-    >((txns, block) => [...txns, ...block.transactions.reverse()], [])
-    .slice(0, 6);
+  const {
+    tokensPrices,
+    latestBlocks,
+    l2BlockTime,
+    latestTransactions,
+    latestL1L2Transactions,
+  } = await fetchHomePageData();
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="grid gap-4 lg:grid-cols-3">
@@ -35,7 +24,10 @@ const Home = async () => {
           <OpPrice op={tokensPrices.op} />
         </div>
         <div className="space-y-4">
-          <LatestBlockAndTxs block={latestBlocks[0]} />
+          <LatestBlockAndTxs
+            blockNumber={latestBlocks[0]?.number}
+            l2BlockTime={l2BlockTime}
+          />
           <LatestL1TxBatch />
         </div>
         <TransactionHistory />
