@@ -25,8 +25,11 @@ interface LatestBlocksTableProps {
 
 async function fetchBlocks(latestBlockNumber: bigint, currentPage: number, blocksPerPage: number) {
   const startBlock = latestBlockNumber - BigInt((currentPage - 1) * blocksPerPage);
+  const remainingBlocks = Number(startBlock + BigInt(1));
+  const blocksToFetch = Math.min(blocksPerPage, remainingBlocks);
+
   const blocks = await Promise.all(
-    Array.from({ length: blocksPerPage }, (_, i) =>
+    Array.from({ length: blocksToFetch }, (_, i) =>
       l2PublicClient.getBlock({ blockNumber: startBlock - BigInt(i) })
     )
   );

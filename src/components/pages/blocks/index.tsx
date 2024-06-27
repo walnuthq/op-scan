@@ -43,6 +43,8 @@ export default function BlocksPage({
             currentPage={currentPage}
             totalPages={totalPages}
             latestBlockNumber={latestBlockNumber.toString()}
+            totalBlocks={totalBlocks}
+            blocksPerPage={blocksPerPage}
           />
         </CardHeader>
         <LatestBlocksTable
@@ -64,6 +66,8 @@ export default function BlocksPage({
             currentPage={currentPage}
             totalPages={totalPages}
             latestBlockNumber={latestBlockNumber.toString()}
+            totalBlocks={totalBlocks}
+            blocksPerPage={blocksPerPage}
           />
         </CardFooter>
       </Card>

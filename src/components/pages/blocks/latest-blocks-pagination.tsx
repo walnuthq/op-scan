@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 interface LatestBlocksPaginationProps {
   currentPage: number;
   totalPages: number;
+  totalBlocks: bigint;
+  blocksPerPage: number;
   latestBlockNumber: string;
 }
 
@@ -12,7 +14,10 @@ export default function LatestBlocksPagination({
   currentPage,
   totalPages,
   latestBlockNumber,
+  totalBlocks,
+  blocksPerPage
 }: LatestBlocksPaginationProps) {
+  const lastPage = Math.ceil(Number(totalBlocks) / blocksPerPage);
   return (
     <section className="flex justify-center items-center space-x-1 mt-4 w-fit">
       <Button asChild className="bg-transparent text-xs text-primary hover:text-white border border-border w-fit h-fit p-2">
@@ -36,7 +41,7 @@ export default function LatestBlocksPagination({
         </Button>
       )}
       <Button asChild className="bg-transparent text-xs text-primary hover:text-white border border-border w-fit h-fit p-2">
-        <Link href={`/blocks?page=${totalPages}&latest=${latestBlockNumber}`}>Last</Link>
+        <Link href={`/blocks?page=${lastPage}&latest=${latestBlockNumber}`}>Last</Link>
       </Button>
     </section>
   );
