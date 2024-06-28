@@ -21,18 +21,7 @@ interface MessageArgs {
   gasLimit: bigint;
 }
 
-function hexToBytes(hex: string): Uint8Array {
-  if (hex.startsWith("0x")) {
-    hex = hex.slice(2);
-  }
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
-  }
-  return bytes;
-}
-
-function encodeL1Args(args: MessageArgs): Uint8Array {
+function encodeL1Args(args: MessageArgs): `0x${string}` {
   const { target, sender, message, value, messageNonce, gasLimit } = args;
 
   const encodedMessage = encodeFunctionData({
@@ -41,21 +30,15 @@ function encodeL1Args(args: MessageArgs): Uint8Array {
     args: [messageNonce, sender, target, value, gasLimit, message],
   });
 
-  return hexToBytes(encodedMessage);
+  return encodedMessage;
 }
 
 export const searchHashInLogs = async (hash: string): Promise<any | null> => {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
 
-    // const log = logs.find(log => log.args.msgHash === hash);
+    const log = logs.find(log => log.args.msgHash === hash);
 
-    const log = logs.find((log) => {
-      console.log("log.args.msgHash:", log.args.msgHash);
-      return log.args.msgHash === hash;
-    });
-
-    console.log("LOG:", log);
     return log;
   } catch (error) {
     console.error("Error searching for hash in logs:", error);
@@ -70,13 +53,13 @@ export const calculateHash = async (args: MessageArgs): Promise<string> => {
   return calculatedHash;
 };
 
-export const searchHashMsg = async (): Promise<any[]> => {
+export const searchHashMsg = async (): Promise<L1L2Transaction[]> => {
   try {
     const sentMessageLogs = await fetchL1SentMessageLatestLogs();
-    const matchedMessages: any[] = [];
+    const l1l2LatestTransacions: any[] = [];
 
     for (const log of sentMessageLogs) {
-      let messageValue = await messageExtension1ArgsBySender(log.args.sender);
+      let messageValue = await messageExtension1ArgsByHash(log.transactionHash);
       let args: MessageArgs = {
         target: log.args.target,
         sender: log.args.sender,
@@ -86,20 +69,26 @@ export const searchHashMsg = async (): Promise<any[]> => {
         gasLimit: log.args.gasLimit,
       };
       let calculatedHash = await calculateHash(args);
-      let l2Message = searchHashInLogs(calculatedHash);
+      let l2Message = await searchHashInLogs(calculatedHash);
 
       if (l2Message) {
-        matchedMessages.push(l2Message);
+        let transaction: L1L2Transaction = {
+          l1BlockNumber: log.blockNumber,
+          l1Hash: log.transactionHash, 
+          l2Hash: l2Message.transactionHash  
+        };
+        l1l2LatestTransacions.push(transaction);
       }
+
     }
-    return matchedMessages;
+    return l1l2LatestTransacions;
   } catch (error) {
     console.error("Error fetching or matching logs:", error);
     throw error;
   }
 };
 
-export const messageExtension1ArgsBySender = async (
+export const messageExtension1ArgsByHash = async (
   transactionHash: string,
 ): Promise<any> => {
   try {
@@ -107,7 +96,7 @@ export const messageExtension1ArgsBySender = async (
       await fetchL1SentMessageExtension1LatestLogs();
 
     const matchedLog = sentMessageExtension1Logs.find(
-      (log) => log.args.sender === transactionHash,
+      (log) => log.transactionHash === transactionHash,
     );
 
     if (!matchedLog) {
@@ -155,7 +144,6 @@ export const fetchL1SentMessageExtension1LatestLogs = async (): Promise<
         toBlock: latestBlock,
       },
     );
-
     return logs;
   } catch (error) {
     console.error("Error fetching logs:", error);
@@ -173,7 +161,6 @@ export const fetchL1SentMessageLatestLogs = async (): Promise<any[]> => {
       fromBlock: startBlock,
       toBlock: latestBlock,
     });
-
     return logs;
   } catch (error) {
     console.error("Error fetching logs:", error);
