@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { l1Chain, l2Chain } from "@/lib/chains";
+import { l1Chain } from "@/lib/chains";
 
 const LatestL1L2Transaction = ({
   transaction,
@@ -48,7 +48,7 @@ const LatestL1L2Transaction = ({
           L2 Tx#{" "}
           <Link
             className="max-w-28 truncate text-primary hover:brightness-150 md:max-w-48 xl:max-w-28"
-            href={`${l2Chain.blockExplorers.default.url}/tx/${transaction.l2Hash}`}
+            href={`/tx/${transaction.l2Hash}`}
           >
             {transaction.l2Hash}
           </Link>
