@@ -1,12 +1,12 @@
 import { createPublicClient, http } from 'viem';
-import { optimism } from 'viem/chains';
+import { optimism } from 'viem/chains'
 
 const client = createPublicClient({
   chain: optimism,
   transport: http(process.env.RPC_URL),
 });
 
-export async function getLatestTransactions() {
+export async function fetchL2LatestTransactions() {
     const latestBlock = await client.getBlockNumber();
     let transactions: any[] = [];
   

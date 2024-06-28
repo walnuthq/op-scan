@@ -6,17 +6,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatAddress, formatTimestamp } from "@/lib/utils";
 import Link from "next/link";
 import { formatEther, formatGwei } from "viem";
 
-function formatTimestamp(timestamp: number): string {
-  const date = new Date(timestamp * 1000);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
-}
 
 export function TransactionsTable({ transactions }: { 
 transactions: any }) {
@@ -36,13 +29,13 @@ transactions: any }) {
       </TableHeader>
       <TableBody>
         {transactions.map((tx: any) =>{
-           const formattedtimestamp = formatTimestamp(Number(tx.timestamp));
+           const formattedtimestamp = formatTimestamp(tx.timestamp);
            return(
           <TableRow key={tx.hash}>
             <TableCell>
               <Link
                 href={`/tx/${tx.hash}`}
-                className="text-blue-500 hover:underline"
+                className="text-primary hover:brightness-150"
               >
                 {tx.hash.slice(0, 10)}...
               </Link>
@@ -51,7 +44,7 @@ transactions: any }) {
             <TableCell>
               <Link
                 href={`/block/${tx.blockNumber}`}
-                className="text-blue-500 hover:underline"
+                className="text-primary hover:brightness-150"
               >
                 {tx.blockNumber.toString()}
               </Link>
@@ -60,7 +53,7 @@ transactions: any }) {
             <TableCell>
               <Link
                 href={`/address/${tx.from}`}
-                className="text-blue-500 hover:underline"
+                className="text-primary hover:brightness-150"
               >
                 {formatAddress(tx.from)}
               </Link>
@@ -69,7 +62,7 @@ transactions: any }) {
               {tx.to && (
                 <Link
                   href={`/address/${tx.to}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-primary hover:brightness-150"
                 >
                   {formatAddress(tx.to)}
                 </Link>
@@ -85,6 +78,4 @@ transactions: any }) {
   );
 }
 
-function formatAddress(address: string) {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
+
