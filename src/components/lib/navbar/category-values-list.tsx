@@ -8,12 +8,12 @@ interface Props {
 }
 
 export function CategoryValuesList({ selectedCategory, searchResult }: Props) {
-  const categoryToRedirect: string = 
-  selectedCategory === "Transactions" 
-    ? "tx" 
-    : selectedCategory === "Blocks" 
-      ? "block" 
-      : "address";
+  const categoryToRedirect: string =
+    selectedCategory === "Transactions"
+      ? "tx"
+      : selectedCategory === "Blocks"
+        ? "block"
+        : "address";
 
   return (
     <div className="custom-scroll flex max-h-64 flex-col items-center justify-start overflow-y-auto px-4">
