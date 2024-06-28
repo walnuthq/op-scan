@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { formatEther as viemFormatEther, Log, formatUnits, encodeFunctionData, keccak256 } from "viem";
+import { formatEther as viemFormatEther, Log, formatUnits, encodeFunctionData, keccak256, Hash} from "viem";
 import { BlockWithTransactions, L1L2Transaction, MessageArgs} from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { getERC20Contract } from "./contracts/erc-20/contract";
@@ -12,7 +12,7 @@ import abi from "./contracts/l2-cross-domain-messenger/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-function encodeL1Args(args: MessageArgs): `0x${string}` {
+function encodeL1Args(args: MessageArgs): Hash {
   const { target, sender, message, value, messageNonce, gasLimit } = args;
 
   const encodedMessage = encodeFunctionData({
