@@ -12,7 +12,7 @@ import abi from "./contracts/l2-cross-domain-messenger/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-interface MessageArgs {
+type MessageArgs = {
   target: `0x${string}`;
   sender: `0x${string}`;
   message: `0x${string}`;
