@@ -153,6 +153,8 @@ export const fetchL1L2LatestTransactions = async (): Promise<L1L2Transaction[]> 
       }
 
     }
+    l1l2LatestTransacions.sort((a, b) => Number(b.l1BlockNumber) - Number(a.l1BlockNumber));
+
     return l1l2LatestTransacions;
   } catch (error) {
     console.error("Error fetching or matching logs:", error);
