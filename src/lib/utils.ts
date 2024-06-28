@@ -10,10 +10,7 @@ import {
   keccak256,
   Hash,
 } from "viem";
-import {
-  L1L2Transaction,
-  MessageArgs,
-} from "@/lib/types";
+import { MessageArgs } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { getERC20Contract } from "./contracts/erc-20/contract";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
@@ -39,7 +36,7 @@ function encodeL1Args(args: MessageArgs): Hash {
   }
 }
 
-async function searchHashInLogs(hash: Hash): Promise<any> {
+export const searchHashInLogs = async(hash: Hash): Promise<any> => {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
 
@@ -52,16 +49,16 @@ async function searchHashInLogs(hash: Hash): Promise<any> {
   }
 }
 
-async function calculateHash(args: MessageArgs): Promise<Hash> {
+export const calculateHash = async(args: MessageArgs): Promise<Hash> => {
   const encodedMessage = encodeL1Args(args);
   const calculatedHash = keccak256(encodedMessage);
 
   return calculatedHash;
 }
 
-async function messageExtension1ArgsByHash(
+export const messageExtension1ArgsByHash = async(
   transactionHash: Hash,
-): Promise<any> {
+): Promise<any> => {
   try {
     const sentMessageExtension1Logs =
       await fetchL1SentMessageExtension1LatestLogs();
@@ -120,7 +117,7 @@ async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
   }
 }
 
-async function fetchL1SentMessageLatestLogs(): Promise<any[]> {
+export const fetchL1SentMessageLatestLogs = async (): Promise<any[]> => {
   try {
     const latestBlock = await l1PublicClient.getBlockNumber();
 
@@ -136,46 +133,6 @@ async function fetchL1SentMessageLatestLogs(): Promise<any[]> {
     throw error;
   }
 }
-
-export const fetchL1L2LatestTransactions = async (): Promise<
-  L1L2Transaction[]
-> => {
-  try {
-    const sentMessageLogs = await fetchL1SentMessageLatestLogs();
-    const l1l2LatestTransacions: any[] = [];
-
-    for (const log of sentMessageLogs) {
-      let messageValue = await messageExtension1ArgsByHash(log.transactionHash);
-      let args: MessageArgs = {
-        target: log.args.target,
-        sender: log.args.sender,
-        message: log.args.message,
-        messageNonce: log.args.messageNonce,
-        value: messageValue,
-        gasLimit: log.args.gasLimit,
-      };
-      let calculatedHash = await calculateHash(args);
-      let l2Message = await searchHashInLogs(calculatedHash);
-
-      if (l2Message) {
-        let transaction: L1L2Transaction = {
-          l1BlockNumber: log.blockNumber,
-          l1Hash: log.transactionHash,
-          l2Hash: l2Message.transactionHash,
-        };
-        l1l2LatestTransacions.push(transaction);
-      }
-    }
-    l1l2LatestTransacions.sort(
-      (a, b) => Number(b.l1BlockNumber) - Number(a.l1BlockNumber),
-    );
-
-    return l1l2LatestTransacions;
-  } catch (error) {
-    console.error("Error fetching or matching logs:", error);
-    throw error;
-  }
-};
 
 export const formatEther = (ether: bigint, precision = 5) =>
   new Intl.NumberFormat("en-US", {
