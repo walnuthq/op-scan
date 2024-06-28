@@ -24,7 +24,7 @@ function encodeL1Args(args: MessageArgs): Hash {
   return encodedMessage;
 }
 
-async function searchHashInLogs(hash: Hash): Promise<any | null> {
+async function searchHashInLogs(hash: Hash): Promise<any> {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
 
@@ -44,7 +44,7 @@ async function calculateHash(args: MessageArgs): Promise<Hash> {
   return calculatedHash;
 };
 
-export const searchHashMsg = async (): Promise<L1L2Transaction[]> => {
+export const fetchL1L2LatestTransactions = async (): Promise<L1L2Transaction[]> => {
   try {
     const sentMessageLogs = await fetchL1SentMessageLatestLogs();
     const l1l2LatestTransacions: any[] = [];
