@@ -2,8 +2,19 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { formatEther as viemFormatEther, Log, formatUnits, encodeFunctionData, keccak256, Hash} from "viem";
-import { BlockWithTransactions, L1L2Transaction, MessageArgs} from "@/lib/types";
+import {
+  formatEther as viemFormatEther,
+  Log,
+  formatUnits,
+  encodeFunctionData,
+  keccak256,
+  Hash,
+} from "viem";
+import {
+  BlockWithTransactions,
+  L1L2Transaction,
+  MessageArgs,
+} from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { getERC20Contract } from "./contracts/erc-20/contract";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
@@ -24,7 +35,7 @@ function encodeL1Args(args: MessageArgs): Hash {
 
     return encodedMessage;
   } catch (error) {
-  console.error("Error encoding L1 arguments", error);
+    console.error("Error encoding L1 arguments", error);
     throw error;
   }
 }
@@ -33,23 +44,25 @@ async function searchHashInLogs(hash: Hash): Promise<any> {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
 
-    const log = logs.find(log => log.args.msgHash === hash);
+    const log = logs.find((log) => log.args.msgHash === hash);
 
     return log;
   } catch (error) {
     console.error("Error searching for hash in logs:", error);
     throw error;
   }
-};
+}
 
 async function calculateHash(args: MessageArgs): Promise<Hash> {
   const encodedMessage = encodeL1Args(args);
   const calculatedHash = keccak256(encodedMessage);
 
   return calculatedHash;
-};
+}
 
-async function messageExtension1ArgsByHash(transactionHash: Hash): Promise<any> {
+async function messageExtension1ArgsByHash(
+  transactionHash: Hash,
+): Promise<any> {
   try {
     const sentMessageExtension1Logs =
       await fetchL1SentMessageExtension1LatestLogs();
@@ -68,7 +81,7 @@ async function messageExtension1ArgsByHash(transactionHash: Hash): Promise<any> 
     console.error("Error fetching or matching logs:", error);
     throw error;
   }
-};
+}
 
 async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
   try {
@@ -86,7 +99,7 @@ async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
     console.error("Error fetching logs:", error);
     throw error;
   }
-};
+}
 
 async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
   try {
@@ -106,7 +119,7 @@ async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
     console.error("Error fetching logs:", error);
     throw error;
   }
-};
+}
 
 async function fetchL1SentMessageLatestLogs(): Promise<any[]> {
   try {
@@ -123,9 +136,11 @@ async function fetchL1SentMessageLatestLogs(): Promise<any[]> {
     console.error("Error fetching logs:", error);
     throw error;
   }
-};
+}
 
-export const fetchL1L2LatestTransactions = async (): Promise<L1L2Transaction[]> => {
+export const fetchL1L2LatestTransactions = async (): Promise<
+  L1L2Transaction[]
+> => {
   try {
     const sentMessageLogs = await fetchL1SentMessageLatestLogs();
     const l1l2LatestTransacions: any[] = [];
@@ -146,14 +161,15 @@ export const fetchL1L2LatestTransactions = async (): Promise<L1L2Transaction[]> 
       if (l2Message) {
         let transaction: L1L2Transaction = {
           l1BlockNumber: log.blockNumber,
-          l1Hash: log.transactionHash, 
-          l2Hash: l2Message.transactionHash  
+          l1Hash: log.transactionHash,
+          l2Hash: l2Message.transactionHash,
         };
         l1l2LatestTransacions.push(transaction);
       }
-
     }
-    l1l2LatestTransacions.sort((a, b) => Number(b.l1BlockNumber) - Number(a.l1BlockNumber));
+    l1l2LatestTransacions.sort(
+      (a, b) => Number(b.l1BlockNumber) - Number(a.l1BlockNumber),
+    );
 
     return l1l2LatestTransacions;
   } catch (error) {
@@ -281,31 +297,33 @@ export const formatTimestamp = (timestamp: bigint, withDate = true) => {
     : timestampDistance;
 };
 
-
-const ERC20_TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const ERC20_TRANSFER_EVENT_TOPIC =
+  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
 export interface TokenTransfer {
   from: string;
   to: string;
   tokenAddress: string;
-  amount: string;  
+  amount: string;
   decimals: number;
 }
 
-export async function parseTokenTransfers(logs: Log[]): Promise<TokenTransfer[]> {
+export async function parseTokenTransfers(
+  logs: Log[],
+): Promise<TokenTransfer[]> {
   const transfers = logs
-    .filter(log => log.topics[0] === ERC20_TRANSFER_EVENT_TOPIC)
-    .map(log => {
+    .filter((log) => log.topics[0] === ERC20_TRANSFER_EVENT_TOPIC)
+    .map((log) => {
       const [, fromTopic, toTopic] = log.topics;
       const from = `0x${fromTopic?.slice(26)}`;
       const to = `0x${toTopic?.slice(26)}`;
       const amount = BigInt(log.data);
-      
+
       return {
         from,
         to,
         tokenAddress: log.address,
-        amount
+        amount,
       };
     });
 
@@ -315,21 +333,24 @@ export async function parseTokenTransfers(logs: Log[]): Promise<TokenTransfer[]>
         const contract = getERC20Contract(transfer.tokenAddress);
         const decimals = await contract.read.decimals();
         const formattedAmount = formatUnits(transfer.amount, decimals);
-        return { 
-          ...transfer, 
-          amount: formattedAmount,  
-          decimals 
+        return {
+          ...transfer,
+          amount: formattedAmount,
+          decimals,
         };
       } catch (error) {
-        console.error(`Error processing transfer for ${transfer.tokenAddress}:`, error);
+        console.error(
+          `Error processing transfer for ${transfer.tokenAddress}:`,
+          error,
+        );
         const defaultDecimals = 18;
-        return { 
-          ...transfer, 
+        return {
+          ...transfer,
           amount: formatUnits(transfer.amount, defaultDecimals),
-          decimals: defaultDecimals 
+          decimals: defaultDecimals,
         };
       }
-    })
+    }),
   );
   return transfersWithDecimals;
 }

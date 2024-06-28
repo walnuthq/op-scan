@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { l1Chain,l2Chain } from "@/lib/chains";
+import { l1Chain, l2Chain } from "@/lib/chains";
 
 const LatestL1L2Transaction = ({
   transaction,

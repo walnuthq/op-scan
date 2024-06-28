@@ -13,7 +13,7 @@ export type MessageArgs = {
   value: bigint;
   messageNonce: bigint;
   gasLimit: bigint;
-}
+};
 
 export type Transaction = {
   hash: Hash;

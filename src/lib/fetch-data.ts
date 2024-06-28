@@ -8,7 +8,7 @@ import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
 import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
 import { prisma } from "@/lib/prisma";
-import { fetchL1L2LatestTransactions } from "@/lib/utils"
+import { fetchL1L2LatestTransactions } from "@/lib/utils";
 
 const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
   const latestBlock = await l2PublicClient.getBlock({
