@@ -4,11 +4,11 @@ import { CategoryListDropdown } from "./category-list-dropdown";
 import { CategoryValuesList } from "./category-values-list";
 
 interface Props {
-  showResult          : boolean;
-  selectedCategory    : string;
-  searchResult        : SearchInputResult[];
+  showResult: boolean;
+  selectedCategory: string;
+  searchResult: SearchInputResult[];
   handleCategorySelect: (category: string) => void;
-  handleShowResult    : (value: boolean) => void
+  handleShowResult: (value: boolean) => void;
 }
 
 export function SearchResultDropDown({
@@ -20,9 +20,13 @@ export function SearchResultDropDown({
 }: Props) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { // Ensures that the menu is hidden if the user clicks on any part of the screen
+  useEffect(() => {
+    // Ensures that the menu is hidden if the user clicks on any part of the screen
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         handleShowResult(false);
       }
     };
@@ -47,15 +51,15 @@ export function SearchResultDropDown({
         >
           {searchResult.length !== 0 ? (
             <div>
-              <CategoryListDropdown 
+              <CategoryListDropdown
                 searchResult={searchResult}
                 selectedCategory={selectedCategory}
                 handleCategorySelect={handleCategorySelect}
-              /> 
-              <CategoryValuesList 
+              />
+              <CategoryValuesList
                 searchResult={searchResult}
                 selectedCategory={selectedCategory}
-              /> 
+              />
             </div>
           ) : (
             <div className="w-full items-center justify-start p-4 text-base opacity-[0.6]">

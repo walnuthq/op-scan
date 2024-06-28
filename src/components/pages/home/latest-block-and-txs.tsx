@@ -1,9 +1,14 @@
 import Link from "next/link";
 import { Server } from "lucide-react";
-import { Block } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const LatestBlockAndTxs = ({ block }: { block: Block }) => (
+const LatestBlockAndTxs = ({
+  blockNumber = BigInt(0),
+  l2BlockTime,
+}: {
+  blockNumber?: bigint;
+  l2BlockTime: bigint;
+}) => (
   <Card className="relative pl-8">
     <Server className="absolute left-4 top-6 size-6" />
     <CardHeader className="space-y-0 pb-2">
@@ -15,12 +20,14 @@ const LatestBlockAndTxs = ({ block }: { block: Block }) => (
     <CardContent className="flex flex-row items-center justify-between">
       <div className="text-sm">
         <Link
-          href={`/block/${block.number}`}
+          href={`/block/${blockNumber}`}
           className="text-primary hover:brightness-150"
         >
-          {block.number.toString()}
+          {blockNumber.toString()}
         </Link>{" "}
-        <span className="text-xs text-muted-foreground">(2.0s)</span>
+        <span className="text-xs text-muted-foreground">
+          ({l2BlockTime.toString()}.0s)
+        </span>
       </div>
       <div className="text-sm">
         <Link href="/txs" className="text-primary hover:brightness-150">
