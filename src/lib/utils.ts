@@ -8,7 +8,7 @@ import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { getERC20Contract } from "./contracts/erc-20/contract";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
 import l2CrossDomainMessenger from "./contracts/l2-cross-domain-messenger/contract";
-import abi from "./contracts/l2-cross-domain-messenger/abi";
+import l2CrossDomainMessengerAbi from "./contracts/l2-cross-domain-messenger/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -16,7 +16,7 @@ function encodeL1Args(args: MessageArgs): Hash {
   const { target, sender, message, value, messageNonce, gasLimit } = args;
 
   const encodedMessage = encodeFunctionData({
-    abi: abi,
+    abi: l2CrossDomainMessengerAbi,
     functionName: "relayMessage",
     args: [messageNonce, sender, target, value, gasLimit, message],
   });
