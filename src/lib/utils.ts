@@ -36,6 +36,45 @@ function encodeL1Args(args: MessageArgs): Hash {
   }
 }
 
+
+async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
+  try {
+    const latestBlock = await l2PublicClient.getBlockNumber();
+
+    const startBlock = latestBlock - BigInt(10000);
+
+    const logs = l2CrossDomainMessenger.getEvents.RelayedMessage(undefined, {
+      fromBlock: startBlock,
+      toBlock: latestBlock,
+    });
+
+    return logs;
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    throw error;
+  }
+}
+
+async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
+  try {
+    const latestBlock = await l1PublicClient.getBlockNumber();
+
+    const startBlock = latestBlock - BigInt(1000);
+
+    const logs = await l1CrossDomainMessenger.getEvents.SentMessageExtension1(
+      undefined,
+      {
+        fromBlock: startBlock,
+        toBlock: latestBlock,
+      },
+    );
+    return logs;
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    throw error;
+  }
+}
+
 export const searchHashInLogs = async(hash: Hash): Promise<any> => {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
@@ -75,44 +114,6 @@ export const messageExtension1ArgsByHash = async(
     return matchedLog.args.value;
   } catch (error) {
     console.error("Error fetching or matching logs:", error);
-    throw error;
-  }
-}
-
-async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
-  try {
-    const latestBlock = await l2PublicClient.getBlockNumber();
-
-    const startBlock = latestBlock - BigInt(10000);
-
-    const logs = l2CrossDomainMessenger.getEvents.RelayedMessage(undefined, {
-      fromBlock: startBlock,
-      toBlock: latestBlock,
-    });
-
-    return logs;
-  } catch (error) {
-    console.error("Error fetching logs:", error);
-    throw error;
-  }
-}
-
-async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
-  try {
-    const latestBlock = await l1PublicClient.getBlockNumber();
-
-    const startBlock = latestBlock - BigInt(1000);
-
-    const logs = await l1CrossDomainMessenger.getEvents.SentMessageExtension1(
-      undefined,
-      {
-        fromBlock: startBlock,
-        toBlock: latestBlock,
-      },
-    );
-    return logs;
-  } catch (error) {
-    console.error("Error fetching logs:", error);
     throw error;
   }
 }
