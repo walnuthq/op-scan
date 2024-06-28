@@ -24,7 +24,7 @@ function encodeL1Args(args: MessageArgs): Hash {
   return encodedMessage;
 }
 
-export const searchHashInLogs = async (hash: string): Promise<any | null> => {
+async function searchHashInLogs(hash: Hash): Promise<any | null> {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
 
@@ -37,7 +37,7 @@ export const searchHashInLogs = async (hash: string): Promise<any | null> => {
   }
 };
 
-export const calculateHash = async (args: MessageArgs): Promise<string> => {
+async function calculateHash(args: MessageArgs): Promise<Hash> {
   const encodedMessage = encodeL1Args(args);
   const calculatedHash = keccak256(encodedMessage);
 
@@ -79,9 +79,7 @@ export const searchHashMsg = async (): Promise<L1L2Transaction[]> => {
   }
 };
 
-export const messageExtension1ArgsByHash = async (
-  transactionHash: string,
-): Promise<any> => {
+async function messageExtension1ArgsByHash(transactionHash: Hash): Promise<any> {
   try {
     const sentMessageExtension1Logs =
       await fetchL1SentMessageExtension1LatestLogs();
@@ -102,7 +100,7 @@ export const messageExtension1ArgsByHash = async (
   }
 };
 
-export const fetchL2RelayedMessageLatestLogs = async (): Promise<any[]> => {
+async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
   try {
     const latestBlock = await l2PublicClient.getBlockNumber();
 
@@ -120,9 +118,7 @@ export const fetchL2RelayedMessageLatestLogs = async (): Promise<any[]> => {
   }
 };
 
-export const fetchL1SentMessageExtension1LatestLogs = async (): Promise<
-  any[]
-> => {
+async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
   try {
     const latestBlock = await l1PublicClient.getBlockNumber();
 
@@ -142,7 +138,7 @@ export const fetchL1SentMessageExtension1LatestLogs = async (): Promise<
   }
 };
 
-export const fetchL1SentMessageLatestLogs = async (): Promise<any[]> => {
+async function fetchL1SentMessageLatestLogs(): Promise<any[]> {
   try {
     const latestBlock = await l1PublicClient.getBlockNumber();
 
