@@ -253,15 +253,6 @@ export const fetchTokensPrices = async () => {
   };
 };
 
-export const fetchLatestL1L2Transactions = async (): Promise<
-  L1L2Transaction[]
-> =>
-  Array.from({ length: 6 }, (_, i) => i).map((i) => ({
-    l1BlockNumber: BigInt(20105119 - i),
-    l1Hash: "0xte",
-    l2Hash: "0xteteo",
-  }));
-
 export const formatEther = (ether: bigint, precision = 5) =>
   new Intl.NumberFormat("en-US", {
     style: "decimal",
