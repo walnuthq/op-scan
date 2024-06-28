@@ -13,15 +13,20 @@ import l2CrossDomainMessengerAbi from "./contracts/l2-cross-domain-messenger/abi
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 function encodeL1Args(args: MessageArgs): Hash {
-  const { target, sender, message, value, messageNonce, gasLimit } = args;
+  try {
+    const { target, sender, message, value, messageNonce, gasLimit } = args;
 
-  const encodedMessage = encodeFunctionData({
-    abi: l2CrossDomainMessengerAbi,
-    functionName: "relayMessage",
-    args: [messageNonce, sender, target, value, gasLimit, message],
-  });
+    const encodedMessage = encodeFunctionData({
+      abi: l2CrossDomainMessengerAbi,
+      functionName: "relayMessage",
+      args: [messageNonce, sender, target, value, gasLimit, message],
+    });
 
-  return encodedMessage;
+    return encodedMessage;
+  } catch (error) {
+  console.error("Error encoding L1 arguments", error);
+    throw error;
+  }
 }
 
 async function searchHashInLogs(hash: Hash): Promise<any> {
