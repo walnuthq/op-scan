@@ -128,7 +128,7 @@ const fetchTokensPrices = async () => {
 const fetchLatestL1L2Transactions = async (): Promise<L1L2Transaction[]> => {
   try {
     const transactions = await fetchL1L2LatestTransactions();
-    return transactions.slice(-10);
+    return transactions.slice(0, 10);
   } catch (error) {
     console.error("Error fetching latest L1L2 transactions:", error);
     throw error;
