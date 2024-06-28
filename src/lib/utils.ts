@@ -11,7 +11,6 @@ import {
   Hash,
 } from "viem";
 import {
-  BlockWithTransactions,
   L1L2Transaction,
   MessageArgs,
 } from "@/lib/types";
@@ -176,81 +175,6 @@ export const fetchL1L2LatestTransactions = async (): Promise<
     console.error("Error fetching or matching logs:", error);
     throw error;
   }
-};
-
-export const fetchL2LatestBlocks = async (): Promise<
-  BlockWithTransactions[]
-> => {
-  const latestBlock = await l2PublicClient.getBlock({
-    includeTransactions: true,
-  });
-  const latestBlocks = await Promise.all(
-    [1, 2, 3, 4, 5].map((index) =>
-      l2PublicClient.getBlock({
-        blockNumber: latestBlock.number - BigInt(index),
-        includeTransactions: true,
-      }),
-    ),
-  );
-  const blocks = [latestBlock, ...latestBlocks];
-  return blocks.map(({ number, hash, timestamp, transactions }) => ({
-    number,
-    hash,
-    timestamp,
-    transactions: transactions.map(
-      ({ hash, blockNumber, from, to, value }) => ({
-        hash,
-        blockNumber,
-        from,
-        to,
-        value,
-        timestamp,
-      }),
-    ),
-  }));
-};
-
-export const fetchTokensPrices = async () => {
-  const date = formatISO(subDays(new Date(), 1), {
-    representation: "date",
-  });
-  const [
-    ethResponseToday,
-    ethResponseYesterday,
-    opResponseToday,
-    opResponseYesterday,
-  ] = await Promise.all([
-    fetch("https://api.coinbase.com/v2/prices/ETH-USD/spot"),
-    fetch(`https://api.coinbase.com/v2/prices/ETH-USD/spot?date=${date}`),
-    fetch("https://api.coinbase.com/v2/prices/OP-USD/spot"),
-    fetch(`https://api.coinbase.com/v2/prices/OP-USD/spot?date=${date}`),
-  ]);
-  const [ethJsonToday, ethJsonYesterday, opJsonToday, opJsonYesterday] =
-    await Promise.all([
-      ethResponseToday.json(),
-      ethResponseYesterday.json(),
-      opResponseToday.json(),
-      opResponseYesterday.json(),
-    ]);
-  type GetSpotPriceResponse = {
-    data: { amount: string; base: string; currency: string };
-  };
-  const {
-    data: { amount: ethPriceToday },
-  } = ethJsonToday as GetSpotPriceResponse;
-  const {
-    data: { amount: ethPriceYesterday },
-  } = ethJsonYesterday as GetSpotPriceResponse;
-  const {
-    data: { amount: opPriceToday },
-  } = opJsonToday as GetSpotPriceResponse;
-  const {
-    data: { amount: opPriceYesterday },
-  } = opJsonYesterday as GetSpotPriceResponse;
-  return {
-    eth: { today: Number(ethPriceToday), yesterday: Number(ethPriceYesterday) },
-    op: { today: Number(opPriceToday), yesterday: Number(opPriceYesterday) },
-  };
 };
 
 export const formatEther = (ether: bigint, precision = 5) =>
