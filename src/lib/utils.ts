@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { formatEther as viemFormatEther, Log, formatUnits, encodeFunctionData, keccak256 } from "viem";
-import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
+import { BlockWithTransactions, L1L2Transaction, MessageArgs} from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { getERC20Contract } from "./contracts/erc-20/contract";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
@@ -11,15 +11,6 @@ import l2CrossDomainMessenger from "./contracts/l2-cross-domain-messenger/contra
 import abi from "./contracts/l2-cross-domain-messenger/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
-
-type MessageArgs = {
-  target: `0x${string}`;
-  sender: `0x${string}`;
-  message: `0x${string}`;
-  value: bigint;
-  messageNonce: bigint;
-  gasLimit: bigint;
-}
 
 function encodeL1Args(args: MessageArgs): `0x${string}` {
   const { target, sender, message, value, messageNonce, gasLimit } = args;
