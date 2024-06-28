@@ -74,7 +74,7 @@ async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
   try {
     const latestBlock = await l2PublicClient.getBlockNumber();
 
-    const startBlock = latestBlock - BigInt(1000);
+    const startBlock = latestBlock - BigInt(10000);
 
     const logs = l2CrossDomainMessenger.getEvents.RelayedMessage(undefined, {
       fromBlock: startBlock,
