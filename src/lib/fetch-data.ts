@@ -2,12 +2,55 @@ import {
   Transaction,
   fromPrismaBlockWithTransactions,
   fromPrismaTransaction,
+  MessageArgs
 } from "@/lib/types";
 import { subDays, formatISO } from "date-fns";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
 import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
 import { prisma } from "@/lib/prisma";
+import { fetchL1SentMessageLatestLogs, messageExtension1ArgsByHash, calculateHash, searchHashInLogs } from "@/lib/utils";
+
+
+export const fetchL1L2LatestTransactions = async (): Promise<
+  L1L2Transaction[]
+> => {
+  try {
+    const sentMessageLogs = await fetchL1SentMessageLatestLogs();
+    const l1l2LatestTransacions: any[] = [];
+
+    for (const log of sentMessageLogs) {
+      let messageValue = await messageExtension1ArgsByHash(log.transactionHash);
+      let args: MessageArgs = {
+        target: log.args.target,
+        sender: log.args.sender,
+        message: log.args.message,
+        messageNonce: log.args.messageNonce,
+        value: messageValue,
+        gasLimit: log.args.gasLimit,
+      };
+      let calculatedHash = await calculateHash(args);
+      let l2Message = await searchHashInLogs(calculatedHash);
+
+      if (l2Message) {
+        let transaction: L1L2Transaction = {
+          l1BlockNumber: log.blockNumber,
+          l1Hash: log.transactionHash,
+          l2Hash: l2Message.transactionHash,
+        };
+        l1l2LatestTransacions.push(transaction);
+      }
+    }
+    l1l2LatestTransacions.sort(
+      (a, b) => Number(b.l1BlockNumber) - Number(a.l1BlockNumber),
+    );
+
+    return l1l2LatestTransacions;
+  } catch (error) {
+    console.error("Error fetching or matching logs:", error);
+    throw error;
+  }
+};
 
 const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
   const latestBlock = await l2PublicClient.getBlock({
@@ -82,14 +125,15 @@ const fetchTokensPrices = async () => {
   };
 };
 
-const fetchLatestL1L2Transactions = async (): Promise<L1L2Transaction[]> =>
-  Array.from({ length: 10 }, (_, i) => i).map((i) => ({
-    l1BlockNumber: BigInt(20105119 - i),
-    l1Hash:
-      "0xc9f6566bfc6ff30a4d97dde51d011c47259268c8b7051f5ef0d23f407aece9a4",
-    l2Hash:
-      "0x8d721b30143b799d4b207bbea88cbf187862654357e7ddc318d6616f409045ae",
-  }));
+const fetchLatestL1L2Transactions = async (): Promise<L1L2Transaction[]> => {
+  try {
+    const transactions = await fetchL1L2LatestTransactions();
+    return transactions.slice(0, 10);
+  } catch (error) {
+    console.error("Error fetching latest L1L2 transactions:", error);
+    throw error;
+  }
+};
 
 export const fetchHomePageData = async () => {
   const [
