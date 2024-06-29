@@ -1,15 +1,21 @@
 {
-  "name": "op-explorer",
+  "name": "op-scan",
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:db:push": "source .env.local && export DATABASE_URL && prisma db push",
+    "prisma:studio": "source .env.local && export DATABASE_URL && prisma studio",
+    "op-indexer": "source .env.local && export DATABASE_URL && export NEXT_PUBLIC_L1_RPC_URL && export NEXT_PUBLIC_L2_RPC_URL && export L1_RPC_WSS && export L2_RPC_WSS && bun op-indexer/index.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.15.1",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.0",
     "@radix-ui/react-dropdown-menu": "^2.1.0",
@@ -27,10 +33,10 @@
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.15.1"
+    "viem": "^2.16.0"
   },
   "devDependencies": {
-    "@types/node": "^20.14.6",
+    "@types/node": "^20.14.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "eslint": "^8.57.0",
@@ -39,7 +45,8 @@
     "postcss": "^8.4.38",
     "prettier": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.5",
+    "prisma": "^5.15.1",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   }
 }

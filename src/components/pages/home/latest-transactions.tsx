@@ -1,7 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { formatEther } from "@/lib/utils";
 import { Transaction } from "@/lib/types";
-import { ReceiptText } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,6 +9,9 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import AddressLink from "@/components/pages/home/AddressLink";
+import { formatEther } from "@/lib/utils";
+import { ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatTimestamp } from "@/lib/utils";
 
@@ -30,21 +33,23 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
       <div className="flex items-center gap-1 text-sm">
         <div className="flex items-center gap-1">
           From{" "}
-          <Link
-            className="max-w-36 truncate text-primary hover:brightness-150 md:max-w-48 xl:max-w-36"
+          <AddressLink
+            addressClassName={"truncate max-w-36 md:max-w-48 xl:max-w-36"}
+            address={transaction.from}
             href={`/address/${transaction.from}`}
           >
             {transaction.from}
-          </Link>
+          </AddressLink>
         </div>
         <div className="flex items-center gap-1">
           To{" "}
-          <Link
-            className="max-w-36 truncate text-primary hover:brightness-150 md:max-w-48 xl:max-w-36"
+          <AddressLink
+            addressClassName={"truncate max-w-36 md:max-w-48 xl:max-w-36"}
+            address={transaction.to}
             href={`/address/${transaction.to}`}
           >
             {transaction.to}
-          </Link>
+          </AddressLink>
         </div>
       </div>
       <div className="flex items-center gap-1 text-sm">
@@ -66,7 +71,7 @@ const LatestTransactions = ({
     <CardHeader className="border-b">
       <CardTitle>Latest Transactions</CardTitle>
     </CardHeader>
-    <CardContent className="grid max-h-[557px] gap-6 divide-y overflow-y-scroll">
+    <CardContent className="grid max-h-[557px] gap-6 divide-y overflow-x-hidden overflow-y-scroll">
       {transactions.map((transaction) => (
         <LatestTransaction key={transaction.hash} transaction={transaction} />
       ))}
