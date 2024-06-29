@@ -174,8 +174,11 @@ export const formatTimestamp = (timestamp: bigint, withDate = true) => {
     : timestampDistance;
 };
 
-const ERC20_TRANSFER_EVENT_TOPIC =
-  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+export function formatAddress(address: string) {
+  return `${address.slice(0, 10)}...${address.slice(-8)}`;
+}
+
+const ERC20_TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 export interface TokenTransfer {
   from: string;
