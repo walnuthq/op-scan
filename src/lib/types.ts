@@ -6,6 +6,15 @@ import {
 
 export type Block = { number: bigint; hash: Hash; timestamp: bigint };
 
+export type MessageArgs = {
+  target: Hash;
+  sender: Hash;
+  message: Hash;
+  value: bigint;
+  messageNonce: bigint;
+  gasLimit: bigint;
+};
+
 export type Transaction = {
   hash: Hash;
   blockNumber: bigint;
