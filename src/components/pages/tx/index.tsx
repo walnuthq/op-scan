@@ -4,7 +4,10 @@ import TransactionDetails from "@/components/pages/tx/transaction-details";
 import { parseTokenTransfers } from "@/lib/utils";
 
 const Tx = async ({ hash }: { hash: Hash }) => {
-  const [transaction, receipt] = await Promise.all([ l2PublicClient.getTransaction({ hash }), l2PublicClient.getTransactionReceipt({ hash })]);
+  const [transaction, receipt] = await Promise.all([
+    l2PublicClient.getTransaction({ hash }),
+    l2PublicClient.getTransactionReceipt({ hash }),
+  ]);
   const tokenTransfers = await parseTokenTransfers(receipt.logs);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
@@ -21,7 +24,7 @@ const Tx = async ({ hash }: { hash: Hash }) => {
           gasPrice: transaction.gasPrice,
           timestamp: BigInt(0),
         }}
-        tokenTransfers = {tokenTransfers}
+        tokenTransfers={tokenTransfers}
       />
     </main>
   );
