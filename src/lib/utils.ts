@@ -4,12 +4,12 @@ import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import {
   formatEther as viemFormatEther,
+  formatGwei as viemFormatGwei,
   Log,
   formatUnits,
   encodeFunctionData,
   keccak256,
   Hash,
-  getBlock
 } from "viem";
 import { L1L2Transaction, MessageArgs } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
@@ -36,25 +36,9 @@ function encodeL1Args(args: MessageArgs): Hash {
   }
 }
 
-export const fetchLatestL1L2Transactions = async (): Promise<
-  L1L2Transaction[]
-> =>
-  Array.from({ length: 50 }, (_, i) => i).map((i) => ({
-    l1BlockNumber: BigInt(20105119 - i),
-    l1Hash:
-      "0xc9f6566bfc6ff30a4d97dde51d011c47259268c8b7051f5ef0d23f407aece9a4",
-    l2Hash:
-      "0x8d721b30143b799d4b207bbea88cbf187862654357e7ddc318d6616f409045ae",
-    timestamp: BigInt(Date.now()), // Timestamp example
-    l1TxHash: "0xc9f6566bfc6ff30a4d97dde51d011c47259268c8b7051f5ef0d23f407aece9a4",
-    l1TxOrigin: "0x8d721b30143b799d4b207bbea88cbf187862654357e7ddc318d6616f409045ae",
-    gasLimit: 200000,
-  }));
-
 async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
   try {
-    const latestBlock = await l2PublicClient.getBlock({ blockTag: 'latest' });
-    console.log(latestBlock.number);
+    const latestBlock = await l2PublicClient.getBlock({ blockTag: "latest" });
     const startBlock = latestBlock.number - BigInt(10000);
 
     const logs = l2CrossDomainMessenger.getEvents.RelayedMessage(undefined, {
@@ -71,7 +55,7 @@ async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
 
 async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
   try {
-    const latestBlock = await l1PublicClient.getBlock({ blockTag: 'latest' });
+    const latestBlock = await l1PublicClient.getBlock({ blockTag: "latest" });
 
     const startBlock = latestBlock.number - BigInt(1000);
 
@@ -89,7 +73,7 @@ async function fetchL1SentMessageExtension1LatestLogs(): Promise<any[]> {
   }
 }
 
-export const searchHashInLogs = async(hash: Hash): Promise<any> => {
+export const searchHashInLogs = async (hash: Hash): Promise<any> => {
   try {
     const logs = await fetchL2RelayedMessageLatestLogs();
 
@@ -100,16 +84,16 @@ export const searchHashInLogs = async(hash: Hash): Promise<any> => {
     console.error("Error searching for hash in logs:", error);
     throw error;
   }
-}
+};
 
-export const calculateHash = async(args: MessageArgs): Promise<Hash> => {
+export const calculateHash = async (args: MessageArgs): Promise<Hash> => {
   const encodedMessage = encodeL1Args(args);
   const calculatedHash = keccak256(encodedMessage);
 
   return calculatedHash;
-}
+};
 
-export const messageExtension1ArgsByHash = async(
+export const messageExtension1ArgsByHash = async (
   transactionHash: Hash,
 ): Promise<any> => {
   try {
@@ -130,34 +114,38 @@ export const messageExtension1ArgsByHash = async(
     console.error("Error fetching or matching logs:", error);
     throw error;
   }
-}
+};
 
 export const fetchL1SentMessageLatestLogs = async (): Promise<any[]> => {
   try {
-    const latestBlock = await l1PublicClient.getBlock({ blockTag: 'latest' });
+    const latestBlock = await l1PublicClient.getBlock({ blockTag: "latest" });
 
     const startBlock = latestBlock.number - BigInt(1000);
 
-    const logs = await l1CrossDomainMessenger.getEvents.SentMessage(
-      undefined,
-      {
-        fromBlock: startBlock,
-        toBlock: latestBlock.number,
-      },
-    );
+    const logs = await l1CrossDomainMessenger.getEvents.SentMessage(undefined, {
+      fromBlock: startBlock,
+      toBlock: latestBlock.number,
+    });
     return logs;
   } catch (error) {
     console.error("Error fetching logs:", error);
     throw error;
   }
-}
+};
 
-export const formatEther = (ether: bigint, precision = 5) =>
+export const formatEther = (wei: bigint, precision = 5) =>
   new Intl.NumberFormat("en-US", {
     style: "decimal",
     minimumFractionDigits: 0,
     maximumFractionDigits: precision,
-  }).format(Number(viemFormatEther(ether)));
+  }).format(Number(viemFormatEther(wei)));
+
+export const formatGwei = (wei: bigint, precision = 8) =>
+  new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: precision,
+  }).format(Number(viemFormatGwei(wei)));
 
 export const formatPrice = (price: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
@@ -171,7 +159,7 @@ export const formatPercent = (percent: number) =>
     signDisplay: "always",
   }).format(percent);
 
-export const formatTimestamp = (timestamp: bigint, withDate = true) => {
+export const formatTimestamp = (timestamp: bigint) => {
   const timestampDate = fromUnixTime(Number(timestamp));
   const timestampDistance = formatDistance(timestampDate, new Date(), {
     includeSeconds: true,
@@ -182,16 +170,21 @@ export const formatTimestamp = (timestamp: bigint, withDate = true) => {
     "UTC",
     "MMM-dd-yyyy hh:mm:ss aa +z",
   );
-  return withDate
+  /*return withDate
     ? `${timestampDistance} (${timestampDateFormatted})`
-    : timestampDistance;
+    : timestampDistance;*/
+  return {
+    distance: timestampDistance,
+    utc: formatInTimeZone(timestampDate, "UTC", "yyyy-dd-MM hh:mm:ss"),
+  };
 };
 
 export function formatAddress(address: string) {
   return `${address.slice(0, 10)}...${address.slice(-8)}`;
 }
 
-const ERC20_TRANSFER_EVENT_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const ERC20_TRANSFER_EVENT_TOPIC =
+  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
 export interface TokenTransfer {
   from: string;

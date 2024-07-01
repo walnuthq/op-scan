@@ -1,4 +1,4 @@
-import { Hash, Address } from "viem";
+import { Hash, Address, Hex } from "viem";
 import {
   Block as PrismaBlock,
   Transaction as PrismaTransaction,
@@ -22,6 +22,9 @@ export type Transaction = {
   to: Address | null;
   value: bigint;
   gasPrice?: bigint;
+  transactionIndex: number;
+  input: Hex;
+  signature: string;
   timestamp: bigint;
 };
 
@@ -30,6 +33,7 @@ export type TransactionReceipt = {
   from: Address;
   to: Address | null;
   effectiveGasPrice: bigint;
+  gasUsed: bigint;
 };
 
 export type TransactionWithReceipt = Transaction & {

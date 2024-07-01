@@ -32,7 +32,7 @@ const TransactionDetails = ({
           </DescriptionListItem>
           <DescriptionListItem title="Timestamp">
             <Clock className="mr-1 size-4" />
-            {formatTimestamp(transaction.timestamp)}
+            {formatTimestamp(transaction.timestamp).distance}
           </DescriptionListItem>
           <DescriptionListItem border title="Value">
             <EthereumIcon className="mr-1 size-4" />

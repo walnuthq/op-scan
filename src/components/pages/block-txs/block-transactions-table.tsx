@@ -1,48 +1,66 @@
-import { Card, CardContent } from "@/components/ui/card";
+"use client";
 import { TransactionWithReceipt } from "@/lib/types";
 import {
   Table,
-  TableCaption,
   TableHeader,
   TableRow,
   TableHead,
   TableBody,
 } from "@/components/ui/table";
 import BlockTransactionsTableRow from "@/components/pages/block-txs/block-transactions-table-row";
+import useGlobalContext from "@/components/lib/context/hook";
 
 const BlockTransactionsTable = ({
   transactions,
 }: {
   transactions: TransactionWithReceipt[];
-}) => (
-  <Card>
-    <CardContent className="p-4">
-      <dl>
-        <Table className="w-full table-auto">
-          <TableCaption>TABLE CAPTION</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="max-w-[10rem]">Transaction Hash</TableHead>
-              <TableHead className="max-w-[8rem]">Method</TableHead>
-              <TableHead className="max-w-[10rem]">Timestamp</TableHead>
-              <TableHead className="max-w-[12rem]">From</TableHead>
-              <TableHead className="max-w-[12rem]">To</TableHead>
-              <TableHead className="max-w-[8rem]">Value</TableHead>
-              <TableHead className="max-w-[8rem]">Fee</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((transaction) => (
-              <BlockTransactionsTableRow
-                key={transaction.hash}
-                transaction={transaction}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </dl>
-    </CardContent>
-  </Card>
-);
+}) => {
+  const {
+    state: { timestampFormattedAsDate, txGasPriceShown },
+    toggleTimestampFormattedAsDate,
+    toggleTxGasPriceShown,
+  } = useGlobalContext();
+  return (
+    <Table className="table-auto">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Transaction Hash</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead>
+            <a
+              className="cursor-pointer text-primary hover:brightness-150"
+              role="button"
+              onClick={toggleTimestampFormattedAsDate}
+            >
+              {timestampFormattedAsDate ? "Date Time (UTC)" : "Age"}
+            </a>
+          </TableHead>
+          <TableHead>From</TableHead>
+          <TableHead>To</TableHead>
+          <TableHead>Value</TableHead>
+          <TableHead>
+            <a
+              className="cursor-pointer text-primary hover:brightness-150"
+              role="button"
+              onClick={toggleTxGasPriceShown}
+            >
+              {txGasPriceShown ? "Gas Price" : "Txn Fee"}
+            </a>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {transactions.map((transaction) => (
+          <BlockTransactionsTableRow
+            key={transaction.hash}
+            transaction={transaction}
+            timestampFormattedAsDate={timestampFormattedAsDate}
+            txGasPriceShown={txGasPriceShown}
+          />
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
 
 export default BlockTransactionsTable;
