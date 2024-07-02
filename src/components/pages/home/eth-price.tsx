@@ -10,7 +10,7 @@ const EthPrice = ({ eth }: { eth: { today: number; yesterday: number } }) => (
       alt="ETH logo"
       className="absolute left-4 top-6 size-6"
     />
-    <CardHeader className="space-y-0 pb-2">
+    <CardHeader className="pb-2">
       <CardTitle className="text-sm font-medium">ETH Price</CardTitle>
     </CardHeader>
     <CardContent>

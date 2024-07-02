@@ -14,14 +14,12 @@ const Block = async ({ number }: { number: bigint }) => {
   }
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
-      <div className="space-y-0.5">
-        <h2 className="flex items-center text-2xl font-bold tracking-tight">
-          Block
-          <span className="ml-2 text-base text-muted-foreground">
-            #{number.toString()}
-          </span>
-        </h2>
-      </div>
+      <h2 className="flex items-center text-2xl font-bold tracking-tight">
+        Block
+        <span className="ml-2 text-base font-normal text-muted-foreground">
+          #{number.toString()}
+        </span>
+      </h2>
       <Separator />
       <Card>
         <CardContent className="p-4">

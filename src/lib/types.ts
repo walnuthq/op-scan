@@ -48,11 +48,6 @@ export type TransactionWithReceipt = Transaction & {
   transactionReceipt: TransactionReceipt;
 };
 
-export type AddressDetails = {
-  addressType: "Contract" | "Address";
-  balance: bigint;
-};
-
 export type BlockWithTransactions = Block & {
   transactions: Transaction[];
 };

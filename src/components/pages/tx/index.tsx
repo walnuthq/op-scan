@@ -24,11 +24,7 @@ const Tx = async ({ hash }: { hash: Hash }) => {
   ]);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
-      <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold tracking-tight">
-          Transaction Details
-        </h2>
-      </div>
+      <h2 className="text-2xl font-bold tracking-tight">Transaction Details</h2>
       <Separator />
       <Card>
         <CardContent className="p-4">
