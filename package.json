@@ -10,9 +10,9 @@
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
-    "prisma:db:push": "source .env.local && export DATABASE_URL && prisma db push",
-    "prisma:studio": "source .env.local && export DATABASE_URL && prisma studio",
-    "op-indexer": "source .env.local && export DATABASE_URL && export NEXT_PUBLIC_L1_RPC_URL && export NEXT_PUBLIC_L2_RPC_URL && export L1_RPC_WSS && export L2_RPC_WSS && bun op-indexer/index.ts"
+    "prisma:db:push": ". .env.local && export DATABASE_URL && prisma db push",
+    "prisma:studio": ". .env.local && export DATABASE_URL && prisma studio",
+    "op-indexer": ". .env.local && export DATABASE_URL && export NEXT_PUBLIC_L1_RPC_URL && export NEXT_PUBLIC_L2_RPC_URL && export L1_RPC_WSS && export L2_RPC_WSS && bun op-indexer/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",

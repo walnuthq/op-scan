@@ -4,7 +4,16 @@ import {
   Transaction as PrismaTransaction,
 } from "@/prisma/generated/client";
 
-export type Block = { number: bigint; hash: Hash; timestamp: bigint };
+export type Block = {
+  number: bigint;
+  hash: Hash;
+  timestamp: bigint;
+  gasUsed: bigint;
+  gasLimit: bigint;
+  extraData: Hex;
+  parentHash: Hash;
+  transactions: string[];
+};
 
 export type MessageArgs = {
   target: Hash;
@@ -54,16 +63,17 @@ export type AddressDetails = {
   balance: bigint;
 };
 
-export type BlockWithTransactions = Block & { transactions: Transaction[] };
+export type BlockWithTransactions = Omit<Block, "transactions"> & {
+  transactions: Transaction[];
+};
 
 export type L1L2Transaction = {
   l1BlockNumber: bigint;
-  l1Hash: Hash;
-  l2Hash: Hash;
+  l1TxHash: Hash;
+  l2TxHash: Hash;
   timestamp: bigint;
-  l1TxHash: string;
-  l1TxOrigin: string;
-  gasLimit: number;
+  l1TxOrigin: Address;
+  gasLimit: bigint;
 };
 
 export const fromPrismaBlock = (block: PrismaBlock) => ({

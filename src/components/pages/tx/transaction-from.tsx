@@ -1,18 +1,14 @@
 import Link from "next/link";
-import { TransactionWithReceipt } from "@/lib/types";
+import { Address } from "viem";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
-const TransactionFrom = ({
-  transaction,
-}: {
-  transaction: TransactionWithReceipt;
-}) => (
+const TransactionFrom = ({ from }: { from: Address }) => (
   <DescriptionListItem title="From">
     <Link
       className="text-primary hover:brightness-150"
-      href={`/address/${transaction.from}`}
+      href={`/address/${from}`}
     >
-      {transaction.from}
+      {from}
     </Link>
   </DescriptionListItem>
 );

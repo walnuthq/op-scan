@@ -39,8 +39,11 @@ export const fetchL1L2LatestTransactions = async (): Promise<
       if (l2Message) {
         let transaction: L1L2Transaction = {
           l1BlockNumber: log.blockNumber,
-          l1Hash: log.transactionHash,
-          l2Hash: l2Message.transactionHash,
+          l1TxHash: log.transactionHash,
+          l2TxHash: l2Message.transactionHash,
+          timestamp: BigInt(0),
+          l1TxOrigin: "0x",
+          gasLimit: BigInt(0),
         };
         l1l2LatestTransacions.push(transaction);
       }
@@ -69,11 +72,15 @@ const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
     ),
   );
   const blocks = [latestBlock, ...latestBlocks];
-  return blocks.map(({ number, hash, timestamp, transactions }) => ({
-    number,
-    hash,
-    timestamp,
-    transactions: transactions.map((transaction) => ({
+  return blocks.map((block) => ({
+    number: block.number,
+    hash: block.hash,
+    timestamp: block.timestamp,
+    gasUsed: block.gasUsed,
+    gasLimit: block.gasLimit,
+    extraData: block.extraData,
+    parentHash: block.parentHash,
+    transactions: block.transactions.map((transaction) => ({
       blockNumber: transaction.blockNumber,
       hash: transaction.hash,
       from: transaction.from,
@@ -87,7 +94,7 @@ const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
       nonce: transaction.nonce,
       input: transaction.input,
       signature: "",
-      timestamp,
+      timestamp: block.timestamp,
     })),
   }));
 };
