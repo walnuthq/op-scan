@@ -22,7 +22,7 @@ const BlockTxs = async ({ number }: { number: bigint }) => {
     ),
     Promise.all(
       block.transactions.map(({ input }) =>
-        input === "0x" ? "" : getSignatureBySelector(input.slice(0, 10)),
+        getSignatureBySelector(input.slice(0, 10)),
       ),
     ),
   ]);
@@ -49,37 +49,34 @@ const BlockTxs = async ({ number }: { number: bigint }) => {
         <CardContent className="px-0">
           <BlockTransactionsTable
             transactions={block.transactions
-              .map(
-                (
-                  {
-                    hash,
-                    blockNumber,
-                    from,
-                    to,
-                    value,
-                    transactionIndex,
-                    input,
-                  },
-                  i,
-                ) => ({
-                  hash,
-                  blockNumber,
-                  from,
-                  to,
-                  value,
-                  transactionIndex,
-                  input,
-                  signature: signatures[i],
-                  timestamp: block.timestamp,
-                  transactionReceipt: {
-                    transactionHash: transactionReceipts[i].transactionHash,
-                    from: transactionReceipts[i].from,
-                    to: transactionReceipts[i].to,
-                    effectiveGasPrice: transactionReceipts[i].effectiveGasPrice,
-                    gasUsed: transactionReceipts[i].gasUsed,
-                  },
-                }),
-              )
+              .map((transaction, i) => ({
+                blockNumber: transaction.blockNumber,
+                hash: transaction.hash,
+                from: transaction.from,
+                to: transaction.to,
+                value: transaction.value,
+                gas: transaction.gas,
+                gasPrice: transaction.gasPrice ?? null,
+                maxFeePerGas: transaction.maxFeePerGas ?? null,
+                maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
+                transactionIndex: transaction.transactionIndex,
+                nonce: transaction.nonce,
+                input: transaction.input,
+                signature: signatures[i],
+                timestamp: block.timestamp,
+                transactionReceipt: {
+                  transactionHash: transactionReceipts[i].transactionHash,
+                  status: transactionReceipts[i].status,
+                  from: transactionReceipts[i].from,
+                  to: transactionReceipts[i].to,
+                  effectiveGasPrice: transactionReceipts[i].effectiveGasPrice,
+                  gasUsed: transactionReceipts[i].gasUsed,
+                  l1Fee: transactionReceipts[i].l1Fee,
+                  l1GasPrice: transactionReceipts[i].l1GasPrice,
+                  l1GasUsed: transactionReceipts[i].l1GasUsed,
+                  l1FeeScalar: transactionReceipts[i].l1FeeScalar,
+                },
+              }))
               .sort((a, b) => b.transactionIndex - a.transactionIndex)}
           />
         </CardContent>

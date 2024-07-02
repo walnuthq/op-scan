@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import useGlobalContext from "@/components/lib/context/hook";
 
-const MethodBadge = ({
+const TxMethodBadge = ({
   selector,
   signature,
 }: {
@@ -58,4 +58,4 @@ const MethodBadge = ({
   );
 };
 
-export default MethodBadge;
+export default TxMethodBadge;

@@ -2,15 +2,19 @@ import {
   Transaction,
   fromPrismaBlockWithTransactions,
   fromPrismaTransaction,
-  MessageArgs
+  MessageArgs,
 } from "@/lib/types";
 import { subDays, formatISO } from "date-fns";
 import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
 import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
 import { prisma } from "@/lib/prisma";
-import { fetchL1SentMessageLatestLogs, messageExtension1ArgsByHash, calculateHash, searchHashInLogs } from "@/lib/utils";
-
+import {
+  fetchL1SentMessageLatestLogs,
+  messageExtension1ArgsByHash,
+  calculateHash,
+  searchHashInLogs,
+} from "@/lib/utils";
 
 export const fetchL1L2LatestTransactions = async (): Promise<
   L1L2Transaction[]
@@ -69,20 +73,26 @@ const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
     number,
     hash,
     timestamp,
-    transactions: transactions.map(
-      ({ hash, blockNumber, from, to, value }) => ({
-        hash,
-        blockNumber,
-        from,
-        to,
-        value,
-        timestamp,
-      }),
-    ),
+    transactions: transactions.map((transaction) => ({
+      blockNumber: transaction.blockNumber,
+      hash: transaction.hash,
+      from: transaction.from,
+      to: transaction.to,
+      value: transaction.value,
+      gas: transaction.gas,
+      gasPrice: transaction.gasPrice ?? null,
+      maxFeePerGas: transaction.maxFeePerGas ?? null,
+      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
+      transactionIndex: transaction.transactionIndex,
+      nonce: transaction.nonce,
+      input: transaction.input,
+      signature: "",
+      timestamp,
+    })),
   }));
 };
 
-const fetchTokensPrices = async () => {
+export const fetchTokensPrices = async () => {
   const date = formatISO(subDays(new Date(), 1), {
     representation: "date",
   });

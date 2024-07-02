@@ -2,7 +2,7 @@ import Link from "next/link";
 import { TransactionWithReceipt } from "@/lib/types";
 import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
-import MethodBadge from "@/components/lib/method-badge";
+import TxMethodBadge from "@/components/lib/tx-method-badge";
 
 const BlockTransactionsTableRow = ({
   transaction,
@@ -25,7 +25,7 @@ const BlockTransactionsTableRow = ({
         </Link>
       </TableCell>
       <TableCell>
-        <MethodBadge
+        <TxMethodBadge
           selector={transaction.input.slice(0, 10)}
           signature={transaction.signature}
         />

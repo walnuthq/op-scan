@@ -22,7 +22,9 @@ const EthPrice = ({ eth }: { eth: { today: number; yesterday: number } }) => (
             "text-green-500": eth.today - eth.yesterday > 0,
           })}
         >
-          ({formatPercent((eth.today - eth.yesterday) / eth.yesterday)})
+          (
+          {formatPercent((eth.today - eth.yesterday) / eth.yesterday, "always")}
+          )
         </span>
       </div>
     </CardContent>

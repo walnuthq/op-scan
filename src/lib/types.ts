@@ -21,7 +21,11 @@ export type Transaction = {
   from: Address;
   to: Address | null;
   value: bigint;
-  gasPrice?: bigint;
+  gas: bigint;
+  gasPrice: bigint | null;
+  maxFeePerGas: bigint | null;
+  maxPriorityFeePerGas: bigint | null;
+  nonce: number;
   transactionIndex: number;
   input: Hex;
   signature: string;
@@ -30,10 +34,15 @@ export type Transaction = {
 
 export type TransactionReceipt = {
   transactionHash: Hash;
+  status: "success" | "reverted";
   from: Address;
   to: Address | null;
   effectiveGasPrice: bigint;
   gasUsed: bigint;
+  l1Fee: bigint | null;
+  l1GasPrice: bigint | null;
+  l1GasUsed: bigint | null;
+  l1FeeScalar: number | null;
 };
 
 export type TransactionWithReceipt = Transaction & {
@@ -79,3 +88,11 @@ export const fromPrismaTransaction = (transaction: PrismaTransaction) => ({
   gasPrice: transaction.gasPrice ? BigInt(transaction.gasPrice) : undefined,
   timestamp: BigInt(transaction.timestamp),
 });
+
+export type TokenTransfer = {
+  from: Address;
+  to: Address;
+  tokenAddress: Address;
+  amount: string;
+  decimals: number;
+};
