@@ -12,16 +12,6 @@ export type Block = {
   gasLimit: bigint;
   extraData: Hex;
   parentHash: Hash;
-  transactions: string[];
-};
-
-export type MessageArgs = {
-  target: Hash;
-  sender: Hash;
-  message: Hash;
-  value: bigint;
-  messageNonce: bigint;
-  gasLimit: bigint;
 };
 
 export type Transaction = {
@@ -63,7 +53,7 @@ export type AddressDetails = {
   balance: bigint;
 };
 
-export type BlockWithTransactions = Omit<Block, "transactions"> & {
+export type BlockWithTransactions = Block & {
   transactions: Transaction[];
 };
 
@@ -76,27 +66,44 @@ export type L1L2Transaction = {
   gasLimit: bigint;
 };
 
-export const fromPrismaBlock = (block: PrismaBlock) => ({
-  number: BigInt(block.number),
+export const fromPrismaBlock = (block: PrismaBlock): Block => ({
+  number: block.number,
   hash: block.hash as Hash,
-  timestamp: BigInt(block.timestamp),
+  timestamp: block.timestamp,
+  gasUsed: BigInt(block.gasUsed),
+  gasLimit: BigInt(block.gasLimit),
+  extraData: block.extraData as Hex,
+  parentHash: block.parentHash as Hash,
 });
 
 export const fromPrismaBlockWithTransactions = (
   block: PrismaBlock & { transactions: PrismaTransaction[] },
-) => ({
+): BlockWithTransactions => ({
   ...fromPrismaBlock(block),
   transactions: block.transactions.map(fromPrismaTransaction),
 });
 
-export const fromPrismaTransaction = (transaction: PrismaTransaction) => ({
+export const fromPrismaTransaction = (
+  transaction: PrismaTransaction,
+): Transaction => ({
   hash: transaction.hash as Hash,
-  blockNumber: BigInt(transaction.blockNumber),
+  blockNumber: transaction.blockNumber,
   from: transaction.from as Address,
   to: transaction.to ? (transaction.from as Address) : null,
   value: BigInt(transaction.value),
-  gasPrice: transaction.gasPrice ? BigInt(transaction.gasPrice) : undefined,
-  timestamp: BigInt(transaction.timestamp),
+  gas: BigInt(transaction.gas),
+  gasPrice: transaction.gasPrice ? BigInt(transaction.gasPrice) : null,
+  maxFeePerGas: transaction.maxFeePerGas
+    ? BigInt(transaction.maxFeePerGas)
+    : null,
+  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas
+    ? BigInt(transaction.maxPriorityFeePerGas)
+    : null,
+  nonce: transaction.nonce,
+  transactionIndex: transaction.transactionIndex,
+  input: transaction.input as Hex,
+  signature: transaction.signature,
+  timestamp: transaction.timestamp,
 });
 
 export type TokenTransfer = {
