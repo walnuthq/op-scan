@@ -11,7 +11,7 @@ import {
   Hash,
   getBlock
 } from "viem";
-import { MessageArgs } from "@/lib/types";
+import { L1L2Transaction, MessageArgs } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { getERC20Contract } from "./contracts/erc-20/contract";
 import l1CrossDomainMessenger from "./contracts/l1-cross-domain-messenger/contract";
@@ -29,7 +29,6 @@ function encodeL1Args(args: MessageArgs): Hash {
       functionName: "relayMessage",
       args: [messageNonce, sender, target, value, gasLimit, message],
     });
-
     return encodedMessage;
   } catch (error) {
     console.error("Error encoding L1 arguments", error);
@@ -37,6 +36,20 @@ function encodeL1Args(args: MessageArgs): Hash {
   }
 }
 
+export const fetchLatestL1L2Transactions = async (): Promise<
+  L1L2Transaction[]
+> =>
+  Array.from({ length: 50 }, (_, i) => i).map((i) => ({
+    l1BlockNumber: BigInt(20105119 - i),
+    l1Hash:
+      "0xc9f6566bfc6ff30a4d97dde51d011c47259268c8b7051f5ef0d23f407aece9a4",
+    l2Hash:
+      "0x8d721b30143b799d4b207bbea88cbf187862654357e7ddc318d6616f409045ae",
+    timestamp: BigInt(Date.now()), // Timestamp example
+    l1TxHash: "0xc9f6566bfc6ff30a4d97dde51d011c47259268c8b7051f5ef0d23f407aece9a4",
+    l1TxOrigin: "0x8d721b30143b799d4b207bbea88cbf187862654357e7ddc318d6616f409045ae",
+    gasLimit: 200000,
+  }));
 
 async function fetchL2RelayedMessageLatestLogs(): Promise<any[]> {
   try {
