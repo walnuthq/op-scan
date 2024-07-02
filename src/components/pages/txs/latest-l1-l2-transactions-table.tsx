@@ -56,10 +56,9 @@ const LatestL1L2TransactionsTable = ({
                 <div className="flex items-center gap-1 text-sm">
                   <Link
                     className="flex items-center truncate text-primary hover:brightness-150"
-                    href={`${l1Chain.blockExplorers.default.url}/tx/${transaction.l2Hash}`}
+                    href={`/tx/${transaction.l2Hash}`}
                   >
                     <span className="truncate">{transaction.l2Hash}</span>
-                    <SquareArrowOutUpRight className="ml-1 w-4 h-4 flex-shrink-0" />
                   </Link>
                 </div>
               </TableCell>
