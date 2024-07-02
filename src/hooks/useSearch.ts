@@ -10,22 +10,32 @@ export function useSearch() {
   const [searchResult, setSearchResult] = useState<SearchInputResult[]>([]);
 
   useEffect(() => {
-    const selectedDefaultCategory = searchResult.length !== 0 ? searchResult[0].category : ""
-    setSelectedCategory(selectedDefaultCategory)
-  }, [searchResult])
-  
+    const selectedDefaultCategory =
+      searchResult.length !== 0 ? searchResult[0].category : "";
+    setSelectedCategory(selectedDefaultCategory);
+  }, [searchResult]);
+
   const onQueryChanged = (event: ChangeEvent<HTMLInputElement>) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-  
+
     debounceRef.current = setTimeout(async () => {
       const searchInputValue = event.target.value.trim();
       setSearchResult([]);
       if (searchInputValue) {
         try {
           let updatedSearchResult = [...searchResult];
-          updatedSearchResult = await handleBlockSearch(updatedSearchResult, searchInputValue);
-          updatedSearchResult = await handleTransactionSearch(updatedSearchResult, searchInputValue);
-          updatedSearchResult = await handleAddressSearch(updatedSearchResult, searchInputValue);
+          updatedSearchResult = await handleBlockSearch(
+            updatedSearchResult,
+            searchInputValue,
+          );
+          updatedSearchResult = await handleTransactionSearch(
+            updatedSearchResult,
+            searchInputValue,
+          );
+          updatedSearchResult = await handleAddressSearch(
+            updatedSearchResult,
+            searchInputValue,
+          );
           setSearchResult(updatedSearchResult);
         } catch (err) {
           console.error("Error fetching data:", err);
@@ -37,44 +47,55 @@ export function useSearch() {
       }
     }, 500);
   };
-  
-  const handleBlockSearch = async (results: SearchInputResult[], searchValue: string) => {
+
+  const handleBlockSearch = async (
+    results: SearchInputResult[],
+    searchValue: string,
+  ) => {
     if (!isNumeric(searchValue)) return results;
-  
+
     const blockNumber = BigInt(parseInt(searchValue, 10));
     const blockData = await l2PublicClient.getBlock({ blockNumber });
     if (blockData) {
       setSelectedCategory("Blocks");
       return updateSearchResult(results, "Blocks", searchValue);
     }
-  
+
     return results;
   };
-  
-  const handleTransactionSearch = async (results: SearchInputResult[], searchValue: string) => {
+
+  const handleTransactionSearch = async (
+    results: SearchInputResult[],
+    searchValue: string,
+  ) => {
     if (!isValidHash(searchValue)) return results;
-  
-    const transactionData = await l2PublicClient.getTransaction({ hash: searchValue as `0x${string}` });
+
+    const transactionData = await l2PublicClient.getTransaction({
+      hash: searchValue as `0x${string}`,
+    });
     if (transactionData) {
       setSelectedCategory("Transactions");
       return updateSearchResult(results, "Transactions", searchValue);
     }
-  
+
     return results;
   };
-  
-  const handleAddressSearch = async (results: SearchInputResult[], searchValue: string) => {
+
+  const handleAddressSearch = async (
+    results: SearchInputResult[],
+    searchValue: string,
+  ) => {
     if (!isAddress(searchValue)) return results;
-  
+
     // const code = await l2PublicClient.getCode({ address: searchValue }); 👈 obtain additional address data if needed
     setSelectedCategory("Addresses");
     return updateSearchResult(results, "Addresses", searchValue);
   };
-  
+
   const updateSearchResult = (
     results: SearchInputResult[],
     category: string,
-    value: string
+    value: string,
   ): SearchInputResult[] => {
     const index = results.findIndex((item) => item.category === category);
     if (index !== -1) {
@@ -86,7 +107,8 @@ export function useSearch() {
   };
 
   const isNumeric = (str: string): boolean => /^\d+$/.test(str);
-  const isValidHash = (str: string): boolean => /^0x([A-Fa-f0-9]{64})$/.test(str);
+  const isValidHash = (str: string): boolean =>
+    /^0x([A-Fa-f0-9]{64})$/.test(str);
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
@@ -105,6 +127,6 @@ export function useSearch() {
     // Functions
     handleCategorySelect,
     onQueryChanged,
-    handleShowResult
-  }
+    handleShowResult,
+  };
 }

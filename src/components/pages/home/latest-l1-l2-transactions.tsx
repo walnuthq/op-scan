@@ -1,7 +1,12 @@
+"use client";
+
+import React from "react";
 import Link from "next/link";
-import { SquareArrowOutUpRight } from "lucide-react";
+import AddressLink from "@/components/pages/home/AddressLink";
 import { L1L2Transaction } from "@/lib/types";
 import { ReceiptText } from "lucide-react";
+import { l1Chain } from "@/lib/chains";
+import { SquareArrowOutUpRight } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,7 +14,6 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { l1Chain } from "@/lib/chains";
 
 const LatestL1L2Transaction = ({
   transaction,
@@ -67,7 +71,7 @@ const LatestL1L2Transactions = ({
     <CardHeader className="border-b">
       <CardTitle>Latest L1→L2 Transactions</CardTitle>
     </CardHeader>
-    <CardContent className="grid gap-6 divide-y">
+    <CardContent className="grid max-h-[557px] gap-6 divide-y overflow-x-hidden overflow-y-scroll">
       {transactions.map((transaction) => (
         <LatestL1L2Transaction
           key={transaction.l1Hash}
