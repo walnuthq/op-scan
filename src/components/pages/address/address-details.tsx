@@ -1,44 +1,53 @@
-import DescriptionListItem from "@/components/lib/description-list-item";
 import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AddressDetails } from "@/lib/types";
-import { formatEther } from "viem";
+import { formatEther, formatPrice } from "@/lib/utils";
 
 const AddressDetailsSection = ({
-  address,
+  balance,
   ethPriceToday,
 }: {
-  address: AddressDetails;
+  balance: bigint;
   ethPriceToday: number;
 }) => (
-  <Card>
-    <CardHeader className="p-4">
-      <CardTitle>Overview</CardTitle>
-    </CardHeader>
-
-    <CardContent>
-      <dl>
-        <DescriptionListItem secondary title="ETH BALANCE">
-          <EthereumIcon className="mr-1 size-4" />
-          {formatEther(address.balance)} ETH
-        </DescriptionListItem>
-        <DescriptionListItem secondary title="ETH VALUE">
-          {(
-            Number(formatEther(address.balance)) * ethPriceToday
-          ).toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-          })}{" "}
-          (@{" "}
-          {ethPriceToday.toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-          })}
-          /ETH)
-        </DescriptionListItem>
-      </dl>
-    </CardContent>
-  </Card>
+  <div className="grid gap-4 lg:grid-cols-3">
+    <Card>
+      <CardHeader>
+        <CardTitle>Overview</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-0.5">
+          <span className="text-xs font-semibold text-muted-foreground">
+            ETH BALANCE
+          </span>
+          <div className="flex items-center text-sm font-semibold">
+            <EthereumIcon className="mr-1 size-4" />
+            {formatEther(balance, 18)} ETH
+          </div>
+        </div>
+        <div className="space-y-0.5">
+          <span className="text-xs font-semibold text-muted-foreground">
+            ETH VALUE
+          </span>
+          <div className="flex items-center text-sm font-semibold">
+            {formatPrice(Number(formatEther(balance)) * ethPriceToday)} (@{" "}
+            {formatPrice(ethPriceToday)}/ETH)
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>More Info</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4"></CardContent>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>Multichain Info</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4"></CardContent>
+    </Card>
+  </div>
 );
 
 export default AddressDetailsSection;

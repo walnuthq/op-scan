@@ -1,15 +1,20 @@
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TokenTransfer } from "@/lib/utils";
-import { ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { TokenTransfer } from "@/lib/types";
+import DescriptionListItem from "@/components/lib/description-list-item";
 
-const ERC20 = ({ tokenTransfers }: { tokenTransfers: TokenTransfer[] }) => {
-  return (
+const TransactionERC20 = ({
+  tokenTransfers,
+}: {
+  tokenTransfers: TokenTransfer[];
+}) => (
+  <DescriptionListItem title="ERC-20 Tokens Transferred">
     <ul className="max-h-64 list-inside overflow-y-auto pr-2">
       {tokenTransfers.map((transfer, index) => (
         <li key={index} className="flex items-center gap-1">
@@ -65,7 +70,7 @@ const ERC20 = ({ tokenTransfers }: { tokenTransfers: TokenTransfer[] }) => {
         </li>
       ))}
     </ul>
-  );
-};
+  </DescriptionListItem>
+);
 
-export default ERC20;
+export default TransactionERC20;

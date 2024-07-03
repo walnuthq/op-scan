@@ -53,8 +53,8 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
         </div>
       </div>
       <div className="flex items-center gap-1 text-sm">
-        <span className="pr-2 text-muted-foreground">
-          {formatTimestamp(transaction.timestamp, false)}
+        <span className="pr-2 text-muted-foreground" suppressHydrationWarning>
+          {formatTimestamp(transaction.timestamp).distance}
         </span>
         <Badge variant="outline">{formatEther(transaction.value)} ETH</Badge>
       </div>

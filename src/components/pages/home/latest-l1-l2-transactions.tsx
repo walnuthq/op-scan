@@ -1,8 +1,5 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
-import AddressLink from "@/components/pages/home/AddressLink";
 import { L1L2Transaction } from "@/lib/types";
 import { ReceiptText } from "lucide-react";
 import { l1Chain } from "@/lib/chains";
@@ -40,10 +37,10 @@ const LatestL1L2Transaction = ({
           L1 Tx#{" "}
           <Link
             className="flex items-center text-primary hover:brightness-150"
-            href={`${l1Chain.blockExplorers.default.url}/tx/${transaction.l1Hash}`}
+            href={`${l1Chain.blockExplorers.default.url}/tx/${transaction.l1TxHash}`}
           >
             <span className="max-w-28 truncate md:max-w-48 xl:max-w-28">
-              {transaction.l1Hash}
+              {transaction.l1TxHash}
             </span>
             <SquareArrowOutUpRight className="size-4" />
           </Link>
@@ -52,9 +49,9 @@ const LatestL1L2Transaction = ({
           L2 Tx#{" "}
           <Link
             className="max-w-28 truncate text-primary hover:brightness-150 md:max-w-48 xl:max-w-28"
-            href={`/tx/${transaction.l2Hash}`}
+            href={`/tx/${transaction.l2TxHash}`}
           >
-            {transaction.l2Hash}
+            {transaction.l2TxHash}
           </Link>
         </div>
       </div>
@@ -74,7 +71,7 @@ const LatestL1L2Transactions = ({
     <CardContent className="grid max-h-[557px] gap-6 divide-y overflow-x-hidden overflow-y-scroll">
       {transactions.map((transaction) => (
         <LatestL1L2Transaction
-          key={transaction.l1Hash}
+          key={transaction.l1TxHash}
           transaction={transaction}
         />
       ))}

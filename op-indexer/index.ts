@@ -1,6 +1,13 @@
 import { parseArgs } from "node:util";
 import { PrismaClient } from "@/prisma/generated/client";
-import { createPublicClient, webSocket, Address, Hash, zeroHash } from "viem";
+import {
+  createPublicClient,
+  webSocket,
+  Address,
+  Hash,
+  zeroHash,
+  Hex,
+} from "viem";
 import { mainnet, optimism } from "viem/chains";
 import { l1Chain, l2Chain, l2PublicClient } from "@/lib/chains";
 import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
@@ -21,36 +28,77 @@ const trimBlock = ({
   number,
   hash,
   timestamp,
+  gasUsed,
+  gasLimit,
+  extraData,
+  parentHash,
 }: {
   number: bigint | null;
   hash: Hash | null;
   timestamp: bigint;
+  gasUsed: bigint;
+  gasLimit: bigint;
+  extraData: Hex;
+  parentHash: Hash;
 }) => ({
-  number: number ? `0x${number.toString(16)}` : "0x0",
+  number: number ?? BigInt(0),
   hash: hash ?? zeroHash,
-  timestamp: `0x${timestamp.toString(16)}`,
+  timestamp,
+  gasUsed: `0x${gasUsed.toString(16)}`,
+  gasLimit: `0x${gasLimit.toString(16)}`,
+  extraData,
+  parentHash,
 });
 
 const trimTransactions = (
   transactions: {
     hash: Hash;
-    blockNumber: bigint;
+    blockNumber: bigint | null;
     from: Address;
     to: Address | null;
     value: bigint;
+    gas: bigint;
     gasPrice?: bigint;
+    maxFeePerGas?: bigint;
+    maxPriorityFeePerGas?: bigint;
+    nonce: number;
+    transactionIndex: number;
+    input: Hex;
   }[],
   timestamp: bigint,
 ) =>
-  transactions.map(({ hash, blockNumber, from, to, value, gasPrice }) => ({
-    hash,
-    blockNumber: `0x${blockNumber.toString(16)}`,
-    from,
-    to,
-    value: `0x${value.toString(16)}`,
-    gasPrice: gasPrice ? `0x${gasPrice.toString(16)}` : "0x0",
-    timestamp: `0x${timestamp.toString(16)}`,
-  }));
+  transactions.map(
+    ({
+      hash,
+      blockNumber,
+      from,
+      to,
+      value,
+      gas,
+      gasPrice,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      nonce,
+      transactionIndex,
+      input,
+    }) => ({
+      hash,
+      blockNumber: blockNumber ?? BigInt(0),
+      from,
+      to,
+      value: `0x${value.toString(16)}`,
+      gas: `0x${gas.toString(16)}`,
+      gasPrice: gasPrice ? `0x${gasPrice.toString(16)}` : null,
+      maxFeePerGas: maxFeePerGas ? `0x${maxFeePerGas.toString(16)}` : null,
+      maxPriorityFeePerGas: maxPriorityFeePerGas
+        ? `0x${maxPriorityFeePerGas.toString(16)}`
+        : null,
+      nonce,
+      transactionIndex,
+      input,
+      timestamp,
+    }),
+  );
 
 const indexBlock = async (blockNumber: bigint) => {
   const block = await l2PublicClient.getBlock({

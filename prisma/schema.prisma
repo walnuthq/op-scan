@@ -17,19 +17,30 @@ model DeployConfig {
 }
 
 model Block {
-  number       String        @id
+  number       BigInt        @id
   hash         String        @unique
-  timestamp    String
+  timestamp    BigInt
+  gasUsed      String
+  gasLimit     String
+  extraData    String
+  parentHash   String
   transactions Transaction[]
 }
 
 model Transaction {
-  hash        String  @id
-  blockNumber String
-  from        String
-  to          String?
-  value       String
-  gasPrice    String?
-  timestamp   String
-  block       Block   @relation(fields: [blockNumber], references: [number])
+  hash                 String  @id
+  blockNumber          BigInt
+  from                 String
+  to                   String?
+  value                String
+  gas                  String
+  gasPrice             String?
+  maxFeePerGas         String?
+  maxPriorityFeePerGas String?
+  nonce                Int
+  transactionIndex     Int
+  input                String
+  signature            String?
+  timestamp            BigInt
+  block                Block   @relation(fields: [blockNumber], references: [number])
 }

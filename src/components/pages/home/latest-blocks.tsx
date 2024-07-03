@@ -31,7 +31,7 @@ const LatestBlock = ({
             {block.number.toString()}
           </Link>
           <p className="text-sm text-muted-foreground">
-            {formatTimestamp(block.timestamp, false)}
+            {formatTimestamp(block.timestamp).distance}
           </p>
         </div>
         <div className="ml-auto text-sm font-medium">
