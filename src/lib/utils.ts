@@ -39,7 +39,7 @@ export const formatPercent = (
 ) =>
   new Intl.NumberFormat("en-US", {
     style: "percent",
-    maximumSignificantDigits: 4,
+    maximumFractionDigits: 2,
     signDisplay,
   }).format(percent);
 
