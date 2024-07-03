@@ -40,7 +40,7 @@ model Transaction {
   nonce                Int
   transactionIndex     Int
   input                String
-  signature            String
+  signature            String?
   timestamp            BigInt
   block                Block   @relation(fields: [blockNumber], references: [number])
 }

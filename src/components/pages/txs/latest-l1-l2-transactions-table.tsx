@@ -1,6 +1,6 @@
 // src/components/tx/latest-l1-l2-transactions-table.tsx
 import Link from "next/link";
-import { formatTimestamp } from "@/lib/utils";
+import { formatTimestamp, formatGas } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { L1L2Transaction } from "@/lib/types";
 import {
@@ -38,8 +38,8 @@ const LatestL1L2TransactionsTable = ({
         </TableHeader>
         <TableBody>
           {transactions.map((transaction) => (
-            <TableRow key={transaction.l2Hash}>
-              <TableCell className="px-4 py-2 max-w-[10rem] truncate">
+            <TableRow key={transaction.l2TxHash}>
+              <TableCell className="max-w-[10rem] truncate px-4 py-2">
                 <div className="flex items-center gap-1 text-sm">
                   <a
                     className="flex items-center truncate text-primary hover:brightness-150"
@@ -47,25 +47,27 @@ const LatestL1L2TransactionsTable = ({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <span className="truncate">{transaction.l1BlockNumber.toString()}</span>
-                    <SquareArrowOutUpRight className="ml-1 w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">
+                      {transaction.l1BlockNumber.toString()}
+                    </span>
+                    <SquareArrowOutUpRight className="ml-1 h-4 w-4 flex-shrink-0" />
                   </a>
                 </div>
               </TableCell>
-              <TableCell className="px-4 py-2 max-w-[14rem] truncate">
+              <TableCell className="max-w-[14rem] truncate px-4 py-2">
                 <div className="flex items-center gap-1 text-sm">
                   <Link
                     className="flex items-center truncate text-primary hover:brightness-150"
-                    href={`/tx/${transaction.l2Hash}`}
+                    href={`/tx/${transaction.l2TxHash}`}
                   >
-                    <span className="truncate">{transaction.l2Hash}</span>
+                    <span className="truncate">{transaction.l2TxHash}</span>
                   </Link>
                 </div>
               </TableCell>
-              <TableCell className="px-4 py-2 max-w-[10rem] truncate">
-                {formatTimestamp(transaction.timestamp, false)}
+              <TableCell className="max-w-[10rem] truncate px-4 py-2">
+                {formatTimestamp(transaction.timestamp).distance}
               </TableCell>
-              <TableCell className="px-4 py-2 max-w-[14rem] truncate">
+              <TableCell className="max-w-[14rem] truncate px-4 py-2">
                 <div className="flex items-center gap-1 text-sm">
                   <a
                     className="flex items-center truncate text-primary hover:brightness-150"
@@ -74,11 +76,11 @@ const LatestL1L2TransactionsTable = ({
                     rel="noopener noreferrer"
                   >
                     <span className="truncate">{transaction.l1TxHash}</span>
-                    <SquareArrowOutUpRight className="ml-1 w-4 h-4 flex-shrink-0" />
+                    <SquareArrowOutUpRight className="ml-1 h-4 w-4 flex-shrink-0" />
                   </a>
                 </div>
               </TableCell>
-              <TableCell className="px-4 py-2 max-w-[14rem] truncate">
+              <TableCell className="max-w-[14rem] truncate px-4 py-2">
                 <div className="flex items-center gap-1 text-sm">
                   <a
                     className="flex items-center truncate text-primary hover:brightness-150"
@@ -87,12 +89,12 @@ const LatestL1L2TransactionsTable = ({
                     rel="noopener noreferrer"
                   >
                     <span className="truncate">{transaction.l1TxOrigin}</span>
-                    <SquareArrowOutUpRight className="ml-1 w-4 h-4 flex-shrink-0" />
+                    <SquareArrowOutUpRight className="ml-1 h-4 w-4 flex-shrink-0" />
                   </a>
                 </div>
               </TableCell>
-              <TableCell className="px-4 py-2 max-w-[8rem] truncate">
-                {transaction.gasLimit}
+              <TableCell className="max-w-[8rem] truncate px-4 py-2">
+                {formatGas(transaction.gasLimit).value}
               </TableCell>
             </TableRow>
           ))}

@@ -1,5 +1,5 @@
 import LatestL1L2TransactionsTable from "@/components/pages/txs/latest-l1-l2-transactions-table";
-import { fetchLatestL1L2Transactions } from "@/lib/utils";
+import { fetchLatestL1L2Transactions } from "@/lib/fetch-data";
 
 const TxsEnqueuedPage = async () => {
   const transactions = await fetchLatestL1L2Transactions();

@@ -27,7 +27,7 @@ const BlockTransactionsTableRow = ({
       <TableCell>
         <TxMethodBadge
           selector={transaction.input.slice(0, 10)}
-          signature={transaction.signature}
+          signature={transaction.signature ?? ""}
         />
       </TableCell>
       <TableCell>{timestampFormattedAsDate ? utc : distance}</TableCell>

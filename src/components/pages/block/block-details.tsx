@@ -11,7 +11,7 @@ const BlockDetails = ({ block }: { block: BlockWithTransactions }) => (
   <dl>
     <BlockHeight number={block.number} />
     <TimestampListItem timestamp={block.timestamp} />
-    <DescriptionListItem border title="Transactions">
+    <DescriptionListItem title="Transactions">
       <Link
         href={`/block/${block.number}/txs`}
         className="mr-1 text-primary hover:brightness-150"

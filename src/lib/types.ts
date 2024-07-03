@@ -27,7 +27,7 @@ export type Transaction = {
   nonce: number;
   transactionIndex: number;
   input: Hex;
-  signature: string;
+  signature: string | null;
   timestamp: bigint;
 };
 

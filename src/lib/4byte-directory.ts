@@ -1,6 +1,6 @@
 export const getSignatureBySelector = async (selector: string) => {
   if (selector === "0x") {
-    return "";
+    return null;
   }
   try {
     const response = await fetch(
@@ -10,7 +10,7 @@ export const getSignatureBySelector = async (selector: string) => {
     const json = await response.json();
     const results = json.results as { id: number; text_signature: string }[];
     if (results.length === 0) {
-      return "";
+      return null;
     }
     const [{ text_signature: textSignature }] = results.sort(
       (a, b) => a.id - b.id,
@@ -18,6 +18,6 @@ export const getSignatureBySelector = async (selector: string) => {
     return textSignature;
   } catch (error) {
     console.error(error);
-    return "";
+    return null;
   }
 };

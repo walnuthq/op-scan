@@ -37,7 +37,7 @@
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.16.5"
+    "viem": "^2.17.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.6",

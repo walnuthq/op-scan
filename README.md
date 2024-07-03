@@ -1,6 +1,6 @@
 > [!WARNING]
 > This project is under active development and not yet suitable for production. For questions or feature requests, [contact us on Telegram](https://t.me/+DYI4FMia43I1NDI8) or [submit an issue](https://github.com/walnuthq/op-scan/issues). To track progress, star the repository. [Supported by an Optimism grant](https://gov.optimism.io/t/season-5-cycle-19-intent-1-developer-advisory-board-finalists-review/7899?u=0xmilton), the project is divided into four milestones. This warning will be removed after completion of Milestone 4.
-> 
+>
 > - [ ] Milestone 1: Homepage and basic nav (current stage)
 > - [ ] Milestone 2: Tx detail page
 > - [ ] Milestone 3: Contract detail page
@@ -15,9 +15,9 @@ OP Scan is a transaction explorer tailored specifically for the [OP Stack](https
 # 🦄 How OP Scan Differs from Other Explorers
 
 1. **Lightweight**: The code and dependencies are designed to be minimalistic. This ensures minimal resource consumption, allowing anyone to run it locally alongside an OP Stack node when working on a rollup.
-2.	**OP Stack Native**: This explorer is purpose-built for the OP Stack. It ensures 100% compatibility with rollups in Optimism’s Superchain.
-3.	**Scalable**: Despite its lightweight design, the explorer is built to handle any scale.
-4.	**Open Source**: All code is open source from day one. This alignment with the community allows anyone to contribute or fork the repository to meet their specific needs.
+2. **OP Stack Native**: This explorer is purpose-built for the OP Stack. It ensures 100% compatibility with rollups in Optimism’s Superchain.
+3. **Scalable**: Despite its lightweight design, the explorer is built to handle any scale.
+4. **Open Source**: All code is open source from day one. This alignment with the community allows anyone to contribute or fork the repository to meet their specific needs.
 
 # 🙋‍♀️ Share Feedback by Submitting an Issue
 
@@ -26,6 +26,7 @@ OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/bu
 # ⚙️ Installation
 
 The app requires the following dependencies:
+
 ```
 NodeJS >= 20
 pnpm >= 9
@@ -45,7 +46,9 @@ Install the dependencies:
 pnpm install
 ```
 
-You will need to create a `.env.local` file in the root of your repository and populate it with `NEXT_PUBLIC_L1_RPC_URL` and `NEXT_PUBLIC_L2_RPC_URL`.
+You will need to copy `.env.local.example` into `.env.local` at the root of your repository and populate it with your own values.
+
+In particular you will need to provide RPC URLs for both L1 and L2 chains:
 
 ```
 NEXT_PUBLIC_L1_RPC_URL="https://eth-mainnet.g.alchemy.com/v2/..."
@@ -54,12 +57,29 @@ NEXT_PUBLIC_L2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/..."
 
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/) or [Infura](https://www.infura.io/).
 
-If you're running the indexer, you will also need to setup a websocket connection to the L2 chain:
-
-Start up the app and see it running at `http://localhost:3000`
+You will also need to provide your L1 contracts addresses:
 
 ```
-pnpm dev
+NEXT_PUBLIC_DISPUTE_GAME_FACTORY_ADDRESS="..."
+NEXT_PUBLIC_L2_OUTPUT_ORACLE_ADDRESS="..."
+NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS="..."
+NEXT_PUBLIC_L1_STANDARD_BRIDGE_ADDRESS="..."
+NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS="..."
+```
+
+You will find theses addresses in your rollup deployment artifacts in `contracts-bedrock/deployments/your-deployment/L1Contract.json`.
+Note that you always need to provide the proxy address, not the underlying contract.
+
+When you're done configuring your environment variables you can build the app:
+
+```
+pnpm build
+```
+
+Make sure your local chain is started and launch the explorer to see it running at `http://localhost:3000`
+
+```
+pnpm start
 ```
 
 ### Run the Indexer
