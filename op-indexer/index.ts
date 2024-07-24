@@ -7,6 +7,7 @@ import {
   Hash,
   zeroHash,
   Hex,
+  TransactionType,
 } from "viem";
 import { mainnet, optimism } from "viem/chains";
 import { l1Chain, l2Chain, l2PublicClient } from "@/lib/chains";
@@ -61,6 +62,7 @@ const trimTransactions = (
     gasPrice?: bigint;
     maxFeePerGas?: bigint;
     maxPriorityFeePerGas?: bigint;
+    type: TransactionType;
     nonce: number;
     transactionIndex: number;
     input: Hex;
@@ -78,6 +80,7 @@ const trimTransactions = (
       gasPrice,
       maxFeePerGas,
       maxPriorityFeePerGas,
+      type,
       nonce,
       transactionIndex,
       input,
@@ -93,6 +96,7 @@ const trimTransactions = (
       maxPriorityFeePerGas: maxPriorityFeePerGas
         ? `0x${maxPriorityFeePerGas.toString(16)}`
         : null,
+      type,
       nonce,
       transactionIndex,
       input,

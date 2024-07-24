@@ -37,6 +37,7 @@ model Transaction {
   gasPrice             String?
   maxFeePerGas         String?
   maxPriorityFeePerGas String?
+  type                 String
   nonce                Int
   transactionIndex     Int
   input                String

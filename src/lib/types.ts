@@ -1,4 +1,4 @@
-import { Hash, Address, Hex } from "viem";
+import { Hash, Address, Hex, TransactionType } from "viem";
 import {
   Block as PrismaBlock,
   Transaction as PrismaTransaction,
@@ -25,6 +25,7 @@ export type Transaction = {
   gasPrice: bigint | null;
   maxFeePerGas: bigint | null;
   maxPriorityFeePerGas: bigint | null;
+  type: TransactionType;
   nonce: number;
   transactionIndex: number;
   input: Hex;
@@ -104,6 +105,7 @@ export const fromPrismaTransaction = (
   maxPriorityFeePerGas: transaction.maxPriorityFeePerGas
     ? BigInt(transaction.maxPriorityFeePerGas)
     : null,
+  type: transaction.type as TransactionType,
   nonce: transaction.nonce,
   transactionIndex: transaction.transactionIndex,
   input: transaction.input as Hex,

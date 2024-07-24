@@ -51,9 +51,6 @@ export const fetchLatestL1L2Transactions = async (): Promise<
         fromBlock: l2FromBlock,
       }),
     ]);
-  console.log(sentMessageLogs.length);
-  console.log(sentMessageExtension1Logs.length);
-  console.log(relayedMessageLogs.length);
   const lastSentMessageLogs = sentMessageLogs.reverse().slice(0, 10);
   const sentMessageLogsBlocks = await Promise.all(
     lastSentMessageLogs.map(({ blockNumber }) =>
@@ -75,7 +72,21 @@ export const fetchLatestL1L2Transactions = async (): Promise<
       const data = encodeFunctionData({
         abi: l1CrossDomainMessenger.abi,
         functionName: "relayMessage",
-        args: [messageNonce!, sender!, target!, value!, gasLimit!, message!],
+        args: [
+          messageNonce!,
+          sender!,
+          target!,
+          value!,
+          gasLimit!,
+          message!,
+        ] as [
+          bigint,
+          `0x${string}`,
+          `0x${string}`,
+          bigint,
+          bigint,
+          `0x${string}`,
+        ],
       });
       const hash = keccak256(data);
       const relayedMessageLog = relayedMessageLogs.find(
@@ -131,6 +142,7 @@ const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
       maxFeePerGas: transaction.maxFeePerGas ?? null,
       maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
       transactionIndex: transaction.transactionIndex,
+      type: transaction.type,
       nonce: transaction.nonce,
       input: transaction.input,
       signature: "",
