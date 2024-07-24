@@ -2,12 +2,42 @@ import { createPublicClient, http, defineChain } from "viem";
 import { mainnet, sepolia, optimism } from "viem/chains";
 import { chainConfig } from "viem/op-stack";
 
-export const l1Chain = process.env.LOCAL === "true" ? sepolia : mainnet;
+const l1KnownChains = { [mainnet.id]: mainnet, [sepolia.id]: sepolia } as const;
+type L1KnownChainId = keyof typeof l1KnownChains;
 
-const optimismLocal = defineChain({
+const l1CustomChain = defineChain({
+  id: Number(process.env.NEXT_PUBLIC_L1_CHAIN_ID),
+  name: process.env.NEXT_PUBLIC_L1_NAME,
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [process.env.NEXT_PUBLIC_L1_RPC_URL],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Etherscan",
+      url: "https://etherscan.io",
+      apiUrl: "https://api.etherscan.io/api",
+    },
+  },
+});
+
+const l1ChainId = Number(process.env.NEXT_PUBLIC_L1_CHAIN_ID);
+
+export const l1Chain = Object.keys(l1KnownChains).includes(
+  process.env.NEXT_PUBLIC_L1_CHAIN_ID,
+)
+  ? l1KnownChains[l1ChainId as L1KnownChainId]
+  : l1CustomChain;
+
+const l2KnownChains = { [optimism.id]: optimism } as const;
+type L2KnownChainId = keyof typeof l2KnownChains;
+
+const l2CustomChain = defineChain({
   ...chainConfig,
   id: Number(process.env.NEXT_PUBLIC_L2_CHAIN_ID),
-  name: "OP Local",
+  name: process.env.NEXT_PUBLIC_L2_NAME,
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
     default: {
@@ -43,7 +73,13 @@ const optimismLocal = defineChain({
   },
 });
 
-export const l2Chain = process.env.LOCAL === "true" ? optimismLocal : optimism;
+const l2ChainId = Number(process.env.NEXT_PUBLIC_L2_CHAIN_ID);
+
+export const l2Chain = Object.keys(l2KnownChains).includes(
+  process.env.NEXT_PUBLIC_L2_CHAIN_ID,
+)
+  ? l2KnownChains[l2ChainId as L2KnownChainId]
+  : l2CustomChain;
 
 export const l1PublicClient = createPublicClient({
   chain: l1Chain,

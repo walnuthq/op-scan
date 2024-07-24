@@ -132,7 +132,7 @@ await prisma.deployConfig.create({
   data: {
     l1ChainId: l1Chain.id,
     l2ChainId: l2Chain.id,
-    l2BlockTime: await l2OutputOracle.read.l2BlockTime(),
+    l2BlockTime: await l2OutputOracle.read.L2_BLOCK_TIME(),
   },
 });
 

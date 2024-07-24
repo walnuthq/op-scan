@@ -12,13 +12,29 @@ import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/co
 import l2CrossDomainMessenger from "@/lib/contracts/l2-cross-domain-messenger/contract";
 import { prisma } from "@/lib/prisma";
 
+export const fetchBlocks = async (
+  latestBlockNumber: bigint,
+  currentPage: bigint,
+  blocksPerPage: bigint,
+) => {
+  const startBlock =
+    latestBlockNumber - (currentPage - BigInt(1)) * blocksPerPage;
+  const remainingBlocks = Number(startBlock + BigInt(1));
+  const blocksToFetch = Math.min(Number(blocksPerPage), remainingBlocks);
+  return Promise.all(
+    Array.from({ length: blocksToFetch }, (_, i) =>
+      l2PublicClient.getBlock({ blockNumber: startBlock - BigInt(i) }),
+    ),
+  );
+};
+
 export const fetchLatestL1L2Transactions = async (): Promise<
   L1L2Transaction[]
 > => {
   const [l1BlockNumber, l2BlockNumber, l2BlockTime] = await Promise.all([
     l1PublicClient.getBlockNumber(),
     l2PublicClient.getBlockNumber(),
-    l2OutputOracle.read.l2BlockTime(),
+    l2OutputOracle.read.L2_BLOCK_TIME(), // renamed to l2BlockTime
   ]);
   const l1FromBlock = l1BlockNumber - BigInt(1000);
   const l2BlocksPerL1Block = 12 / Number(l2BlockTime);
@@ -35,6 +51,9 @@ export const fetchLatestL1L2Transactions = async (): Promise<
         fromBlock: l2FromBlock,
       }),
     ]);
+  console.log(sentMessageLogs.length);
+  console.log(sentMessageExtension1Logs.length);
+  console.log(relayedMessageLogs.length);
   const lastSentMessageLogs = sentMessageLogs.reverse().slice(0, 10);
   const sentMessageLogsBlocks = await Promise.all(
     lastSentMessageLogs.map(({ blockNumber }) =>
@@ -201,7 +220,7 @@ export const fetchHomePageData = async () => {
   ] = await Promise.all([
     fetchTokensPrices(),
     fetchL2LatestBlocks(),
-    l2OutputOracle.read.l2BlockTime(),
+    l2OutputOracle.read.L2_BLOCK_TIME(),
     fetchLatestL1L2Transactions(),
   ]);
   const latestTransactionsFromJsonRpc = latestBlocksFromJsonRpc

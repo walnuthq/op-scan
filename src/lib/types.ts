@@ -12,6 +12,7 @@ export type Block = {
   gasLimit: bigint;
   extraData: Hex;
   parentHash: Hash;
+  transactions: Hash[];
 };
 
 export type Transaction = {
@@ -48,7 +49,7 @@ export type TransactionWithReceipt = Transaction & {
   transactionReceipt: TransactionReceipt;
 };
 
-export type BlockWithTransactions = Block & {
+export type BlockWithTransactions = Omit<Block, "transactions"> & {
   transactions: Transaction[];
 };
 
@@ -61,7 +62,9 @@ export type L1L2Transaction = {
   gasLimit: bigint;
 };
 
-export const fromPrismaBlock = (block: PrismaBlock): Block => ({
+export const fromPrismaBlock = (
+  block: PrismaBlock & { transactions: string[] },
+): Block => ({
   number: block.number,
   hash: block.hash as Hash,
   timestamp: block.timestamp,
@@ -69,12 +72,19 @@ export const fromPrismaBlock = (block: PrismaBlock): Block => ({
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
+  transactions: block.transactions as Hash[],
 });
 
 export const fromPrismaBlockWithTransactions = (
   block: PrismaBlock & { transactions: PrismaTransaction[] },
 ): BlockWithTransactions => ({
-  ...fromPrismaBlock(block),
+  number: block.number,
+  hash: block.hash as Hash,
+  timestamp: block.timestamp,
+  gasUsed: BigInt(block.gasUsed),
+  gasLimit: BigInt(block.gasLimit),
+  extraData: block.extraData as Hex,
+  parentHash: block.parentHash as Hash,
   transactions: block.transactions.map(fromPrismaTransaction),
 });
 

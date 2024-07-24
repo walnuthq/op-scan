@@ -62,9 +62,13 @@ export const formatTimestamp = (timestamp: bigint) => {
 export const formatAddress = (address: Address) =>
   `${address.slice(0, 10)}...${address.slice(-8)}`;
 
+export const formatNumber = (value: bigint) =>
+  new Intl.NumberFormat("en-US").format(value);
+
 export const formatGas = (value: bigint, total: bigint = BigInt(1)) => ({
-  value: new Intl.NumberFormat("en-US").format(value),
-  percentage: formatPercent(Number(value) / Number(total)),
+  value: formatNumber(value),
+  percentage: (Number(value) / Number(total)) * 100,
+  percentageFormatted: formatPercent(Number(value) / Number(total)),
 });
 
 const ERC20_TRANSFER_EVENT_TOPIC =

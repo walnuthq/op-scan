@@ -82,7 +82,7 @@ const TransactionDetails = ({
       {formatGas(transaction.transactionReceipt.gasUsed).value} (
       {
         formatGas(transaction.transactionReceipt.gasUsed, transaction.gas)
-          .percentage
+          .percentageFormatted
       }
       )
     </DescriptionListItem>
