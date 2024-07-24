@@ -12,13 +12,29 @@ import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/co
 import l2CrossDomainMessenger from "@/lib/contracts/l2-cross-domain-messenger/contract";
 import { prisma } from "@/lib/prisma";
 
+export const fetchBlocks = async (
+  latestBlockNumber: bigint,
+  currentPage: bigint,
+  blocksPerPage: bigint,
+) => {
+  const startBlock =
+    latestBlockNumber - (currentPage - BigInt(1)) * blocksPerPage;
+  const remainingBlocks = Number(startBlock + BigInt(1));
+  const blocksToFetch = Math.min(Number(blocksPerPage), remainingBlocks);
+  return Promise.all(
+    Array.from({ length: blocksToFetch }, (_, i) =>
+      l2PublicClient.getBlock({ blockNumber: startBlock - BigInt(i) }),
+    ),
+  );
+};
+
 export const fetchLatestL1L2Transactions = async (): Promise<
   L1L2Transaction[]
 > => {
   const [l1BlockNumber, l2BlockNumber, l2BlockTime] = await Promise.all([
     l1PublicClient.getBlockNumber(),
     l2PublicClient.getBlockNumber(),
-    l2OutputOracle.read.l2BlockTime(),
+    l2OutputOracle.read.L2_BLOCK_TIME(), // renamed to l2BlockTime
   ]);
   const l1FromBlock = l1BlockNumber - BigInt(1000);
   const l2BlocksPerL1Block = 12 / Number(l2BlockTime);
@@ -56,7 +72,21 @@ export const fetchLatestL1L2Transactions = async (): Promise<
       const data = encodeFunctionData({
         abi: l1CrossDomainMessenger.abi,
         functionName: "relayMessage",
-        args: [messageNonce!, sender!, target!, value!, gasLimit!, message!],
+        args: [
+          messageNonce!,
+          sender!,
+          target!,
+          value!,
+          gasLimit!,
+          message!,
+        ] as [
+          bigint,
+          `0x${string}`,
+          `0x${string}`,
+          bigint,
+          bigint,
+          `0x${string}`,
+        ],
       });
       const hash = keccak256(data);
       const relayedMessageLog = relayedMessageLogs.find(
@@ -112,6 +142,7 @@ const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
       maxFeePerGas: transaction.maxFeePerGas ?? null,
       maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
       transactionIndex: transaction.transactionIndex,
+      type: transaction.type,
       nonce: transaction.nonce,
       input: transaction.input,
       signature: "",
@@ -201,7 +232,7 @@ export const fetchHomePageData = async () => {
   ] = await Promise.all([
     fetchTokensPrices(),
     fetchL2LatestBlocks(),
-    l2OutputOracle.read.l2BlockTime(),
+    l2OutputOracle.read.L2_BLOCK_TIME(),
     fetchLatestL1L2Transactions(),
   ]);
   const latestTransactionsFromJsonRpc = latestBlocksFromJsonRpc

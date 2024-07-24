@@ -17,10 +17,12 @@ import TransactionInput from "@/components/pages/tx/transaction-input";
 
 const TransactionDetails = ({
   transaction,
+  confirmations,
   ethPriceToday,
   tokenTransfers,
 }: {
   transaction: TransactionWithReceipt;
+  confirmations: bigint;
   ethPriceToday: number;
   tokenTransfers: TokenTransfer[];
 }) => (
@@ -40,6 +42,8 @@ const TransactionDetails = ({
       >
         {transaction.blockNumber.toString()}
       </Link>
+      <span className="mx-4 text-muted-foreground">|</span>
+      <span>{confirmations.toString()} Block confirmations</span>
     </DescriptionListItem>
     <TimestampListItem timestamp={transaction.timestamp} />
     <Separator />
@@ -82,7 +86,7 @@ const TransactionDetails = ({
       {formatGas(transaction.transactionReceipt.gasUsed).value} (
       {
         formatGas(transaction.transactionReceipt.gasUsed, transaction.gas)
-          .percentage
+          .percentageFormatted
       }
       )
     </DescriptionListItem>
@@ -124,7 +128,10 @@ const TransactionDetails = ({
     </DescriptionListItem>
     <Separator />
     <TransactionOtherAttributes transaction={transaction} />
-    <TransactionInput input={transaction.input} />
+    <TransactionInput
+      signature={transaction.signature ?? ""}
+      input={transaction.input}
+    />
   </dl>
 );
 

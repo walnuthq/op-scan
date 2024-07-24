@@ -60,6 +60,7 @@ const BlockTxs = async ({ number }: { number: bigint }) => {
                 maxFeePerGas: transaction.maxFeePerGas ?? null,
                 maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
                 transactionIndex: transaction.transactionIndex,
+                type: transaction.type,
                 nonce: transaction.nonce,
                 input: transaction.input,
                 signature: signatures[i],

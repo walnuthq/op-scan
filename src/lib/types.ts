@@ -1,4 +1,4 @@
-import { Hash, Address, Hex } from "viem";
+import { Hash, Address, Hex, TransactionType } from "viem";
 import {
   Block as PrismaBlock,
   Transaction as PrismaTransaction,
@@ -12,6 +12,7 @@ export type Block = {
   gasLimit: bigint;
   extraData: Hex;
   parentHash: Hash;
+  transactions: Hash[];
 };
 
 export type Transaction = {
@@ -24,6 +25,7 @@ export type Transaction = {
   gasPrice: bigint | null;
   maxFeePerGas: bigint | null;
   maxPriorityFeePerGas: bigint | null;
+  type: TransactionType;
   nonce: number;
   transactionIndex: number;
   input: Hex;
@@ -48,7 +50,7 @@ export type TransactionWithReceipt = Transaction & {
   transactionReceipt: TransactionReceipt;
 };
 
-export type BlockWithTransactions = Block & {
+export type BlockWithTransactions = Omit<Block, "transactions"> & {
   transactions: Transaction[];
 };
 
@@ -61,7 +63,9 @@ export type L1L2Transaction = {
   gasLimit: bigint;
 };
 
-export const fromPrismaBlock = (block: PrismaBlock): Block => ({
+export const fromPrismaBlock = (
+  block: PrismaBlock & { transactions: string[] },
+): Block => ({
   number: block.number,
   hash: block.hash as Hash,
   timestamp: block.timestamp,
@@ -69,12 +73,19 @@ export const fromPrismaBlock = (block: PrismaBlock): Block => ({
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
+  transactions: block.transactions as Hash[],
 });
 
 export const fromPrismaBlockWithTransactions = (
   block: PrismaBlock & { transactions: PrismaTransaction[] },
 ): BlockWithTransactions => ({
-  ...fromPrismaBlock(block),
+  number: block.number,
+  hash: block.hash as Hash,
+  timestamp: block.timestamp,
+  gasUsed: BigInt(block.gasUsed),
+  gasLimit: BigInt(block.gasLimit),
+  extraData: block.extraData as Hex,
+  parentHash: block.parentHash as Hash,
   transactions: block.transactions.map(fromPrismaTransaction),
 });
 
@@ -94,6 +105,7 @@ export const fromPrismaTransaction = (
   maxPriorityFeePerGas: transaction.maxPriorityFeePerGas
     ? BigInt(transaction.maxPriorityFeePerGas)
     : null,
+  type: transaction.type as TransactionType,
   nonce: transaction.nonce,
   transactionIndex: transaction.transactionIndex,
   input: transaction.input as Hex,

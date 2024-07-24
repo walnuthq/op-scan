@@ -1,8 +1,8 @@
 > [!WARNING]
 > This project is under active development and not yet suitable for production. For questions or feature requests, [contact us on Telegram](https://t.me/+DYI4FMia43I1NDI8) or [submit an issue](https://github.com/walnuthq/op-scan/issues). To track progress, star the repository. [Supported by an Optimism grant](https://gov.optimism.io/t/season-5-cycle-19-intent-1-developer-advisory-board-finalists-review/7899?u=0xmilton), the project is divided into four milestones. This warning will be removed after completion of Milestone 4.
 >
-> - [ ] Milestone 1: Homepage and basic nav (current stage)
-> - [ ] Milestone 2: Tx detail page
+> - [x] Milestone 1: Homepage and basic nav (current stage)
+> - [x] Milestone 2: Tx detail page
 > - [ ] Milestone 3: Contract detail page
 > - [ ] Milestone 4: Feedback incorporation and polish
 
@@ -48,11 +48,15 @@ pnpm install
 
 You will need to copy `.env.local.example` into `.env.local` at the root of your repository and populate it with your own values.
 
-In particular you will need to provide RPC URLs for both L1 and L2 chains:
+In particular you will need to provide configuration for both L1 and L2 chains:
 
 ```
-NEXT_PUBLIC_L1_RPC_URL="https://eth-mainnet.g.alchemy.com/v2/..."
-NEXT_PUBLIC_L2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/..."
+NEXT_PUBLIC_L1_CHAIN_ID="11155111"
+NEXT_PUBLIC_L1_NAME="Sepolia"
+NEXT_PUBLIC_L1_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/API_KEY"
+NEXT_PUBLIC_L2_CHAIN_ID="42069"
+NEXT_PUBLIC_L2_NAME="OP Local"
+NEXT_PUBLIC_L2_RPC_URL="http://localhost:8545"
 ```
 
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/) or [Infura](https://www.infura.io/).
@@ -69,6 +73,8 @@ NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS="..."
 
 You will find theses addresses in your rollup deployment artifacts in `contracts-bedrock/deployments/your-deployment/L1Contract.json`.
 Note that you always need to provide the proxy address, not the underlying contract.
+
+If you don't want to run the explorer with your local chain setup, you will find all the necessary environment variables commented in `.env.local.example` to configure the explorer with OP Mainnet.
 
 When you're done configuring your environment variables you can build the app:
 

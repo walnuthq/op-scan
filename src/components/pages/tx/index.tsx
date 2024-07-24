@@ -9,19 +9,21 @@ import TransactionDetails from "@/components/pages/tx/transaction-details";
 import { getSignatureBySelector } from "@/lib/4byte-directory";
 
 const Tx = async ({ hash }: { hash: Hash }) => {
-  const [transaction, receipt] = await Promise.all([
+  const [transaction, transactionReceipt] = await Promise.all([
     l2PublicClient.getTransaction({ hash }),
     l2PublicClient.getTransactionReceipt({ hash }),
   ]);
-  if (!transaction || !receipt) {
+  if (!transaction || !transactionReceipt) {
     notFound();
   }
-  const [block, tokenTransfers, signature, tokensPrices] = await Promise.all([
-    l2PublicClient.getBlock({ blockNumber: transaction.blockNumber }),
-    parseTokenTransfers(receipt.logs),
-    getSignatureBySelector(transaction.input.slice(0, 10)),
-    fetchTokensPrices(),
-  ]);
+  const [block, confirmations, tokenTransfers, signature, tokensPrices] =
+    await Promise.all([
+      l2PublicClient.getBlock({ blockNumber: transaction.blockNumber }),
+      l2PublicClient.getTransactionConfirmations({ transactionReceipt }),
+      parseTokenTransfers(transactionReceipt.logs),
+      getSignatureBySelector(transaction.input.slice(0, 10)),
+      fetchTokensPrices(),
+    ]);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h2 className="text-2xl font-bold tracking-tight">Transaction Details</h2>
@@ -40,23 +42,25 @@ const Tx = async ({ hash }: { hash: Hash }) => {
               maxFeePerGas: transaction.maxFeePerGas ?? null,
               maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
               transactionIndex: transaction.transactionIndex,
+              type: transaction.type,
               nonce: transaction.nonce,
               input: transaction.input,
               signature,
               timestamp: block.timestamp,
               transactionReceipt: {
-                transactionHash: receipt.transactionHash,
-                status: receipt.status,
-                from: receipt.from,
-                to: receipt.to,
-                effectiveGasPrice: receipt.effectiveGasPrice,
-                gasUsed: receipt.gasUsed,
-                l1Fee: receipt.l1Fee,
-                l1GasPrice: receipt.l1GasPrice,
-                l1GasUsed: receipt.l1GasUsed,
-                l1FeeScalar: receipt.l1FeeScalar,
+                transactionHash: transactionReceipt.transactionHash,
+                status: transactionReceipt.status,
+                from: transactionReceipt.from,
+                to: transactionReceipt.to,
+                effectiveGasPrice: transactionReceipt.effectiveGasPrice,
+                gasUsed: transactionReceipt.gasUsed,
+                l1Fee: transactionReceipt.l1Fee,
+                l1GasPrice: transactionReceipt.l1GasPrice,
+                l1GasUsed: transactionReceipt.l1GasUsed,
+                l1FeeScalar: transactionReceipt.l1FeeScalar,
               },
             }}
+            confirmations={confirmations}
             ethPriceToday={tokensPrices.eth.today}
             tokenTransfers={tokenTransfers}
           />
