@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { L1L2Transaction } from "@/lib/types";
+import { TransactionEnqueued } from "@/lib/types";
 import { ReceiptText } from "lucide-react";
 import { l1Chain } from "@/lib/chains";
 import { SquareArrowOutUpRight } from "lucide-react";
@@ -15,7 +15,7 @@ import {
 const LatestL1L2Transaction = ({
   transaction,
 }: {
-  transaction: L1L2Transaction;
+  transaction: TransactionEnqueued;
 }) => (
   <div className="flex items-center gap-4 pt-6">
     <div className="hidden h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground 2xl:flex">
@@ -62,7 +62,7 @@ const LatestL1L2Transaction = ({
 const LatestL1L2Transactions = ({
   transactions,
 }: {
-  transactions: L1L2Transaction[];
+  transactions: TransactionEnqueued[];
 }) => (
   <Card>
     <CardHeader className="border-b">

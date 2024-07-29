@@ -11,7 +11,6 @@ import {
 } from "viem";
 import { mainnet, optimism } from "viem/chains";
 import { l1Chain, l2Chain, l2PublicClient } from "@/lib/chains";
-import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
 
 const prisma = new PrismaClient();
 
@@ -63,6 +62,7 @@ const trimTransactions = (
     maxFeePerGas?: bigint;
     maxPriorityFeePerGas?: bigint;
     type: TransactionType;
+    typeHex: Hex | null;
     nonce: number;
     transactionIndex: number;
     input: Hex;
@@ -81,6 +81,7 @@ const trimTransactions = (
       maxFeePerGas,
       maxPriorityFeePerGas,
       type,
+      typeHex,
       nonce,
       transactionIndex,
       input,
@@ -96,7 +97,8 @@ const trimTransactions = (
       maxPriorityFeePerGas: maxPriorityFeePerGas
         ? `0x${maxPriorityFeePerGas.toString(16)}`
         : null,
-      type,
+      type: type || "legacy",
+      typeHex: typeHex || "0x1",
       nonce,
       transactionIndex,
       input,
@@ -136,7 +138,6 @@ await prisma.deployConfig.create({
   data: {
     l1ChainId: l1Chain.id,
     l2ChainId: l2Chain.id,
-    l2BlockTime: await l2OutputOracle.read.L2_BLOCK_TIME(),
   },
 });
 

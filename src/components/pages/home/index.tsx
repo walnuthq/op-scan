@@ -12,9 +12,8 @@ const Home = async () => {
   const {
     tokensPrices,
     latestBlocks,
-    l2BlockTime,
     latestTransactions,
-    latestL1L2Transactions,
+    latestTransactionsEnqueued,
   } = await fetchHomePageData();
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
@@ -24,18 +23,15 @@ const Home = async () => {
           <OpPrice op={tokensPrices.op} />
         </div>
         <div className="space-y-4">
-          <LatestBlockAndTxs
-            blockNumber={latestBlocks[0]?.number}
-            l2BlockTime={l2BlockTime}
-          />
+          <LatestBlockAndTxs blockNumber={latestBlocks[0]?.number} />
           <LatestL1TxBatch />
         </div>
         <TransactionHistory />
       </div>
       <div className="grid gap-4 md:gap-4 lg:grid-cols-2 xl:grid-cols-3">
-        <LatestBlocks blocks={latestBlocks} l2BlockTime={l2BlockTime} />
+        <LatestBlocks blocks={latestBlocks} />
         <LatestTransactions transactions={latestTransactions} />
-        <LatestL1L2Transactions transactions={latestL1L2Transactions} />
+        <LatestL1L2Transactions transactions={latestTransactionsEnqueued} />
       </div>
     </main>
   );

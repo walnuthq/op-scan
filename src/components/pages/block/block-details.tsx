@@ -25,7 +25,7 @@ const BlockDetails = ({ block }: { block: BlockWithTransactions }) => (
     <DescriptionListItem title="Gas Used">
       {formatGas(block.gasUsed).value}{" "}
       <span className="ml-1 text-muted-foreground">
-        ({formatGas(block.gasUsed, block.gasLimit).percentage})
+        ({formatGas(block.gasUsed, block.gasLimit).percentageFormatted})
       </span>
     </DescriptionListItem>
     <DescriptionListItem title="Gas Limit">

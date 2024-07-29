@@ -1,10 +1,29 @@
-import { LatestTransactions } from "@/components/pages/txs/LatestTransactions";
+import { l2PublicClient } from "@/lib/chains";
+import Txs from "@/components/pages/txs";
 
-export default function TxsPage() {
+const TxsPage = async ({
+  searchParams,
+}: {
+  searchParams: {
+    start?: string;
+    index?: string;
+    page?: string;
+    latest?: string;
+  };
+}) => {
+  const latestBlockNumber = await l2PublicClient.getBlockNumber();
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Latest Transactions</h1>
-      <LatestTransactions />
-    </div>
+    <Txs
+      start={
+        searchParams.start ? BigInt(searchParams.start) : latestBlockNumber
+      }
+      index={searchParams.index ? Number(searchParams.index) : 0}
+      page={searchParams.page ? Number(searchParams.page) : 1}
+      latest={
+        searchParams.latest ? BigInt(searchParams.latest) : latestBlockNumber
+      }
+    />
   );
-}
+};
+
+export default TxsPage;

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Box } from "lucide-react";
-import { BlockWithTransactions } from "@/lib/types";
+import { Block } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -10,13 +10,7 @@ import {
 } from "@/components/ui/card";
 import { formatTimestamp } from "@/lib/utils";
 
-const LatestBlock = ({
-  block,
-  l2BlockTime,
-}: {
-  block: BlockWithTransactions;
-  l2BlockTime: bigint;
-}) => (
+const LatestBlock = ({ block }: { block: Block }) => (
   <div className="flex items-center gap-4 pt-6">
     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
       <Box className="h-5 w-5" />
@@ -43,7 +37,7 @@ const LatestBlock = ({
             {block.transactions.length === 1 ? "" : "s"}
           </Link>{" "}
           <span className="text-muted-foreground">
-            in {l2BlockTime.toString()} secs
+            in {process.env.NEXT_PUBLIC_L2_BLOCK_TIME} secs
           </span>
         </div>
       </div>
@@ -51,20 +45,14 @@ const LatestBlock = ({
   </div>
 );
 
-const LatestBlocks = ({
-  blocks,
-  l2BlockTime,
-}: {
-  blocks: BlockWithTransactions[];
-  l2BlockTime: bigint;
-}) => (
+const LatestBlocks = ({ blocks }: { blocks: Block[] }) => (
   <Card>
     <CardHeader className="border-b">
       <CardTitle>Latest Blocks</CardTitle>
     </CardHeader>
     <CardContent className="grid gap-6 divide-y">
       {blocks.map((block) => (
-        <LatestBlock key={block.hash} block={block} l2BlockTime={l2BlockTime} />
+        <LatestBlock key={block.hash} block={block} />
       ))}
     </CardContent>
     <CardFooter className="flex justify-center border-t">

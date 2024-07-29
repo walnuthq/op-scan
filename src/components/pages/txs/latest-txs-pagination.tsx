@@ -12,20 +12,24 @@ import { Button } from "@/components/ui/button";
 import { RotateCw } from "lucide-react";
 import { l2PublicClient } from "@/lib/chains";
 
-const LatestBlocksPagination = ({
-  start,
+const LatestTxsPagination = ({
+  page,
+  previousStart,
+  previousIndex,
+  nextStart,
+  nextIndex,
   latest,
 }: {
-  start: bigint;
+  page: number;
+  previousStart?: bigint;
+  previousIndex?: number;
+  nextStart?: bigint;
+  nextIndex?: number;
   latest: bigint;
 }) => {
   const router = useRouter();
-  const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
-  const totalBlocks = latest + BigInt(1);
-  const page = (latest - start) / blocksPerPage + BigInt(1);
-  const totalPages = BigInt(
-    Math.ceil(Number(totalBlocks) / Number(blocksPerPage)),
-  );
+  const txsPerPage = BigInt(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
+  const totalPages = BigInt(Math.ceil(500000 / Number(txsPerPage)));
   return (
     <Pagination className="mx-0 w-auto">
       <PaginationContent>
@@ -36,7 +40,7 @@ const LatestBlocksPagination = ({
             onClick={async () => {
               const latestBlockNumber = await l2PublicClient.getBlockNumber();
               router.push(
-                `/blocks?start=${latestBlockNumber}&latest=${latestBlockNumber}`,
+                `/txs?start=${latestBlockNumber}&index=0&latest=${latestBlockNumber}`,
               );
             }}
           >
@@ -46,8 +50,8 @@ const LatestBlocksPagination = ({
         <PaginationItem>
           <PaginationLink
             className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${latest}&latest=${latest}`}
-            aria-disabled={page === BigInt(1)}
+            href={`/txs?start=${latest}&index=0&latest=${latest}`}
+            aria-disabled={!previousStart}
           >
             First
           </PaginationLink>
@@ -55,32 +59,23 @@ const LatestBlocksPagination = ({
         <PaginationItem>
           <PaginationPrevious
             className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${start + blocksPerPage}&latest=${latest}`}
-            aria-disabled={page === BigInt(1)}
+            href={`/txs?start=${previousStart}&index=${previousIndex}&latest=${latest}`}
+            aria-disabled={!previousStart}
           />
         </PaginationItem>
         <PaginationItem className="text-sm">
-          Page {page.toString()} of {totalPages.toString()}
+          Page {page} of {totalPages.toString()}
         </PaginationItem>
         <PaginationItem>
           <PaginationNext
             className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${start - blocksPerPage}&latest=${latest}`}
-            aria-disabled={page === totalPages}
+            href={`/txs?start=${nextStart}&index=${nextIndex}&latest=${latest}`}
+            aria-disabled={!nextStart}
           />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink
-            className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${latest - (totalPages - BigInt(1)) * blocksPerPage}&latest=${latest}`}
-            aria-disabled={page === totalPages}
-          >
-            Last
-          </PaginationLink>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
   );
 };
 
-export default LatestBlocksPagination;
+export default LatestTxsPagination;

@@ -31,9 +31,7 @@ const TransactionDetails = ({
       {transaction.hash}
     </DescriptionListItem>
     <DescriptionListItem title="Status">
-      <TxStatusBadge
-        success={transaction.transactionReceipt.status === "success"}
-      />
+      <TxStatusBadge success={transaction.receipt.status === "success"} />
     </DescriptionListItem>
     <DescriptionListItem title="Block">
       <Link
@@ -64,8 +62,7 @@ const TransactionDetails = ({
     </DescriptionListItem>
     <DescriptionListItem title="Transaction Fee">
       {formatEther(
-        transaction.transactionReceipt.effectiveGasPrice *
-          transaction.transactionReceipt.gasUsed,
+        transaction.receipt.effectiveGasPrice * transaction.receipt.gasUsed,
         18,
       )}{" "}
       ETH
@@ -83,9 +80,9 @@ const TransactionDetails = ({
     <DescriptionListItem title="Gas Limit & Usage by Txn">
       {formatGas(transaction.gas).value}
       <span className="mx-4 text-muted-foreground">|</span>
-      {formatGas(transaction.transactionReceipt.gasUsed).value} (
+      {formatGas(transaction.receipt.gasUsed).value} (
       {
-        formatGas(transaction.transactionReceipt.gasUsed, transaction.gas)
+        formatGas(transaction.receipt.gasUsed, transaction.gas)
           .percentageFormatted
       }
       )
@@ -103,33 +100,30 @@ const TransactionDetails = ({
     <Separator />
     <DescriptionListItem title="L2 Fees Paid">
       {formatEther(
-        transaction.transactionReceipt.effectiveGasPrice *
-          transaction.transactionReceipt.gasUsed,
+        transaction.receipt.effectiveGasPrice * transaction.receipt.gasUsed,
         18,
       )}{" "}
       ETH
     </DescriptionListItem>
     <DescriptionListItem title="L1 Fees Paid">
-      {formatEther(transaction.transactionReceipt.l1Fee ?? BigInt(0), 18)} ETH
+      {formatEther(transaction.receipt.l1Fee ?? BigInt(0), 18)} ETH
     </DescriptionListItem>
     <DescriptionListItem title="L1 Gas Price">
-      {formatEther(transaction.transactionReceipt.l1GasPrice ?? BigInt(0), 18)}{" "}
-      ETH{" "}
+      {formatEther(transaction.receipt.l1GasPrice ?? BigInt(0), 18)} ETH{" "}
       <span className="ml-1 text-muted-foreground">
-        ({formatGwei(transaction.transactionReceipt.l1GasPrice ?? BigInt(0), 9)}{" "}
-        Gwei)
+        ({formatGwei(transaction.receipt.l1GasPrice ?? BigInt(0), 9)} Gwei)
       </span>
     </DescriptionListItem>
     <DescriptionListItem title="L1 Gas Used by Txn">
-      {formatGas(transaction.transactionReceipt.l1GasUsed ?? BigInt(0)).value}
+      {formatGas(transaction.receipt.l1GasUsed ?? BigInt(0)).value}
     </DescriptionListItem>
     <DescriptionListItem title="L1 Fee Scalar">
-      {transaction.transactionReceipt.l1FeeScalar ?? 0}
+      {transaction.receipt.l1FeeScalar ?? 0}
     </DescriptionListItem>
     <Separator />
     <TransactionOtherAttributes transaction={transaction} />
     <TransactionInput
-      signature={transaction.signature ?? ""}
+      signature={transaction.signature}
       input={transaction.input}
     />
   </dl>

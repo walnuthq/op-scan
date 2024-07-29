@@ -1,154 +1,167 @@
+import { range } from "lodash";
 import { subDays, formatISO } from "date-fns";
-import { encodeFunctionData, keccak256, Address } from "viem";
+import { Hash } from "viem";
 import {
-  Transaction,
-  fromPrismaBlockWithTransactions,
+  extractTransactionDepositedLogs,
+  getL2TransactionHash,
+} from "viem/op-stack";
+import {
+  Block,
+  TransactionWithReceipt,
+  fromPrismaBlock,
   fromPrismaTransaction,
+  fromViemBlock,
+  fromViemTransactionWithReceipt,
+  fromPrismaTransactionEnqueued,
 } from "@/lib/types";
-import { BlockWithTransactions, L1L2Transaction } from "@/lib/types";
+import { TransactionEnqueued } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
-import l2OutputOracle from "@/lib/contracts/l2-output-oracle/contract";
+import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
-import l2CrossDomainMessenger from "@/lib/contracts/l2-cross-domain-messenger/contract";
 import { prisma } from "@/lib/prisma";
+import { getSignatureBySelector } from "@/lib/4byte-directory";
 
-export const fetchBlocks = async (
-  latestBlockNumber: bigint,
-  currentPage: bigint,
-  blocksPerPage: bigint,
-) => {
-  const startBlock =
-    latestBlockNumber - (currentPage - BigInt(1)) * blocksPerPage;
-  const remainingBlocks = Number(startBlock + BigInt(1));
-  const blocksToFetch = Math.min(Number(blocksPerPage), remainingBlocks);
-  return Promise.all(
-    Array.from({ length: blocksToFetch }, (_, i) =>
-      l2PublicClient.getBlock({ blockNumber: startBlock - BigInt(i) }),
+export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
+  const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
+  const blocks = await Promise.all(
+    range(Number(start), Math.max(Number(start - blocksPerPage), -1)).map((i) =>
+      l2PublicClient.getBlock({ blockNumber: BigInt(i) }),
     ),
   );
+  return blocks.map(fromViemBlock);
 };
 
-export const fetchLatestL1L2Transactions = async (): Promise<
-  L1L2Transaction[]
-> => {
-  const [l1BlockNumber, l2BlockNumber, l2BlockTime] = await Promise.all([
-    l1PublicClient.getBlockNumber(),
-    l2PublicClient.getBlockNumber(),
-    l2OutputOracle.read.L2_BLOCK_TIME(), // renamed to l2BlockTime
-  ]);
-  const l1FromBlock = l1BlockNumber - BigInt(1000);
-  const l2BlocksPerL1Block = 12 / Number(l2BlockTime);
-  const l2FromBlock = l2BlockNumber - BigInt(1000 * l2BlocksPerL1Block);
-  const [sentMessageLogs, sentMessageExtension1Logs, relayedMessageLogs] =
-    await Promise.all([
-      l1CrossDomainMessenger.getEvents.SentMessage(undefined, {
-        fromBlock: l1FromBlock,
-      }),
-      l1CrossDomainMessenger.getEvents.SentMessageExtension1(undefined, {
-        fromBlock: l1FromBlock,
-      }),
-      l2CrossDomainMessenger.getEvents.RelayedMessage(undefined, {
-        fromBlock: l2FromBlock,
-      }),
-    ]);
-  const lastSentMessageLogs = sentMessageLogs.reverse().slice(0, 10);
-  const sentMessageLogsBlocks = await Promise.all(
-    lastSentMessageLogs.map(({ blockNumber }) =>
-      l1PublicClient.getBlock({ blockNumber }),
-    ),
+export const fetchLatestTransactions = async (
+  start: bigint,
+  index: number,
+  latest: bigint,
+): Promise<{
+  transactions: TransactionWithReceipt[];
+  previousStart?: bigint;
+  previousIndex?: number;
+  nextStart?: bigint;
+  nextIndex?: number;
+}> => {
+  const txsPerPage = BigInt(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
+  const blocks = await Promise.all(
+    range(
+      Math.min(Number(start + txsPerPage), Number(latest)),
+      Math.max(Number(start - BigInt(2) * txsPerPage), -1),
+    ).map((i) => l2PublicClient.getBlock({ blockNumber: BigInt(i) })),
   );
-  return lastSentMessageLogs.reduce<L1L2Transaction[]>(
-    (txns, sentMessageLog, i) => {
-      const { messageNonce, sender, target, gasLimit, message } =
-        sentMessageLog.args;
-      const sentMessageExtension1Log = sentMessageExtension1Logs.find(
-        ({ transactionHash }) =>
-          transactionHash === sentMessageLog.transactionHash,
-      );
-      if (!sentMessageExtension1Log) {
-        return txns;
-      }
-      const { value } = sentMessageExtension1Log.args;
-      const data = encodeFunctionData({
-        abi: l1CrossDomainMessenger.abi,
-        functionName: "relayMessage",
-        args: [
-          messageNonce!,
-          sender!,
-          target!,
-          value!,
-          gasLimit!,
-          message!,
-        ] as [
-          bigint,
-          `0x${string}`,
-          `0x${string}`,
-          bigint,
-          bigint,
-          `0x${string}`,
-        ],
-      });
-      const hash = keccak256(data);
-      const relayedMessageLog = relayedMessageLogs.find(
-        ({ args }) => args.msgHash === hash,
-      );
-      if (!relayedMessageLog) {
-        return txns;
-      }
-      const txn = {
-        l1BlockNumber: sentMessageLog.blockNumber,
-        l1TxHash: sentMessageLog.transactionHash,
-        l2TxHash: relayedMessageLog.transactionHash,
-        timestamp: sentMessageLogsBlocks[i].timestamp,
-        // Optimism: Aliased L1 Cross-Domain Messenger
-        l1TxOrigin: "0x36bde71c97b33cc4729cf772ae268934f7ab70b2" as Address,
-        gasLimit: gasLimit!,
-      };
-      return [...txns, txn];
+  type TransactionPaginationItem = {
+    hash: Hash;
+    transactionIndex: number;
+    blockNumber: bigint;
+    timestamp: bigint;
+  };
+  const transactionPaginationItems = blocks.reduce<TransactionPaginationItem[]>(
+    (previousValue, block) => {
+      const items = block.transactions.map((hash, i) => ({
+        hash,
+        transactionIndex: i,
+        blockNumber: block.number,
+        timestamp: block.timestamp,
+      }));
+      return [...previousValue, ...items];
     },
     [],
   );
-};
-
-const fetchL2LatestBlocks = async (): Promise<BlockWithTransactions[]> => {
-  const latestBlock = await l2PublicClient.getBlock({
-    includeTransactions: true,
-  });
-  const latestBlocks = await Promise.all(
-    [1, 2, 3, 4, 5].map((index) =>
-      l2PublicClient.getBlock({
-        blockNumber: latestBlock.number - BigInt(index),
-        includeTransactions: true,
+  const startItemIndex = transactionPaginationItems.findIndex(
+    ({ blockNumber, transactionIndex }) =>
+      blockNumber === start && transactionIndex === index,
+  );
+  const previousItem =
+    transactionPaginationItems[startItemIndex - Number(txsPerPage)];
+  const nextItem =
+    transactionPaginationItems[startItemIndex + Number(txsPerPage)];
+  const currentItems = transactionPaginationItems.slice(
+    startItemIndex,
+    startItemIndex + Number(txsPerPage),
+  );
+  const [transactionsWithTimestamp, receipts] = await Promise.all([
+    Promise.all(
+      currentItems.map(async ({ hash, timestamp }) => {
+        const transaction = await l2PublicClient.getTransaction({ hash });
+        return { ...transaction, timestamp };
       }),
     ),
+    Promise.all(
+      currentItems.map(({ hash }) =>
+        l2PublicClient.getTransactionReceipt({ hash }),
+      ),
+    ),
+  ]);
+  const signatures = await Promise.all(
+    transactionsWithTimestamp.map(({ input }) =>
+      getSignatureBySelector(input.slice(0, 10)),
+    ),
   );
-  const blocks = [latestBlock, ...latestBlocks];
-  return blocks.map((block) => ({
-    number: block.number,
-    hash: block.hash,
-    timestamp: block.timestamp,
-    gasUsed: block.gasUsed,
-    gasLimit: block.gasLimit,
-    extraData: block.extraData,
-    parentHash: block.parentHash,
-    transactions: block.transactions.map((transaction) => ({
-      blockNumber: transaction.blockNumber,
-      hash: transaction.hash,
-      from: transaction.from,
-      to: transaction.to,
-      value: transaction.value,
-      gas: transaction.gas,
-      gasPrice: transaction.gasPrice ?? null,
-      maxFeePerGas: transaction.maxFeePerGas ?? null,
-      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
-      transactionIndex: transaction.transactionIndex,
-      type: transaction.type,
-      nonce: transaction.nonce,
-      input: transaction.input,
-      signature: "",
-      timestamp: block.timestamp,
-    })),
-  }));
+  const transactions = transactionsWithTimestamp.map((transaction, i) => {
+    return fromViemTransactionWithReceipt(
+      transaction,
+      receipts[i],
+      transaction.timestamp,
+      signatures[i],
+    );
+  });
+  return {
+    transactions,
+    previousStart: previousItem?.blockNumber,
+    previousIndex: previousItem?.transactionIndex,
+    nextStart: nextItem?.blockNumber,
+    nextIndex: nextItem?.transactionIndex,
+  };
+};
+
+export const fetchLatestTransactionsEnqueued = async (
+  start: bigint,
+  hash: Hash,
+  latest: bigint,
+): Promise<{
+  transactions: TransactionEnqueued[];
+  previousStart?: bigint;
+  previousHash?: Hash;
+  nextStart?: bigint;
+  nextHash?: Hash;
+}> => {
+  const l1BlocksPerTxsEnqueued = BigInt(250);
+  const txsEnqueuedPerPage = BigInt(
+    process.env.NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE,
+  );
+  const l1FromBlock = start - l1BlocksPerTxsEnqueued * txsEnqueuedPerPage;
+  const [transactionDepositedLogs, sentMessageLogs] = await Promise.all([
+    portal.getEvents.TransactionDeposited(undefined, {
+      fromBlock: l1FromBlock,
+    }),
+    l1CrossDomainMessenger.getEvents.SentMessage(undefined, {
+      fromBlock: l1FromBlock,
+    }),
+  ]);
+  const transactions = await Promise.all(
+    extractTransactionDepositedLogs({ logs: transactionDepositedLogs }).map(
+      async (transactionDepositedLog, index) => {
+        const { timestamp } = await l1PublicClient.getBlock({
+          blockNumber: transactionDepositedLog.blockNumber,
+        });
+        return {
+          l1BlockNumber: transactionDepositedLog.blockNumber,
+          l2TxHash: getL2TransactionHash({ log: transactionDepositedLog }),
+          l1TxHash: transactionDepositedLog.transactionHash,
+          timestamp,
+          l1TxOrigin: transactionDepositedLog.args.from,
+          gasLimit: sentMessageLogs[index].args.gasLimit ?? BigInt(0),
+        };
+      },
+    ),
+  );
+  return {
+    transactions: transactions.reverse().slice(0, Number(txsEnqueuedPerPage)),
+    previousStart: BigInt(0),
+    previousHash: "0x",
+    nextStart: BigInt(0),
+    nextHash: "0x",
+  };
 };
 
 export const fetchTokensPrices = async () => {
@@ -194,57 +207,66 @@ export const fetchTokensPrices = async () => {
   };
 };
 
-export const fetchHomePageData = async () => {
-  if (process.env.DATABASE_URL) {
-    const [
-      tokensPrices,
-      latestBlocks,
-      deployConfig,
-      latestTransactions,
-      latestL1L2Transactions,
-    ] = await Promise.all([
-      fetchTokensPrices(),
-      prisma.block.findMany({
-        include: { transactions: true },
-        orderBy: { number: "desc" },
-        take: 6,
-      }),
-      prisma.deployConfig.findFirst(),
-      prisma.transaction.findMany({
-        orderBy: { timestamp: "desc" },
-        take: 6,
-      }),
-      fetchLatestL1L2Transactions(),
-    ]);
-    return {
-      tokensPrices,
-      latestBlocks: latestBlocks.map(fromPrismaBlockWithTransactions),
-      l2BlockTime: deployConfig ? deployConfig.l2BlockTime : BigInt(2),
-      latestTransactions: latestTransactions.map(fromPrismaTransaction),
-      latestL1L2Transactions,
-    };
-  }
+export const fetchHomePageDataFromJsonRpc = async () => {
+  const [latestL1BlockNumber, latestL2BlockNumber] = await Promise.all([
+    l1PublicClient.getBlockNumber(),
+    l2PublicClient.getBlockNumber(),
+  ]);
   const [
     tokensPrices,
-    latestBlocksFromJsonRpc,
-    l2BlockTime,
-    latestL1L2Transactions,
+    latestBlocks,
+    { transactions: latestTransactions },
+    { transactions: latestTransactionsEnqueued },
   ] = await Promise.all([
     fetchTokensPrices(),
-    fetchL2LatestBlocks(),
-    l2OutputOracle.read.L2_BLOCK_TIME(),
-    fetchLatestL1L2Transactions(),
+    fetchLatestBlocks(latestL2BlockNumber),
+    fetchLatestTransactions(latestL2BlockNumber, 0, latestL2BlockNumber),
+    fetchLatestTransactionsEnqueued(
+      latestL1BlockNumber,
+      "0x",
+      latestL1BlockNumber,
+    ),
   ]);
-  const latestTransactionsFromJsonRpc = latestBlocksFromJsonRpc
-    .reduce<
-      Transaction[]
-    >((txns, block) => [...txns, ...block.transactions.reverse()], [])
-    .slice(0, 6);
   return {
     tokensPrices,
-    latestBlocks: latestBlocksFromJsonRpc,
-    l2BlockTime,
-    latestTransactions: latestTransactionsFromJsonRpc,
-    latestL1L2Transactions,
+    latestBlocks: latestBlocks.slice(0, 6),
+    latestTransactions: latestTransactions.slice(0, 6),
+    latestTransactionsEnqueued: latestTransactionsEnqueued.slice(0, 10),
   };
 };
+
+export const fetchHomePageDataFromDatabase = async () => {
+  const [
+    tokensPrices,
+    latestBlocks,
+    latestTransactions,
+    latestTransactionsEnqueued,
+  ] = await Promise.all([
+    fetchTokensPrices(),
+    prisma.block.findMany({
+      include: { transactions: true },
+      orderBy: { number: "desc" },
+      take: 6,
+    }),
+    prisma.transaction.findMany({
+      orderBy: { timestamp: "desc" },
+      take: 6,
+    }),
+    prisma.transactionEnqueued.findMany({
+      orderBy: { timestamp: "desc" },
+      take: 10,
+    }),
+  ]);
+  return {
+    tokensPrices,
+    latestBlocks: latestBlocks.map(fromPrismaBlock),
+    latestTransactions: latestTransactions.map(fromPrismaTransaction),
+    latestTransactionsEnqueued: latestTransactionsEnqueued.map(
+      fromPrismaTransactionEnqueued,
+    ),
+  };
+};
+
+export const fetchHomePageData = process.env.DATABASE_URL
+  ? fetchHomePageDataFromDatabase
+  : fetchHomePageDataFromJsonRpc;

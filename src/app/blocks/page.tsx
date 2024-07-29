@@ -4,16 +4,19 @@ import Blocks from "@/components/pages/blocks";
 const BlocksPage = async ({
   searchParams,
 }: {
-  searchParams: { page?: string; latest?: string };
-}) => (
-  <Blocks
-    page={searchParams.page ? BigInt(searchParams.page) : BigInt(1)}
-    latest={
-      searchParams.latest
-        ? BigInt(searchParams.latest)
-        : await l2PublicClient.getBlockNumber()
-    }
-  />
-);
+  searchParams: { start?: string; latest?: string };
+}) => {
+  const latestBlockNumber = await l2PublicClient.getBlockNumber();
+  return (
+    <Blocks
+      start={
+        searchParams.start ? BigInt(searchParams.start) : latestBlockNumber
+      }
+      latest={
+        searchParams.latest ? BigInt(searchParams.latest) : latestBlockNumber
+      }
+    />
+  );
+};
 
 export default BlocksPage;
