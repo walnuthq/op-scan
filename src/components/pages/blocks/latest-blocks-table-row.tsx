@@ -23,17 +23,17 @@ const LatestBlocksTableRow = ({
     block.gasLimit,
   );
   return (
-    <TooltipProvider>
-      <TableRow>
-        <TableCell>
-          <Link
-            href={`/block/${block.number}`}
-            className="text-sm font-medium leading-none text-primary hover:brightness-150"
-          >
-            {block.number.toString()}
-          </Link>
-        </TableCell>
-        <TableCell>
+    <TableRow>
+      <TableCell>
+        <Link
+          href={`/block/${block.number}`}
+          className="text-sm font-medium leading-none text-primary hover:brightness-150"
+        >
+          {block.number.toString()}
+        </Link>
+      </TableCell>
+      <TableCell>
+        <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
               <span suppressHydrationWarning>
@@ -46,18 +46,20 @@ const LatestBlocksTableRow = ({
               </span>
             </TooltipContent>
           </Tooltip>
-        </TableCell>
-        <TableCell>
-          <Link
-            href={`/block/${block.number}/txs`}
-            className="text-sm font-medium leading-none text-primary hover:brightness-150"
-          >
-            {block.transactions.length}
-          </Link>
-        </TableCell>
-        <TableCell>
-          <div className="flex items-center space-x-2">
-            <span>{value}</span>
+        </TooltipProvider>
+      </TableCell>
+      <TableCell>
+        <Link
+          href={`/block/${block.number}/txs`}
+          className="text-sm font-medium leading-none text-primary hover:brightness-150"
+        >
+          {block.transactions.length}
+        </Link>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center space-x-2">
+          <span>{value}</span>
+          <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <span className="text-xs text-gray-500">
@@ -66,14 +68,12 @@ const LatestBlocksTableRow = ({
               </TooltipTrigger>
               <TooltipContent className="text-xs">Gas used in %</TooltipContent>
             </Tooltip>
-          </div>
-          <div className="progress-bar mt-1 h-[3px] max-w-[4rem] bg-gray-200">
-            <Progress className="h-full rounded-none" value={percentage} />
-          </div>
-        </TableCell>
-        <TableCell>{formatGas(block.gasLimit).value}</TableCell>
-      </TableRow>
-    </TooltipProvider>
+          </TooltipProvider>
+        </div>
+        <Progress value={percentage} className="h-1" />
+      </TableCell>
+      <TableCell>{formatGas(block.gasLimit).value}</TableCell>
+    </TableRow>
   );
 };
 

@@ -2,15 +2,15 @@
 import { TransactionWithReceipt } from "@/lib/types";
 import {
   Table,
+  TableBody,
+  TableHead,
   TableHeader,
   TableRow,
-  TableHead,
-  TableBody,
 } from "@/components/ui/table";
-import BlockTransactionsTableRow from "@/components/pages/block-txs/block-transactions-table-row";
 import useGlobalContext from "@/components/lib/context/hook";
+import LatestTxsTableRow from "@/components/pages/txs/latest-txs-table-row";
 
-const BlockTransactionsTable = ({
+const LatestTxsTable = ({
   transactions,
 }: {
   transactions: TransactionWithReceipt[];
@@ -21,11 +21,12 @@ const BlockTransactionsTable = ({
     toggleTxGasPriceShown,
   } = useGlobalContext();
   return (
-    <Table className="table-auto">
+    <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Transaction Hash</TableHead>
           <TableHead>Method</TableHead>
+          <TableHead>Block</TableHead>
           <TableHead>
             <a
               className="cursor-pointer text-primary hover:brightness-150"
@@ -37,7 +38,7 @@ const BlockTransactionsTable = ({
           </TableHead>
           <TableHead>From</TableHead>
           <TableHead>To</TableHead>
-          <TableHead>Value</TableHead>
+          <TableHead>Amount</TableHead>
           <TableHead>
             <a
               className="cursor-pointer text-primary hover:brightness-150"
@@ -51,7 +52,7 @@ const BlockTransactionsTable = ({
       </TableHeader>
       <TableBody>
         {transactions.map((transaction) => (
-          <BlockTransactionsTableRow
+          <LatestTxsTableRow
             key={transaction.hash}
             transaction={transaction}
             timestampFormattedAsDate={timestampFormattedAsDate}
@@ -63,4 +64,4 @@ const BlockTransactionsTable = ({
   );
 };
 
-export default BlockTransactionsTable;
+export default LatestTxsTable;

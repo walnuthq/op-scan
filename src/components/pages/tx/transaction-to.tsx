@@ -23,7 +23,7 @@ const TransactionTo = ({
       </Link>
       {transaction.input !== "0x" && (
         <>
-          {transaction.transactionReceipt.status === "success" ? (
+          {transaction.receipt.status === "success" ? (
             <CircleCheck className="ml-4 size-4 text-green-400" />
           ) : (
             <CircleX className="ml-4 size-4 text-red-400" />

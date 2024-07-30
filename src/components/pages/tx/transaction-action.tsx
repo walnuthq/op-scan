@@ -35,7 +35,7 @@ const TransactionAction = ({
           <span className="mr-2">Call</span>
           <TxMethodBadge
             selector={selector}
-            signature={transaction.signature ?? ""}
+            signature={transaction.signature}
           />
           <span className="mx-2">Method by</span>
           <Link

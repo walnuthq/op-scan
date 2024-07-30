@@ -7,6 +7,7 @@ import { parseTokenTransfers } from "@/lib/utils";
 import { fetchTokensPrices } from "@/lib/fetch-data";
 import TransactionDetails from "@/components/pages/tx/transaction-details";
 import { getSignatureBySelector } from "@/lib/4byte-directory";
+import { fromViemTransactionWithReceipt } from "@/lib/types";
 
 const Tx = async ({ hash }: { hash: Hash }) => {
   const [transaction, transactionReceipt] = await Promise.all([
@@ -24,6 +25,12 @@ const Tx = async ({ hash }: { hash: Hash }) => {
       getSignatureBySelector(transaction.input.slice(0, 10)),
       fetchTokensPrices(),
     ]);
+  const transactionWithReceipt = fromViemTransactionWithReceipt(
+    transaction,
+    transactionReceipt,
+    block.timestamp,
+    signature,
+  );
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h2 className="text-2xl font-bold tracking-tight">Transaction Details</h2>
@@ -31,35 +38,7 @@ const Tx = async ({ hash }: { hash: Hash }) => {
       <Card>
         <CardContent className="p-4">
           <TransactionDetails
-            transaction={{
-              blockNumber: transaction.blockNumber,
-              hash: transaction.hash,
-              from: transaction.from,
-              to: transaction.to,
-              value: transaction.value,
-              gas: transaction.gas,
-              gasPrice: transaction.gasPrice ?? null,
-              maxFeePerGas: transaction.maxFeePerGas ?? null,
-              maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
-              transactionIndex: transaction.transactionIndex,
-              type: transaction.type,
-              nonce: transaction.nonce,
-              input: transaction.input,
-              signature,
-              timestamp: block.timestamp,
-              transactionReceipt: {
-                transactionHash: transactionReceipt.transactionHash,
-                status: transactionReceipt.status,
-                from: transactionReceipt.from,
-                to: transactionReceipt.to,
-                effectiveGasPrice: transactionReceipt.effectiveGasPrice,
-                gasUsed: transactionReceipt.gasUsed,
-                l1Fee: transactionReceipt.l1Fee,
-                l1GasPrice: transactionReceipt.l1GasPrice,
-                l1GasUsed: transactionReceipt.l1GasUsed,
-                l1FeeScalar: transactionReceipt.l1FeeScalar,
-              },
-            }}
+            transaction={transactionWithReceipt}
             confirmations={confirmations}
             ethPriceToday={tokensPrices.eth.today}
             tokenTransfers={tokenTransfers}

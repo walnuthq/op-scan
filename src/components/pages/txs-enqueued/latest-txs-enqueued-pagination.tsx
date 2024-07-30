@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { Hash } from "viem";
 import {
   Pagination,
   PaginationContent,
@@ -10,22 +11,28 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { RotateCw } from "lucide-react";
-import { l2PublicClient } from "@/lib/chains";
+import { l1PublicClient } from "@/lib/chains";
 
-const LatestBlocksPagination = ({
-  start,
+const LatestTxsEnqueuedPagination = ({
+  page,
+  previousStart,
+  previousHash,
+  nextStart,
+  nextHash,
   latest,
 }: {
-  start: bigint;
+  page: number;
+  previousStart?: bigint;
+  previousHash?: Hash;
+  nextStart?: bigint;
+  nextHash?: Hash;
   latest: bigint;
 }) => {
   const router = useRouter();
-  const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
-  const totalBlocks = latest + BigInt(1);
-  const page = (latest - start) / blocksPerPage + BigInt(1);
-  const totalPages = BigInt(
-    Math.ceil(Number(totalBlocks) / Number(blocksPerPage)),
+  const txsEnqueuedPerPage = BigInt(
+    process.env.NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE,
   );
+  const totalPages = BigInt(Math.ceil(100000 / Number(txsEnqueuedPerPage)));
   return (
     <Pagination className="mx-0 w-auto">
       <PaginationContent>
@@ -34,9 +41,9 @@ const LatestBlocksPagination = ({
             variant="ghost"
             className="text-primary hover:bg-primary"
             onClick={async () => {
-              const latestBlockNumber = await l2PublicClient.getBlockNumber();
+              const latestBlockNumber = await l1PublicClient.getBlockNumber();
               router.push(
-                `/blocks?start=${latestBlockNumber}&latest=${latestBlockNumber}`,
+                `/txs-enqueued?start=${latestBlockNumber}&hash=0x&latest=${latestBlockNumber}`,
               );
             }}
           >
@@ -46,8 +53,8 @@ const LatestBlocksPagination = ({
         <PaginationItem>
           <PaginationLink
             className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${latest}&latest=${latest}`}
-            aria-disabled={page === BigInt(1)}
+            href={`/txs-enqueued?start=${latest}&hash=0x&latest=${latest}`}
+            aria-disabled={!previousStart}
           >
             First
           </PaginationLink>
@@ -55,32 +62,23 @@ const LatestBlocksPagination = ({
         <PaginationItem>
           <PaginationPrevious
             className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${start + blocksPerPage}&latest=${latest}`}
-            aria-disabled={page === BigInt(1)}
+            href={`/txs-enqueued?start=${previousStart}&hash=${previousHash}&latest=${latest}`}
+            aria-disabled={!previousStart}
           />
         </PaginationItem>
         <PaginationItem className="text-sm">
-          Page {page.toString()} of {totalPages.toString()}
+          Page {page} of {totalPages.toString()}
         </PaginationItem>
         <PaginationItem>
           <PaginationNext
             className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${start - blocksPerPage}&latest=${latest}`}
-            aria-disabled={page === totalPages}
+            href={`/txs-enqueued?start=${nextStart}&hash=${nextHash}&latest=${latest}`}
+            aria-disabled={!nextStart}
           />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink
-            className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${latest - (totalPages - BigInt(1)) * blocksPerPage}&latest=${latest}`}
-            aria-disabled={page === totalPages}
-          >
-            Last
-          </PaginationLink>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
   );
 };
 
-export default LatestBlocksPagination;
+export default LatestTxsEnqueuedPagination;

@@ -4,10 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const LatestBlockAndTxs = ({
   blockNumber = BigInt(0),
-  l2BlockTime,
 }: {
   blockNumber?: bigint;
-  l2BlockTime: bigint;
 }) => (
   <Card className="relative pl-8">
     <Server className="absolute left-4 top-6 size-6" />
@@ -26,7 +24,7 @@ const LatestBlockAndTxs = ({
           {blockNumber.toString()}
         </Link>{" "}
         <span className="text-xs text-muted-foreground">
-          ({l2BlockTime.toString()}.0s)
+          ({process.env.NEXT_PUBLIC_L2_BLOCK_TIME}.0s)
         </span>
       </div>
       <div className="text-sm">

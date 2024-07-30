@@ -1,16 +1,29 @@
-import LatestL1L2TransactionsTable from "@/components/pages/txs/latest-l1-l2-transactions-table";
-import { fetchLatestL1L2Transactions } from "@/lib/fetch-data";
+import { Hash } from "viem";
+import { l1PublicClient } from "@/lib/chains";
+import TxsEnqueued from "@/components/pages/txs-enqueued";
 
-const TxsEnqueuedPage = async () => {
-  const transactions = await fetchLatestL1L2Transactions();
-
+const TxsEnqueuedPage = async ({
+  searchParams,
+}: {
+  searchParams: {
+    start?: string;
+    hash?: string;
+    page?: string;
+    latest?: string;
+  };
+}) => {
+  const latestBlockNumber = await l1PublicClient.getBlockNumber();
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
-      <h2 className="mt-10 scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight transition-colors first:mt-0">
-        L1 - L2 Transactions
-      </h2>
-      <LatestL1L2TransactionsTable transactions={transactions} />
-    </main>
+    <TxsEnqueued
+      start={
+        searchParams.start ? BigInt(searchParams.start) : latestBlockNumber
+      }
+      hash={searchParams.hash ? (searchParams.hash as Hash) : "0x"}
+      page={searchParams.page ? Number(searchParams.page) : 1}
+      latest={
+        searchParams.latest ? BigInt(searchParams.latest) : latestBlockNumber
+      }
+    />
   );
 };
 

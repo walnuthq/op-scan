@@ -8,9 +8,12 @@ import {
   Log,
   formatUnits,
   Address,
+  Hex,
+  TransactionType,
 } from "viem";
 import { TokenTransfer } from "@/lib/types";
-import { getERC20Contract } from "./contracts/erc-20/contract";
+import { capitalize } from "lodash";
+import { getERC20Contract } from "@/lib/contracts/erc-20/contract";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -70,6 +73,13 @@ export const formatGas = (value: bigint, total: bigint = BigInt(1)) => ({
   percentage: (Number(value) / Number(total)) * 100,
   percentageFormatted: formatPercent(Number(value) / Number(total)),
 });
+
+export const formatTransactionType = (type: TransactionType, typeHex: Hex) => {
+  const typeString = type.startsWith("eip")
+    ? `EIP-${type.slice(3)}`
+    : capitalize(type);
+  return `${Number(typeHex)} (${typeString})`;
+};
 
 const ERC20_TRANSFER_EVENT_TOPIC =
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";

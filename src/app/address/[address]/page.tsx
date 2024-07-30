@@ -1,10 +1,10 @@
 import { Address } from "viem";
-import AddressComponent from "@/components/pages/address";
+import AddressTransactions from "@/components/pages/address/address-transactions";
 
-const AddressPage = ({
+const AddressTransactionsPage = ({
   params: { address },
 }: {
   params: { address: string };
-}) => <AddressComponent address={address as Address} />;
+}) => <AddressTransactions address={address as Address} />;
 
-export default AddressPage;
+export default AddressTransactionsPage;

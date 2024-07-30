@@ -23,9 +23,11 @@ declare global {
       readonly NEXT_PUBLIC_L1_STANDARD_BRIDGE_ADDRESS: `0x${string}`;
       readonly NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS: `0x${string}`;
       // constants
+      readonly NEXT_PUBLIC_L1_BLOCK_TIME: string;
+      readonly NEXT_PUBLIC_L2_BLOCK_TIME: string;
       readonly NEXT_PUBLIC_BLOCKS_PER_PAGE: string;
       readonly NEXT_PUBLIC_TXS_PER_PAGE: string;
-      readonly NEXT_PUBLIC_L1L2TXS_PER_PAGE: string;
+      readonly NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE: string;
     }
   }
 }

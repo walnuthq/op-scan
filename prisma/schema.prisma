@@ -11,9 +11,8 @@ datasource db {
 }
 
 model DeployConfig {
-  l2ChainId   Int    @id
-  l1ChainId   Int
-  l2BlockTime BigInt
+  l2ChainId Int @id
+  l1ChainId Int
 }
 
 model Block {
@@ -38,10 +37,22 @@ model Transaction {
   maxFeePerGas         String?
   maxPriorityFeePerGas String?
   type                 String
+  typeHex              String
   nonce                Int
   transactionIndex     Int
   input                String
   signature            String?
   timestamp            BigInt
   block                Block   @relation(fields: [blockNumber], references: [number])
+}
+
+model TransactionEnqueued {
+  l1BlockNumber BigInt
+  l2TxHash      String
+  timestamp     BigInt
+  l1TxHash      String
+  l1TxOrigin    String
+  gasLimit      String
+
+  @@id([l1BlockNumber, l2TxHash])
 }

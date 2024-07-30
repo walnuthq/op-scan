@@ -4,7 +4,7 @@ import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 
-const BlockTransactionsTableRow = ({
+const BlockTxsTableRow = ({
   transaction,
   timestampFormattedAsDate,
   txGasPriceShown,
@@ -27,7 +27,7 @@ const BlockTransactionsTableRow = ({
       <TableCell>
         <TxMethodBadge
           selector={transaction.input.slice(0, 10)}
-          signature={transaction.signature ?? ""}
+          signature={transaction.signature}
         />
       </TableCell>
       <TableCell>{timestampFormattedAsDate ? utc : distance}</TableCell>
@@ -50,10 +50,10 @@ const BlockTransactionsTableRow = ({
       <TableCell>{formatEther(transaction.value, 15)} ETH</TableCell>
       <TableCell>
         {txGasPriceShown
-          ? formatGwei(transaction.transactionReceipt.effectiveGasPrice)
+          ? formatGwei(transaction.receipt.effectiveGasPrice)
           : formatEther(
-              transaction.transactionReceipt.effectiveGasPrice *
-                transaction.transactionReceipt.gasUsed,
+              transaction.receipt.effectiveGasPrice *
+                transaction.receipt.gasUsed,
               8,
             )}
       </TableCell>
@@ -61,4 +61,4 @@ const BlockTransactionsTableRow = ({
   );
 };
 
-export default BlockTransactionsTableRow;
+export default BlockTxsTableRow;
