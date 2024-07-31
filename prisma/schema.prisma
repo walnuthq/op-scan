@@ -11,8 +11,10 @@ datasource db {
 }
 
 model DeployConfig {
-  l2ChainId Int @id
   l1ChainId Int
+  l2ChainId Int
+
+  @@id([l1ChainId, l2ChainId])
 }
 
 model Block {
@@ -27,7 +29,7 @@ model Block {
 }
 
 model Transaction {
-  hash                 String  @id
+  hash                 String              @id
   blockNumber          BigInt
   from                 String
   to                   String?
@@ -41,9 +43,59 @@ model Transaction {
   nonce                Int
   transactionIndex     Int
   input                String
-  signature            String?
+  signature            String
   timestamp            BigInt
-  block                Block   @relation(fields: [blockNumber], references: [number])
+  block                Block               @relation(fields: [blockNumber], references: [number])
+  receipt              TransactionReceipt?
+}
+
+model TransactionReceipt {
+  transactionHash   String          @id
+  status            Boolean
+  from              String
+  to                String?
+  effectiveGasPrice String?
+  gasUsed           String
+  l1Fee             String?
+  l1GasPrice        String?
+  l1GasUsed         String?
+  l1FeeScalar       Int?
+  logs              Log[]
+  erc20Transfers    erc20Transfer[]
+  transaction       Transaction     @relation(fields: [transactionHash], references: [hash])
+}
+
+model Log {
+  address          String
+  blockNumber      BigInt
+  blockHash        String
+  data             String
+  logIndex         Int
+  transactionHash  String
+  transactionIndex Int
+  removed          Boolean
+  topics           String
+  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+
+  @@id([transactionHash, logIndex])
+}
+
+model Address {
+  address    String  @id
+  isContract Boolean
+}
+
+model erc20Transfer {
+  transactionHash String
+  logIndex        Int
+  from            String
+  to              String
+  address         String
+  amount          String
+  decimals        Int
+  receipt         TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+
+  @@id([transactionHash, logIndex])
 }
 
 model TransactionEnqueued {

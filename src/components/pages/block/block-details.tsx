@@ -3,11 +3,11 @@ import { formatGas } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TimestampListItem from "@/components/lib/timestamp-list-item";
-import { BlockWithTransactions } from "@/lib/types";
+import { Block } from "@/lib/types";
 import BlockHeight from "@/components/pages/block/block-height";
 import BlockExtraData from "@/components/pages/block/block-extra-data";
 
-const BlockDetails = ({ block }: { block: BlockWithTransactions }) => (
+const BlockDetails = ({ block }: { block: Block }) => (
   <dl>
     <BlockHeight number={block.number} />
     <TimestampListItem timestamp={block.timestamp} />
