@@ -22,8 +22,13 @@ const TxsEnqueued = async ({
   page: number;
   latest: bigint;
 }) => {
-  const { transactions, previousStart, previousHash, nextStart, nextHash } =
-    await fetchLatestTransactionsEnqueued(start, hash, latest);
+  const {
+    transactionsEnqueued,
+    previousStart,
+    previousHash,
+    nextStart,
+    nextHash,
+  } = await fetchLatestTransactionsEnqueued(start, hash, latest);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h2 className="text-2xl font-bold tracking-tight">L1→L2 Transactions</h2>
@@ -44,7 +49,7 @@ const TxsEnqueued = async ({
           /> */}
         </CardHeader>
         <CardContent className="px-0">
-          <LatestTxsEnqueuedTable transactions={transactions} />
+          <LatestTxsEnqueuedTable transactionsEnqueued={transactionsEnqueued} />
         </CardContent>
         <CardFooter className="flex flex-col items-start justify-start md:flex-row md:items-center md:justify-between">
           <div className="space-y-0.5">

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { formatEther, formatGwei, formatGas, formatPrice } from "@/lib/utils";
-import { TokenTransfer } from "@/lib/types";
+import { ERC20Transfer } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Separator } from "@/components/ui/separator";
@@ -11,7 +11,7 @@ import TimestampListItem from "@/components/lib/timestamp-list-item";
 import TransactionAction from "@/components/pages/tx/transaction-action";
 import TransactionFrom from "@/components/pages/tx/transaction-from";
 import TransactionTo from "@/components/pages/tx/transaction-to";
-import TransactionERC20 from "@/components/pages/tx/transaction-erc20";
+import TransactionERC20Transfers from "@/components/pages/tx/transaction-erc20-transfers";
 import TransactionOtherAttributes from "@/components/pages/tx/transaction-other-attributes";
 import TransactionInput from "@/components/pages/tx/transaction-input";
 
@@ -19,12 +19,12 @@ const TransactionDetails = ({
   transaction,
   confirmations,
   ethPriceToday,
-  tokenTransfers,
+  erc20Transfers,
 }: {
   transaction: TransactionWithReceipt;
   confirmations: bigint;
   ethPriceToday: number;
-  tokenTransfers: TokenTransfer[];
+  erc20Transfers: ERC20Transfer[];
 }) => (
   <dl>
     <DescriptionListItem title="Transaction Hash">
@@ -49,10 +49,10 @@ const TransactionDetails = ({
     <Separator />
     <TransactionFrom from={transaction.from} />
     <TransactionTo transaction={transaction} />
-    {tokenTransfers.length > 0 && (
+    {erc20Transfers.length > 0 && (
       <>
         <Separator />
-        <TransactionERC20 tokenTransfers={tokenTransfers} />
+        <TransactionERC20Transfers erc20Transfers={erc20Transfers} />
       </>
     )}
     <Separator />
