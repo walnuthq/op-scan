@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,
@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  TooltipProps,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
@@ -28,54 +29,27 @@ type DataPoint = {
   name: string;
   date: string;
   price: number;
+  transactionsCount: number;
 };
 
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   if (active && payload && payload.length) {
+    const { date, price, transactionsCount } = payload[0].payload;
     return (
       <div className="rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md">
         <p className="text-xs">
-          {format(parseISO(payload[0].payload.date), "EEEE, MMMM d, yyyy")}
+          {format(parseISO(date), "EEEE, MMMM d, yyyy")}
         </p>
-        <p>Price: {formatPrice(payload[0].payload.price)}</p>
+        <p>Price: {formatPrice(price)}</p>
+        <p>Transactions: {transactionsCount}k</p>
       </div>
     );
   }
   return null;
 };
 
-const TransactionHistory = () => {
-  const [data, setData] = useState<DataPoint[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dates = Array.from({ length: 15 }, (_, i) => {
-        const date = subDays(new Date(), 14 - i);
-        return {
-          name: format(date, "MMM d"),
-          formattedDate: format(date, "yyyy-MM-dd"),
-        };
-      });
-
-      const responses = await Promise.all(
-        dates.map(async (dateObj) => {
-          const response = await fetch(
-            `https://api.coinbase.com/v2/prices/OP-USD/spot?date=${dateObj.formattedDate}`,
-          );
-          const json = await response.json();
-          return {
-            name: dateObj.name,
-            date: dateObj.formattedDate,
-            price: parseFloat(json.data.amount),
-          };
-        }),
-      );
-
-      setData(responses);
-    };
-
-    fetchData();
-  }, []);
+const TransactionHistory = ({ history }: { history: DataPoint[] }) => {
+  const [data, setData] = useState<DataPoint[]>(history);
 
   return (
     <Card>
@@ -95,7 +69,7 @@ const TransactionHistory = () => {
                 axisLine={false}
                 ticks={
                   data.length > 0
-                    ? [data[0].name, data[7].name, data[14].name]
+                    ? [data[0].name, data[Math.floor(data.length / 2)].name, data[data.length - 1].name]
                     : []
                 }
               />
@@ -107,7 +81,6 @@ const TransactionHistory = () => {
               <Line
                 type="monotone"
                 dataKey="price"
-                // stroke="var(--chart-1)"
                 style={{ stroke: "hsl(var(--primary))" }}
                 strokeWidth={2}
               />
