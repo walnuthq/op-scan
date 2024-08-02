@@ -15,7 +15,7 @@ import { TransactionEnqueued } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
-import { getSignatureBySelector } from "@/lib/4byte-directory";
+import { loadFunctions } from "@/lib/signatures";
 
 export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -90,7 +90,7 @@ export const fetchLatestTransactions = async (
   ]);
   const signatures = await Promise.all(
     transactionsWithTimestamp.map(({ input }) =>
-      getSignatureBySelector(input.slice(0, 10)),
+      loadFunctions(input.slice(0, 10)),
     ),
   );
   const transactions = transactionsWithTimestamp.map((transaction, i) => {

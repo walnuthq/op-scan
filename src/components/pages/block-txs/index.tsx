@@ -4,7 +4,7 @@ import { l2PublicClient } from "@/lib/chains";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import BlockTxsTable from "@/components/pages/block-txs/block-txs-table";
-import { getSignatureBySelector } from "@/lib/4byte-directory";
+import { loadFunctions } from "@/lib/signatures";
 import { fromViemTransactionWithReceipt } from "@/lib/types";
 
 const BlockTxs = async ({ number }: { number: bigint }) => {
@@ -22,9 +22,7 @@ const BlockTxs = async ({ number }: { number: bigint }) => {
       ),
     ),
     Promise.all(
-      block.transactions.map(({ input }) =>
-        getSignatureBySelector(input.slice(0, 10)),
-      ),
+      block.transactions.map(({ input }) => loadFunctions(input.slice(0, 10))),
     ),
   ]);
   const transactions = block.transactions.map((transaction, i) =>
