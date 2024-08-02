@@ -6,23 +6,23 @@ import { l1Chain } from "@/lib/chains";
 import { SquareArrowOutUpRight } from "lucide-react";
 
 const LatestTxsEnqueuedTableRow = ({
-  transaction,
+  transactionEnqueued,
   timestampFormattedAsDate,
 }: {
-  transaction: TransactionEnqueued;
+  transactionEnqueued: TransactionEnqueued;
   timestampFormattedAsDate: boolean;
 }) => {
-  const { distance, utc } = formatTimestamp(transaction.timestamp);
+  const { distance, utc } = formatTimestamp(transactionEnqueued.timestamp);
   return (
     <TableRow>
       <TableCell>
         <a
           className="flex items-center truncate text-primary hover:brightness-150"
-          href={`${l1Chain.blockExplorers.default.url}/block/${transaction.l1BlockNumber}`}
+          href={`${l1Chain.blockExplorers.default.url}/block/${transactionEnqueued.l1BlockNumber}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {transaction.l1BlockNumber.toString()}
+          {transactionEnqueued.l1BlockNumber.toString()}
           <SquareArrowOutUpRight className="ml-1 size-4" />
         </a>
       </TableCell>
@@ -30,9 +30,9 @@ const LatestTxsEnqueuedTableRow = ({
         <div className="max-w-40 truncate text-primary hover:brightness-150">
           <Link
             className="text-sm font-medium leading-none"
-            href={`/tx/${transaction.l2TxHash}`}
+            href={`/tx/${transactionEnqueued.l2TxHash}`}
           >
-            {transaction.l2TxHash}
+            {transactionEnqueued.l2TxHash}
           </Link>
         </div>
       </TableCell>
@@ -42,26 +42,30 @@ const LatestTxsEnqueuedTableRow = ({
       <TableCell>
         <a
           className="flex items-center text-primary hover:brightness-150"
-          href={`${l1Chain.blockExplorers.default.url}/tx/${transaction.l1TxHash}`}
+          href={`${l1Chain.blockExplorers.default.url}/tx/${transactionEnqueued.l1TxHash}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span className="max-w-40 truncate">{transaction.l1TxHash}</span>
+          <span className="max-w-40 truncate">
+            {transactionEnqueued.l1TxHash}
+          </span>
           <SquareArrowOutUpRight className="ml-1 size-4" />
         </a>
       </TableCell>
       <TableCell>
         <a
           className="flex items-center text-primary hover:brightness-150"
-          href={`${l1Chain.blockExplorers.default.url}/address/${transaction.l1TxOrigin}`}
+          href={`${l1Chain.blockExplorers.default.url}/address/${transactionEnqueued.l1TxOrigin}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span className="max-w-40 truncate">{transaction.l1TxOrigin}</span>
+          <span className="max-w-40 truncate">
+            {transactionEnqueued.l1TxOrigin}
+          </span>
           <SquareArrowOutUpRight className="ml-1 size-4" />
         </a>
       </TableCell>
-      <TableCell>{formatGas(transaction.gasLimit).value}</TableCell>
+      <TableCell>{formatGas(transactionEnqueued.gasLimit).value}</TableCell>
     </TableRow>
   );
 };

@@ -28,6 +28,11 @@ declare global {
       readonly NEXT_PUBLIC_BLOCKS_PER_PAGE: string;
       readonly NEXT_PUBLIC_TXS_PER_PAGE: string;
       readonly NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE: string;
+      // fallback rpc urls
+      readonly NEXT_PUBLIC_L1_FALLBACK1_RPC_URL: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK1_RPC_URL: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK2_RPC_URL: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK2_RPC_URL: string;
     }
   }
 }

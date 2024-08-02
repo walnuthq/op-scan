@@ -3,13 +3,10 @@ import { l2PublicClient } from "@/lib/chains";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import BlockDetails from "@/components/pages/block/block-details";
-import { fromViemBlockWithTransactions } from "@/lib/types";
+import { fromViemBlock } from "@/lib/types";
 
 const Block = async ({ number }: { number: bigint }) => {
-  const block = await l2PublicClient.getBlock({
-    blockNumber: number,
-    includeTransactions: true,
-  });
+  const block = await l2PublicClient.getBlock({ blockNumber: number });
   if (!block) {
     notFound();
   }
@@ -24,7 +21,7 @@ const Block = async ({ number }: { number: bigint }) => {
       <Separator />
       <Card>
         <CardContent className="p-4">
-          <BlockDetails block={fromViemBlockWithTransactions(block)} />
+          <BlockDetails block={fromViemBlock(block)} />
         </CardContent>
       </Card>
     </main>
