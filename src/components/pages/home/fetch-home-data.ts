@@ -64,8 +64,12 @@ const fetchHomeDataFromDatabase = async () => {
   ]);
   return {
     tokensPrices,
-    latestBlocks: latestBlocks.map(fromPrismaBlock),
-    latestTransactions: latestTransactions.map(fromPrismaTransaction),
+    latestBlocks: latestBlocks.map((block) =>
+      fromPrismaBlock(block, block.transactions),
+    ),
+    latestTransactions: latestTransactions.map((transaction) =>
+      fromPrismaTransaction(transaction),
+    ),
     latestTransactionsEnqueued: latestTransactionsEnqueued.map(
       fromPrismaTransactionEnqueued,
     ),

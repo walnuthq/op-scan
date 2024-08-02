@@ -51,7 +51,7 @@ const TransactionERC20Transfers = ({
             </span>
             <span>
               <span className="font-semibold">For: </span>
-              {formatUnits(erc20Transfer.amount, erc20Transfer.decimals)}
+              {formatUnits(erc20Transfer.value, erc20Transfer.decimals)}
             </span>
             <span>
               <span className="font-semibold">Token: </span>

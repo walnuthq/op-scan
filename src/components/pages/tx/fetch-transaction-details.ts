@@ -7,7 +7,7 @@ import {
   fromPrismaTransactionWithReceipt,
   fromPrismaERC20Transfer,
 } from "@/lib/types";
-import { getSignatureBySelector } from "@/lib/4byte-directory";
+import { loadFunctions } from "@/lib/signatures";
 import { prisma } from "@/lib/prisma";
 import { parseERC20Transfers } from "@/lib/utils";
 
@@ -30,10 +30,12 @@ const fetchTransactionDetailsFromDatabase = async (
   if (!transaction || !transaction.receipt) {
     return fetchTransactionDetailsFromJsonRpc(hash);
   }
+  const signature = await loadFunctions(transaction.input.slice(0, 10));
   return {
     transaction: fromPrismaTransactionWithReceipt(
       transaction,
       transaction.receipt,
+      signature,
     ),
     confirmations,
     erc20Transfers: transaction.receipt.erc20Transfers.map(
@@ -60,7 +62,7 @@ const fetchTransactionDetailsFromJsonRpc = async (
     l2PublicClient.getBlock({ blockNumber: transaction.blockNumber }),
     l2PublicClient.getTransactionConfirmations({ transactionReceipt }),
     parseERC20Transfers(transactionReceipt.logs),
-    getSignatureBySelector(transaction.input.slice(0, 10)),
+    loadFunctions(transaction.input.slice(0, 10)),
   ]);
   return {
     transaction: fromViemTransactionWithReceipt(
