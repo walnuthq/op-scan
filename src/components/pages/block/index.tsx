@@ -5,7 +5,7 @@ import BlockDetails from "@/components/pages/block/block-details";
 import fetchBlockDetails from "@/components/pages/block/fetch-block-details";
 
 const Block = async ({ number }: { number: bigint }) => {
-  const { block } = await fetchBlockDetails(number);
+  const block = await fetchBlockDetails(number);
 
   if (!block) {
     notFound();
