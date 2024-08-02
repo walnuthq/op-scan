@@ -1,15 +1,16 @@
 import { notFound } from "next/navigation";
-import { l2PublicClient } from "@/lib/chains";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import BlockDetails from "@/components/pages/block/block-details";
-import { fromViemBlock } from "@/lib/types";
+import fetchBlockDetails from "@/components/pages/block/fetch-block-details";
 
 const Block = async ({ number }: { number: bigint }) => {
-  const block = await l2PublicClient.getBlock({ blockNumber: number });
+  const { block } = await fetchBlockDetails(number);
+
   if (!block) {
     notFound();
   }
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h2 className="flex items-center text-2xl font-bold tracking-tight">
@@ -21,7 +22,7 @@ const Block = async ({ number }: { number: bigint }) => {
       <Separator />
       <Card>
         <CardContent className="p-4">
-          <BlockDetails block={fromViemBlock(block)} />
+          <BlockDetails block={block} />
         </CardContent>
       </Card>
     </main>
