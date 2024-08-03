@@ -3,6 +3,7 @@ import { TransactionWithReceipt } from "@/lib/types";
 import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
+import AddressLink from "@/components/lib/address-link";
 
 const LatestTxsTableRow = ({
   transaction,
@@ -44,22 +45,16 @@ const LatestTxsTableRow = ({
         {timestampFormattedAsDate ? utc : distance}
       </TableCell>
       <TableCell>
-        <div className="max-w-40 truncate text-primary hover:brightness-150">
-          <Link
+          <AddressLink
             href={`/address/${transaction.from}`}
-            className="text-sm font-medium leading-none"
-          >
-            {transaction.from}
-          </Link>
-        </div>
+            address={transaction.from}
+          />
       </TableCell>
-      <TableCell className="max-w-40 truncate text-primary hover:brightness-150">
-        <Link
+      <TableCell>
+        <AddressLink
           href={`/address/${transaction.to}`}
-          className="text-sm font-medium leading-none"
-        >
-          {transaction.to}
-        </Link>
+          address={transaction.to}
+        />
       </TableCell>
       <TableCell>{formatEther(transaction.value, 15)} ETH</TableCell>
       <TableCell>

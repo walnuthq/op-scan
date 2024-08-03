@@ -5,6 +5,7 @@ import { formatAddress } from "@/lib/utils";
 import { TransactionWithReceipt } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
+import AddressLink from "@/components/lib/address-link";
 
 const TransactionAction = ({
   transaction,
@@ -23,12 +24,10 @@ const TransactionAction = ({
           <span className="mr-2 text-muted-foreground">Native Transfer</span>
           <span>{formatEther(transaction.value)} ETH</span>
           <span className="mx-2 text-muted-foreground">To</span>
-          <Link
-            className="text-primary hover:brightness-150"
+          <AddressLink
             href={`/address/${transaction.to}`}
-          >
-            {formatAddress(transaction.to)}
-          </Link>
+            address={formatAddress(transaction.to)}
+          />
         </>
       ) : (
         <>
@@ -38,19 +37,16 @@ const TransactionAction = ({
             signature={transaction.signature}
           />
           <span className="mx-2">Method by</span>
-          <Link
-            className="text-primary hover:brightness-150"
+          <AddressLink
             href={`/address/${transaction.from}`}
-          >
-            {formatAddress(transaction.from)}
-          </Link>
+            address={formatAddress(transaction.from)}
+         />
+            
           <span className="mx-2">on</span>
-          <Link
-            className="text-primary hover:brightness-150"
+          <AddressLink
             href={`/address/${transaction.to}`}
-          >
-            {formatAddress(transaction.to)}
-          </Link>
+            address={formatAddress(transaction.to)}
+          />
         </>
       )}
     </DescriptionListItem>
