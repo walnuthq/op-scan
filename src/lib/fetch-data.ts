@@ -21,6 +21,7 @@ import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/co
 import { prisma } from "@/lib/prisma";
 import { getSignatureBySelector } from "@/lib/4byte-directory";
 
+
 export const fetchTransactionHistory = async () => {
   const dates = Array.from({ length: 15 }, (_, i) => {
     const date = subDays(new Date(), 14 - i);
@@ -121,7 +122,7 @@ export const fetchLatestTransactions = async (
   ]);
   const signatures = await Promise.all(
     transactionsWithTimestamp.map(({ input }) =>
-      getSignatureBySelector(input.slice(0, 10)),
+      loadFunctions(input.slice(0, 10)),
     ),
   );
   const transactions = transactionsWithTimestamp.map((transaction, i) => {
