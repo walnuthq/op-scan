@@ -5,15 +5,17 @@ import { formatInTimeZone } from "date-fns-tz";
 import {
   formatEther as viemFormatEther,
   formatGwei as viemFormatGwei,
-  Log,
-  formatUnits,
   Address,
   Hex,
   TransactionType,
+  Log,
+  getAddress,
+  parseEventLogs,
 } from "viem";
-import { TokenTransfer } from "@/lib/types";
 import { capitalize } from "lodash";
+import erc20Abi from "@/lib/contracts/erc-20/abi";
 import { getERC20Contract } from "@/lib/contracts/erc-20/contract";
+import { ERC20Transfer } from "@/lib/types";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -81,51 +83,23 @@ export const formatTransactionType = (type: TransactionType, typeHex: Hex) => {
   return `${Number(typeHex)} (${typeString})`;
 };
 
-const ERC20_TRANSFER_EVENT_TOPIC =
-  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-
-export const parseTokenTransfers = async (
-  logs: Log[],
-): Promise<TokenTransfer[]> => {
-  const transfers = logs
-    .filter((log) => log.topics[0] === ERC20_TRANSFER_EVENT_TOPIC)
-    .map((log) => {
-      const [, fromTopic, toTopic] = log.topics;
-      const from = `0x${fromTopic?.slice(26)}` as Address;
-      const to = `0x${toTopic?.slice(26)}` as Address;
-      const amount = BigInt(log.data);
+export const parseERC20Transfers = (logs: Log[]): Promise<ERC20Transfer[]> =>
+  Promise.all(
+    parseEventLogs({
+      abi: erc20Abi,
+      eventName: "Transfer",
+      logs,
+    }).map(async ({ transactionHash, logIndex, args, address, data }) => {
+      const contract = getERC20Contract(address);
+      const decimals = await contract.read.decimals();
       return {
-        from,
-        to,
-        tokenAddress: log.address,
-        amount,
+        transactionHash,
+        logIndex,
+        from: args.from,
+        to: args.to,
+        address: getAddress(address),
+        amount: BigInt(data),
+        decimals,
       };
-    });
-
-  const transfersWithDecimals = await Promise.all(
-    transfers.map(async (transfer) => {
-      try {
-        const contract = getERC20Contract(transfer.tokenAddress);
-        const decimals = await contract.read.decimals();
-        const formattedAmount = formatUnits(transfer.amount, decimals);
-        return {
-          ...transfer,
-          amount: formattedAmount,
-          decimals,
-        };
-      } catch (error) {
-        console.error(
-          `Error processing transfer for ${transfer.tokenAddress}:`,
-          error,
-        );
-        const defaultDecimals = 18;
-        return {
-          ...transfer,
-          amount: formatUnits(transfer.amount, defaultDecimals),
-          decimals: defaultDecimals,
-        };
-      }
     }),
   );
-  return transfersWithDecimals;
-};

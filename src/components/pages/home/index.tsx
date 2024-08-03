@@ -1,4 +1,4 @@
-import { fetchHomePageData } from "@/lib/fetch-data";
+import { fetchHomeData } from "@/components/pages/home/fetch-home-data";
 import EthPrice from "@/components/pages/home/eth-price";
 import OpPrice from "@/components/pages/home/op-price";
 import LatestBlockAndTxs from "@/components/pages/home/latest-block-and-txs";
@@ -16,6 +16,7 @@ const Home = async () => {
     latestTransactionsEnqueued,
     transactionHistory,
   } = await fetchHomePageData();
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="grid gap-4 lg:grid-cols-3">

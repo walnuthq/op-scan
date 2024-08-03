@@ -12,7 +12,7 @@
     "prisma:generate": "prisma generate",
     "prisma:db:push": ". .env.local && export DATABASE_URL && prisma db push",
     "prisma:studio": ". .env.local && export DATABASE_URL && prisma studio",
-    "op-indexer": ". .env.local && export DATABASE_URL && export NEXT_PUBLIC_L1_RPC_URL && export NEXT_PUBLIC_L2_RPC_URL && export L1_RPC_WSS && export L2_RPC_WSS && bun op-indexer/index.ts"
+    "op-indexer": ". .env.local && export DATABASE_URL && export NEXT_PUBLIC_L1_RPC_URL && export NEXT_PUBLIC_L1_FALLBACK1_RPC_URL && export NEXT_PUBLIC_L1_FALLBACK2_RPC_URL && export NEXT_PUBLIC_L2_RPC_URL && export NEXT_PUBLIC_L2_FALLBACK1_RPC_URL && export NEXT_PUBLIC_L2_FALLBACK2_RPC_URL && export L1_RPC_WSS && export L2_RPC_WSS && bun op-indexer/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",
@@ -38,7 +38,7 @@
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.18.2"
+    "viem": "^2.18.6"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

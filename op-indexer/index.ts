@@ -1,172 +1,112 @@
 import { parseArgs } from "node:util";
-import { PrismaClient } from "@/prisma/generated/client";
-import {
-  createPublicClient,
-  webSocket,
-  Address,
-  Hash,
-  zeroHash,
-  Hex,
-  TransactionType,
-} from "viem";
-import { mainnet, optimism } from "viem/chains";
-import { l1Chain, l2Chain, l2PublicClient } from "@/lib/chains";
-
-const prisma = new PrismaClient();
+import { range } from "lodash";
+import { createPublicClient, webSocket } from "viem";
+import { prisma } from "@/lib/prisma";
+import { l1Chain, l2Chain, l1PublicClient, l2PublicClient } from "@/lib/chains";
+import { indexL1Block, indexL2Block } from "./utils";
 
 const l1PublicClientWs = createPublicClient({
-  chain: mainnet,
+  chain: l1Chain,
   transport: webSocket(process.env.L1_RPC_WSS),
 });
 
 const l2PublicClientWs = createPublicClient({
-  chain: optimism,
+  chain: l2Chain,
   transport: webSocket(process.env.L2_RPC_WSS),
 });
 
-const trimBlock = ({
-  number,
-  hash,
-  timestamp,
-  gasUsed,
-  gasLimit,
-  extraData,
-  parentHash,
-}: {
-  number: bigint | null;
-  hash: Hash | null;
-  timestamp: bigint;
-  gasUsed: bigint;
-  gasLimit: bigint;
-  extraData: Hex;
-  parentHash: Hash;
-}) => ({
-  number: number ?? BigInt(0),
-  hash: hash ?? zeroHash,
-  timestamp,
-  gasUsed: `0x${gasUsed.toString(16)}`,
-  gasLimit: `0x${gasLimit.toString(16)}`,
-  extraData,
-  parentHash,
-});
-
-const trimTransactions = (
-  transactions: {
-    hash: Hash;
-    blockNumber: bigint | null;
-    from: Address;
-    to: Address | null;
-    value: bigint;
-    gas: bigint;
-    gasPrice?: bigint;
-    maxFeePerGas?: bigint;
-    maxPriorityFeePerGas?: bigint;
-    type: TransactionType;
-    typeHex: Hex | null;
-    nonce: number;
-    transactionIndex: number;
-    input: Hex;
-  }[],
-  timestamp: bigint,
-) =>
-  transactions.map(
-    ({
-      hash,
-      blockNumber,
-      from,
-      to,
-      value,
-      gas,
-      gasPrice,
-      maxFeePerGas,
-      maxPriorityFeePerGas,
-      type,
-      typeHex,
-      nonce,
-      transactionIndex,
-      input,
-    }) => ({
-      hash,
-      blockNumber: blockNumber ?? BigInt(0),
-      from,
-      to,
-      value: `0x${value.toString(16)}`,
-      gas: `0x${gas.toString(16)}`,
-      gasPrice: gasPrice ? `0x${gasPrice.toString(16)}` : null,
-      maxFeePerGas: maxFeePerGas ? `0x${maxFeePerGas.toString(16)}` : null,
-      maxPriorityFeePerGas: maxPriorityFeePerGas
-        ? `0x${maxPriorityFeePerGas.toString(16)}`
-        : null,
-      type: type || "legacy",
-      typeHex: typeHex || "0x1",
-      nonce,
-      transactionIndex,
-      input,
-      timestamp,
-    }),
-  );
-
-const indexBlock = async (blockNumber: bigint) => {
-  const block = await l2PublicClient.getBlock({
-    blockNumber,
-    includeTransactions: true,
-  });
-  const trimmedBlock = trimBlock(block);
-  const trimmedTransactions = trimTransactions(
-    block.transactions,
-    block.timestamp,
-  );
-  await Promise.all([
-    await prisma.block.upsert({
-      where: { number: trimmedBlock.number },
-      create: trimmedBlock,
-      update: trimmedBlock,
-    }),
-    ...trimmedTransactions.map((trimmedTransaction) =>
-      prisma.transaction.upsert({
-        where: { hash: trimmedTransaction.hash },
-        create: trimmedTransaction,
-        update: trimmedTransaction,
-      }),
-    ),
-  ]);
-  console.log(blockNumber, "indexed");
-};
-
+const deployConfig = { l1ChainId: l1Chain.id, l2ChainId: l2Chain.id };
 // create the OP Stack deploy config
-await prisma.deployConfig.create({
-  data: {
-    l1ChainId: l1Chain.id,
-    l2ChainId: l2Chain.id,
-  },
+await prisma.deployConfig.upsert({
+  where: { l1ChainId_l2ChainId: deployConfig },
+  create: deployConfig,
+  update: deployConfig,
 });
-
-// listen to new head and index block
-l2PublicClientWs.watchBlockNumber({ onBlockNumber: indexBlock });
 
 const { values } = parseArgs({
   args: process.argv,
   options: {
-    "starting-block": {
+    "l1-from-block": {
+      type: "string",
+    },
+    "l1-index-block": {
+      type: "string",
+      multiple: true,
+      default: [],
+    },
+    "l2-from-block": {
+      type: "string",
+      short: "f",
+    },
+    "l2-index-block": {
       type: "string",
       short: "b",
+      multiple: true,
+      default: [],
     },
+    "index-delay": { type: "string", short: "d", default: "1000" },
   },
   strict: true,
   allowPositionals: true,
 });
 
-const latestBlockNumber = await l2PublicClient.getBlockNumber();
-const defaultStartingBlockNumber = latestBlockNumber - BigInt(64);
-const startingBlock = values["starting-block"]
-  ? BigInt(values["starting-block"])
-  : defaultStartingBlockNumber;
+const [latestL1BlockNumber, latestL2BlockNumber] = await Promise.all([
+  l1PublicClient.getBlockNumber(),
+  l2PublicClient.getBlockNumber(),
+]);
 
-// index blocks from starting-block to head
-for (
-  let blockNumber = startingBlock;
-  blockNumber <= latestBlockNumber;
-  blockNumber++
-) {
-  await indexBlock(blockNumber);
-}
+const defaultL1FromBlock = latestL1BlockNumber - BigInt(1);
+const l1FromBlock = values["l1-from-block"]
+  ? BigInt(values["l1-from-block"])
+  : defaultL1FromBlock;
+const indexL1Blocks = values["l1-index-block"] ?? [];
+const l1BlocksToIndex = new Set<bigint>([
+  ...indexL1Blocks.map(BigInt),
+  ...range(Number(l1FromBlock), Number(latestL1BlockNumber) + 1).map(BigInt),
+]);
+
+const defaultL2FromBlock = latestL2BlockNumber - BigInt(1);
+const l2FromBlock = values["l2-from-block"]
+  ? BigInt(values["l2-from-block"])
+  : defaultL2FromBlock;
+const indexL2Blocks = values["l2-index-block"] ?? [];
+const l2BlocksToIndex = new Set<bigint>([
+  ...indexL2Blocks.map(BigInt),
+  ...range(Number(l2FromBlock), Number(latestL2BlockNumber) + 1).map(BigInt),
+]);
+
+// listen to new head and index blocks
+l1PublicClientWs.watchBlockNumber({
+  onBlockNumber: (blockNumber) => l1BlocksToIndex.add(blockNumber),
+});
+l2PublicClientWs.watchBlockNumber({
+  onBlockNumber: (blockNumber) => l2BlocksToIndex.add(blockNumber),
+});
+
+const indexDelay = Number(values["index-delay"] ?? "1000");
+
+setInterval(async () => {
+  const [blockNumber] = l1BlocksToIndex;
+  if (blockNumber === undefined) {
+    return;
+  }
+  l1BlocksToIndex.delete(blockNumber);
+  console.info(`Indexing L1 Block #${blockNumber}`);
+  console.time(`l1-${blockNumber}`);
+  await indexL1Block(blockNumber);
+  console.timeEnd(`l1-${blockNumber}`);
+  console.info(`L1 Block #${blockNumber} indexed`);
+}, indexDelay);
+
+setInterval(async () => {
+  const [blockNumber] = l2BlocksToIndex;
+  if (blockNumber === undefined) {
+    return;
+  }
+  l2BlocksToIndex.delete(blockNumber);
+  console.info(`Indexing L2 Block #${blockNumber}`);
+  console.time(`l2-${blockNumber}`);
+  await indexL2Block(blockNumber);
+  console.timeEnd(`l2-${blockNumber}`);
+  console.info(`L2 Block #${blockNumber} indexed`);
+}, indexDelay);
