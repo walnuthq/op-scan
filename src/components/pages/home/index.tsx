@@ -1,4 +1,3 @@
-import { fetchHomeData } from "@/components/pages/home/fetch-home-data";
 import EthPrice from "@/components/pages/home/eth-price";
 import OpPrice from "@/components/pages/home/op-price";
 import LatestBlockAndTxs from "@/components/pages/home/latest-block-and-txs";
@@ -7,6 +6,7 @@ import TransactionHistory from "@/components/pages/home/transaction-history";
 import LatestBlocks from "@/components/pages/home/latest-blocks";
 import LatestTransactions from "@/components/pages/home/latest-transactions";
 import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions";
+import { fetchHomePageData } from "@/lib/fetch-data";
 
 const Home = async () => {
   const {

@@ -8,13 +8,17 @@ import {
 import {
   Block,
   TransactionWithReceipt,
+  fromPrismaBlock,
+  fromPrismaTransaction,
   fromViemBlock,
   fromViemTransactionWithReceipt,
+  fromPrismaTransactionEnqueued,
 } from "@/lib/types";
 import { TransactionEnqueued } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
+import { prisma } from "@/lib/prisma";
 import { getSignatureBySelector } from "@/lib/4byte-directory";
 
 export const fetchTransactionHistory = async () => {
@@ -142,7 +146,7 @@ export const fetchLatestTransactionsEnqueued = async (
   hash: Hash,
   latest: bigint,
 ): Promise<{
-  transactionsEnqueued: TransactionEnqueued[];
+  transactions: TransactionEnqueued[];
   previousStart?: bigint;
   previousHash?: Hash;
   nextStart?: bigint;
@@ -161,13 +165,9 @@ export const fetchLatestTransactionsEnqueued = async (
       fromBlock: l1FromBlock,
     }),
   ]);
-  const transactionsEnqueued = await Promise.all(
+  const transactions = await Promise.all(
     extractTransactionDepositedLogs({ logs: transactionDepositedLogs }).map(
       async (transactionDepositedLog, index) => {
-        const sentMessageLog = sentMessageLogs[index];
-        if (!sentMessageLog || !sentMessageLog.args.gasLimit) {
-          return null;
-        }
         const { timestamp } = await l1PublicClient.getBlock({
           blockNumber: transactionDepositedLog.blockNumber,
         });
@@ -177,16 +177,13 @@ export const fetchLatestTransactionsEnqueued = async (
           l1TxHash: transactionDepositedLog.transactionHash,
           timestamp,
           l1TxOrigin: transactionDepositedLog.args.from,
-          gasLimit: sentMessageLog.args.gasLimit,
+          gasLimit: sentMessageLogs[index].args.gasLimit ?? BigInt(0),
         };
       },
     ),
   );
   return {
-    transactionsEnqueued: transactionsEnqueued
-      .filter((transactionEnqueud) => transactionEnqueud !== null)
-      .reverse()
-      .slice(0, Number(txsEnqueuedPerPage)),
+    transactions: transactions.reverse().slice(0, Number(txsEnqueuedPerPage)),
     previousStart: BigInt(0),
     previousHash: "0x",
     nextStart: BigInt(0),
