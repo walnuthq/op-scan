@@ -49,7 +49,6 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
 };
 
 const TransactionHistory = ({ history }: { history: DataPoint[] }) => {
-  const [data, setData] = useState<DataPoint[]>(history);
 
   return (
     <Card>
@@ -61,15 +60,15 @@ const TransactionHistory = ({ history }: { history: DataPoint[] }) => {
       <CardContent className="h-40">
         <ChartContainer className="h-full w-full" config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart data={history}>
               <XAxis
                 dataKey="name"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
                 ticks={
-                  data.length > 0
-                    ? [data[0].name, data[Math.floor(data.length / 2)].name, data[data.length - 1].name]
+                  history.length > 0
+                    ? [history[0].name, history[Math.floor(history.length / 2)].name, history[history.length - 1].name]
                     : []
                 }
               />
