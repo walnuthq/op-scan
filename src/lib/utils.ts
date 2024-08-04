@@ -1,4 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
+import { getBytes, hexlify, getAddress as ethersGetAddress, isHexString } from "ethers";
+import { ABIEventExtended, DecodedArgs } from "@/interfaces";
+import { loaders } from "@shazow/whatsabi";
 import { twMerge } from "tailwind-merge";
 import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
@@ -18,6 +21,7 @@ import erc20Abi from "@/lib/contracts/erc-20/abi";
 import getERC20Contract from "@/lib/contracts/erc-20/contract";
 import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
+import { l2PublicClient } from "./chains";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -63,6 +67,7 @@ export const formatTimestamp = (timestamp: bigint) => {
       "UTC",
       "MMM-dd-yyyy hh:mm:ss aa +z",
     ),
+    originalTimestamp: timestamp,
   };
 };
 
@@ -156,4 +161,94 @@ export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
     [],
   );
   return [...transfersSingle, ...transfersBatch];
+};
+
+const decodeData = (data: string): { hex: string; number: string; address: string }[] => {
+  const decoded: { hex: string; number: string; address: string }[] = [];
+
+  if (!isHexString(data)) {
+    return [];
+  }
+
+  const dataBytes = getBytes(data);
+
+  for (let i = 0; i < dataBytes.length; i += 32) {
+    const value = dataBytes.slice(i, i + 32);
+    const hexValue = hexlify(value);
+
+    let formattedValue: { hex: string; number: string; address: string } = {
+      hex: hexValue,
+      number: 'N/A',
+      address: 'N/A'
+    };
+
+    try {
+      const numberValue = BigInt(hexValue);
+      formattedValue.number = numberValue.toString();
+    } catch (error) {
+      console.error(`Error converting hex to number at index ${i}:`, error);
+    }
+
+    try {
+      if (value.length === 20) {
+        const addressValue = ethersGetAddress(hexValue);
+        formattedValue.address = addressValue;
+      } else if (value.length === 32) {
+        const addressValue = ethersGetAddress(hexlify(value.slice(12)));
+        formattedValue.address = addressValue;
+      }
+    } catch (error) {
+      console.error(`Error converting hex to address at index ${i}:`, error);
+    }
+
+    decoded.push(formattedValue);
+  }
+
+  return decoded;
+};
+
+export const formatEventLog = async (
+  log: Log,
+  abi: ABIEventExtended[],
+  signatureLookup: loaders.OpenChainSignatureLookup
+): Promise<{ eventName: string; method: string; args: DecodedArgs }> => {
+  const eventFragment = abi.find(item => item.type === 'event' && item.hash === log.topics[0]);
+  if (!eventFragment) {
+    return {
+      eventName: 'Unknown',
+      method: log.topics?.[0]?.slice(0, 10) || 'Unknown',
+      args: {
+        function: 'Unknown function',
+        topics: log.topics,
+        data: log.data,
+        decoded: decodeData(log.data),
+      },
+    };
+  }
+
+  const eventSignatures = await signatureLookup.loadEvents(log.topics[0] as Address);
+  const eventName = eventSignatures.length > 0 ? eventSignatures[0] : 'Unknown';
+
+  let methodID = 'Unknown';
+  if (log.transactionHash) {
+    try {
+      const transaction = await l2PublicClient.getTransaction({ hash: log.transactionHash as Address });
+      methodID = transaction.input.slice(0, 10);
+    } catch (error) {
+      console.error(`Error fetching transaction for log: ${log.transactionHash}`, error);
+    }
+  }
+
+  const decodedLog: DecodedArgs = {
+    function: `${eventName}`,
+    topics: log.topics,
+    data: log.data,
+    decoded: decodeData(log.data),
+  };
+
+  return {
+    eventName,
+    method: methodID,
+    args: decodedLog,
+  };
 };
