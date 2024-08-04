@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import ContractValidator from "@/components/pages/contract/contract-validator";
@@ -13,9 +13,11 @@ type ContractStatus = {
 async function getStatusForContract(hash: string): Promise<ContractStatus[]> {
   const chainId = "11155420"; // op sepolia
   const url = `https://sourcify.dev/server/check-by-addresses?addresses=${hash}&chainIds=${chainId}`;
-  const response = await fetch(url, { cache: 'no-store' });
+  const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
-    throw new Error(`Failed to fetch status for contract: ${response.statusText}`);
+    throw new Error(
+      `Failed to fetch status for contract: ${response.statusText}`,
+    );
   }
   return response.json();
 }
@@ -40,8 +42,12 @@ const ContractPage = async ({ params }: ContractPageProps) => {
         <Card>
           <CardContent className="p-4">
             <dl>
-              <DescriptionListItem title="Contract Hash">{hash}</DescriptionListItem>
-              <DescriptionListItem title="Status">{statusData[0].status}</DescriptionListItem>
+              <DescriptionListItem title="Contract Hash">
+                {hash}
+              </DescriptionListItem>
+              <DescriptionListItem title="Status">
+                {statusData[0].status}
+              </DescriptionListItem>
             </dl>
           </CardContent>
         </Card>
