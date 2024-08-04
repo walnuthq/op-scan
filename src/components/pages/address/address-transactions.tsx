@@ -22,7 +22,8 @@ const fetchTransactionsData = async (address: Address): Promise<TransactionQuery
     orderBy: { timestamp: 'desc' },
     include: { receipt: true },
   });
-
+  
+//Filter null reciept
   const transactionsWithReceipts = associatedTransactions.filter(tx => tx.receipt !== null);
   const validTransactions = await Promise.all(
     transactionsWithReceipts.map(async (tx) => {
