@@ -8,9 +8,9 @@ import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import {
   fetchTokensPrices,
   fetchLatestBlocks,
-  fetchLatestTransactions,
   fetchLatestTransactionsEnqueued,
 } from "@/lib/fetch-data";
+import fetchLatestTransactions from "../txs/fetch-transactions";
 
 const fetchHomeDataFromJsonRpc = async () => {
   const [latestL1BlockNumber, latestL2BlockNumber] = await Promise.all([
