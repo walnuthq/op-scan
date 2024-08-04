@@ -4,7 +4,7 @@ import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 
-const LatestTxsTableRow = ({
+const TxsTableRow = ({
   transaction,
   timestampFormattedAsDate,
   txGasPriceShown,
@@ -75,4 +75,4 @@ const LatestTxsTableRow = ({
   );
 };
 
-export default LatestTxsTableRow;
+export default TxsTableRow;

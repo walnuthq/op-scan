@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import LatestTxsPagination from "@/components/pages/txs/latest-txs-pagination";
-import LatestTxsTable from "@/components/pages/txs/latest-txs-table";
+import TxsTable from "@/components/lib/txs-table";
 
 const Txs = async ({
   start,
@@ -43,7 +43,7 @@ const Txs = async ({
           />
         </CardHeader>
         <CardContent className="px-0">
-          <LatestTxsTable transactions={transactions} />
+          <TxsTable transactions={transactions} />
         </CardContent>
         <CardFooter className="flex flex-col items-start justify-start md:flex-row md:items-center md:justify-between">
           <div className="space-y-0.5">
