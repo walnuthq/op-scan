@@ -6,7 +6,7 @@ import TransactionHistory from "@/components/pages/home/transaction-history";
 import LatestBlocks from "@/components/pages/home/latest-blocks";
 import LatestTransactions from "@/components/pages/home/latest-transactions";
 import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions";
-import { fetchHomePageData } from "@/lib/fetch-data";
+import { fetchHomeData } from './fetch-home-data';
 
 const Home = async () => {
   const {
@@ -15,7 +15,7 @@ const Home = async () => {
     latestTransactions,
     latestTransactionsEnqueued,
     transactionHistory,
-  } = await fetchHomePageData();
+  } = await fetchHomeData();
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">

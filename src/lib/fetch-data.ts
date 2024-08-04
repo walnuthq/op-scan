@@ -1,5 +1,5 @@
 import { range } from "lodash";
-import { subDays, formatISO, format } from "date-fns";
+import { subDays, formatISO } from "date-fns";
 import { Hash } from "viem";
 import {
   extractTransactionDepositedLogs,
@@ -8,46 +8,14 @@ import {
 import {
   Block,
   TransactionWithReceipt,
-  fromPrismaBlock,
-  fromPrismaTransaction,
   fromViemBlock,
   fromViemTransactionWithReceipt,
-  fromPrismaTransactionEnqueued,
 } from "@/lib/types";
 import { TransactionEnqueued } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
-import { prisma } from "@/lib/prisma";
-import { getSignatureBySelector } from "@/lib/4byte-directory";
-
-
-export const fetchTransactionHistory = async () => {
-  const dates = Array.from({ length: 15 }, (_, i) => {
-    const date = subDays(new Date(), 14 - i);
-    return {
-      name: format(date, "MMM d"),
-      formattedDate: format(date, "yyyy-MM-dd"),
-    };
-  });
-
-  const responses = await Promise.all(
-    dates.map(async (dateObj) => {
-      const response = await fetch(
-        `https://api.coinbase.com/v2/prices/OP-USD/spot?date=${dateObj.formattedDate}`,
-      );
-      const json = await response.json();
-      return {
-        name: dateObj.name,
-        date: dateObj.formattedDate,
-        price: parseFloat(json.data.amount),
-        transactionsCount: Math.floor(Math.random() * 200) + 400,
-      };
-    }),
-  );
-
-  return responses;
-};
+import { loadFunctions } from "@/lib/signatures";
 
 export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -147,7 +115,7 @@ export const fetchLatestTransactionsEnqueued = async (
   hash: Hash,
   latest: bigint,
 ): Promise<{
-  transactions: TransactionEnqueued[];
+  transactionsEnqueued: TransactionEnqueued[];
   previousStart?: bigint;
   previousHash?: Hash;
   nextStart?: bigint;
@@ -166,9 +134,13 @@ export const fetchLatestTransactionsEnqueued = async (
       fromBlock: l1FromBlock,
     }),
   ]);
-  const transactions = await Promise.all(
+  const transactionsEnqueued = await Promise.all(
     extractTransactionDepositedLogs({ logs: transactionDepositedLogs }).map(
       async (transactionDepositedLog, index) => {
+        const sentMessageLog = sentMessageLogs[index];
+        if (!sentMessageLog || !sentMessageLog.args.gasLimit) {
+          return null;
+        }
         const { timestamp } = await l1PublicClient.getBlock({
           blockNumber: transactionDepositedLog.blockNumber,
         });
@@ -178,13 +150,16 @@ export const fetchLatestTransactionsEnqueued = async (
           l1TxHash: transactionDepositedLog.transactionHash,
           timestamp,
           l1TxOrigin: transactionDepositedLog.args.from,
-          gasLimit: sentMessageLogs[index].args.gasLimit ?? BigInt(0),
+          gasLimit: sentMessageLog.args.gasLimit,
         };
       },
     ),
   );
   return {
-    transactions: transactions.reverse().slice(0, Number(txsEnqueuedPerPage)),
+    transactionsEnqueued: transactionsEnqueued
+      .filter((transactionEnqueud) => transactionEnqueud !== null)
+      .reverse()
+      .slice(0, Number(txsEnqueuedPerPage)),
     previousStart: BigInt(0),
     previousHash: "0x",
     nextStart: BigInt(0),
@@ -234,73 +209,3 @@ export const fetchTokensPrices = async () => {
     op: { today: Number(opPriceToday), yesterday: Number(opPriceYesterday) },
   };
 };
-
-export const fetchHomePageDataFromJsonRpc = async () => {
-  const [latestL1BlockNumber, latestL2BlockNumber] = await Promise.all([
-    l1PublicClient.getBlockNumber(),
-    l2PublicClient.getBlockNumber(),
-  ]);
-  const [
-    tokensPrices,
-    latestBlocks,
-    { transactions: latestTransactions },
-    { transactions: latestTransactionsEnqueued },
-    transactionHistory,
-  ] = await Promise.all([
-    fetchTokensPrices(),
-    fetchLatestBlocks(latestL2BlockNumber),
-    fetchLatestTransactions(latestL2BlockNumber, 0, latestL2BlockNumber),
-    fetchLatestTransactionsEnqueued(
-      latestL1BlockNumber,
-      "0x",
-      latestL1BlockNumber,
-    ),
-    fetchTransactionHistory(),
-  ]);
-  return {
-    tokensPrices,
-    latestBlocks: latestBlocks.slice(0, 6),
-    latestTransactions: latestTransactions.slice(0, 6),
-    latestTransactionsEnqueued: latestTransactionsEnqueued.slice(0, 10),
-    transactionHistory,
-  };
-};
-
-export const fetchHomePageDataFromDatabase = async () => {
-  const [
-    tokensPrices,
-    latestBlocks,
-    latestTransactions,
-    latestTransactionsEnqueued,
-    transactionHistory,
-  ] = await Promise.all([
-    fetchTokensPrices(),
-    prisma.block.findMany({
-      include: { transactions: true },
-      orderBy: { number: "desc" },
-      take: 6,
-    }),
-    prisma.transaction.findMany({
-      orderBy: { timestamp: "desc" },
-      take: 6,
-    }),
-    prisma.transactionEnqueued.findMany({
-      orderBy: { timestamp: "desc" },
-      take: 10,
-    }),
-    fetchTransactionHistory(),
-  ]);
-  return {
-    tokensPrices,
-    latestBlocks: latestBlocks.map(fromPrismaBlock),
-    latestTransactions: latestTransactions.map(fromPrismaTransaction),
-    latestTransactionsEnqueued: latestTransactionsEnqueued.map(
-      fromPrismaTransactionEnqueued,
-    ),
-    transactionHistory,
-  };
-};
-
-export const fetchHomePageData = process.env.DATABASE_URL
-  ? fetchHomePageDataFromDatabase
-  : fetchHomePageDataFromJsonRpc;
