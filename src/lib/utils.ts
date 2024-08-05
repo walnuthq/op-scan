@@ -1,7 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import { getBytes, hexlify, getAddress as ethersGetAddress, isHexString } from "ethers";
 import { ABIEventExtended, DecodedArgs } from "@/interfaces";
-import { loaders } from "@shazow/whatsabi";
 import { twMerge } from "tailwind-merge";
 import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
@@ -14,6 +12,9 @@ import {
   Log,
   getAddress,
   parseEventLogs,
+  toHex,
+  isHex,
+  toBytes 
 } from "viem";
 import { capitalize } from "lodash";
 import { ERC20Transfer, ERC721Transfer, ERC1155Transfer } from "@/lib/types";
@@ -22,6 +23,7 @@ import getERC20Contract from "@/lib/contracts/erc-20/contract";
 import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
 import { l2PublicClient } from "./chains";
+import { loadEvents } from "./signatures";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -166,15 +168,15 @@ export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
 const decodeData = (data: string): { hex: string; number: string; address: string }[] => {
   const decoded: { hex: string; number: string; address: string }[] = [];
 
-  if (!isHexString(data)) {
+  if (!isHex(data)) {
     return [];
   }
 
-  const dataBytes = getBytes(data);
+  const dataBytes = toBytes(data);
 
   for (let i = 0; i < dataBytes.length; i += 32) {
     const value = dataBytes.slice(i, i + 32);
-    const hexValue = hexlify(value);
+    const hexValue = toHex(value);
 
     let formattedValue: { hex: string; number: string; address: string } = {
       hex: hexValue,
@@ -191,10 +193,10 @@ const decodeData = (data: string): { hex: string; number: string; address: strin
 
     try {
       if (value.length === 20) {
-        const addressValue = ethersGetAddress(hexValue);
+        const addressValue = getAddress(hexValue);
         formattedValue.address = addressValue;
       } else if (value.length === 32) {
-        const addressValue = ethersGetAddress(hexlify(value.slice(12)));
+        const addressValue = getAddress(toHex(value.slice(12)));
         formattedValue.address = addressValue;
       }
     } catch (error) {
@@ -210,7 +212,6 @@ const decodeData = (data: string): { hex: string; number: string; address: strin
 export const formatEventLog = async (
   log: Log,
   abi: ABIEventExtended[],
-  signatureLookup: loaders.OpenChainSignatureLookup
 ): Promise<{ eventName: string; method: string; args: DecodedArgs }> => {
   const eventFragment = abi.find(item => item.type === 'event' && item.hash === log.topics[0]);
   if (!eventFragment) {
@@ -226,8 +227,8 @@ export const formatEventLog = async (
     };
   }
 
-  const eventSignatures = await signatureLookup.loadEvents(log.topics[0] as Address);
-  const eventName = eventSignatures.length > 0 ? eventSignatures[0] : 'Unknown';
+  const eventSignatures = await loadEvents(log.topics[0] as Address);
+  const eventName = eventSignatures.length > 0 ? eventSignatures : 'Unknown';
 
   let methodID = 'Unknown';
   if (log.transactionHash) {
