@@ -14,12 +14,14 @@ interface AddressLinkProps {
   address: string | null;
   href: string;
   isExternal?: boolean;
+  className?: string;
 }
 
 const AddressLink = ({
   address,
   href,
-  isExternal = false
+  isExternal = false,
+  className
 }: AddressLinkProps) => {
   const {
     state: { hoveredAddress },
@@ -36,7 +38,7 @@ const AddressLink = ({
         <TooltipTrigger>
             <Link
             href={href}
-            className={"flex items-center"}
+            className={cn("flex items-center", className)}
             >
                 <div
                 className={cn(
@@ -49,7 +51,7 @@ const AddressLink = ({
                 >
                     {address?.slice(0,10).concat("...")}
                 </div>
-                {!isExternal && (
+                {isExternal && (
                     <SquareArrowOutUpRight className="ml-1 size-4" />
                 )}
             </Link>
