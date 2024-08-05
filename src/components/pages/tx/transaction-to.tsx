@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CircleCheck, CircleX } from "lucide-react";
 import { TransactionWithReceipt } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
+import CopyButton from "@/components/lib/copy-button";
 
 const TransactionTo = ({
   transaction,
@@ -21,6 +22,7 @@ const TransactionTo = ({
       >
         {transaction.to}
       </Link>
+      <CopyButton content="Copy Address to clipboard" copy={transaction.to} />
       {transaction.input !== "0x" && (
         <>
           {transaction.receipt.status === "success" ? (
