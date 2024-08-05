@@ -11,12 +11,7 @@ export interface FormattedLog {
   args: DecodedArgs;
   transactionHash: string;
   blockNumber: bigint;
-  timestamp: {
-    distance: string;
-    utc: string;
-    utcWithTz: string;
-    originalTimestamp: bigint;
-  };
+  timestamp: bigint;
 }
 
 export interface ABIEventExtended {
