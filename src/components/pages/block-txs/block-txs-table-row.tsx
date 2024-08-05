@@ -3,6 +3,7 @@ import { TransactionWithReceipt } from "@/lib/types";
 import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
+import AddressLink from "@/components/lib/address-link";
 import CopyButton from "@/components/lib/copy-button";
 
 const BlockTxsTableRow = ({
@@ -40,12 +41,11 @@ const BlockTxsTableRow = ({
       <TableCell>{timestampFormattedAsDate ? utc : distance}</TableCell>
       <TableCell className="max-w-40">
         <div className="flex">
-          <Link
+          <AddressLink
             href={`/address/${transaction.from}`}
+            address={transaction.from}
             className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
-          >
-            {transaction.from}
-          </Link>
+          />
           <CopyButton
             content="Copy Address to clipboard"
             copy={transaction.from}
@@ -54,12 +54,11 @@ const BlockTxsTableRow = ({
       </TableCell>
       <TableCell className="max-w-40">
         <div className="flex">
-          <Link
+          <AddressLink
             href={`/address/${transaction.to}`}
+            address={transaction.to}
             className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
-          >
-            {transaction.to}
-          </Link>
+          />
           <CopyButton
             content="Copy Address to clipboard"
             copy={transaction.to ?? ""}

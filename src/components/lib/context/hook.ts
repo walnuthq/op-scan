@@ -17,11 +17,17 @@ const useGlobalContext = () => {
       type: "SET_HOVERED_SELECTOR",
       payload: { selector },
     });
+  const setHoveredAddress = (address: string): void =>
+  dispatch({
+    type: "SET_HOVERED_ADDRESS",
+    payload: { address },
+  });
   return {
     state,
     toggleTimestampFormattedAsDate,
     toggleTxGasPriceShown,
     setHoveredSelector,
+    setHoveredAddress
   };
 };
 
