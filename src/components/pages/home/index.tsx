@@ -1,4 +1,3 @@
-import { fetchHomeData } from "@/components/pages/home/fetch-home-data";
 import EthPrice from "@/components/pages/home/eth-price";
 import OpPrice from "@/components/pages/home/op-price";
 import LatestBlockAndTxs from "@/components/pages/home/latest-block-and-txs";
@@ -7,6 +6,7 @@ import TransactionHistory from "@/components/pages/home/transaction-history";
 import LatestBlocks from "@/components/pages/home/latest-blocks";
 import LatestTransactions from "@/components/pages/home/latest-transactions";
 import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions";
+import { fetchHomeData } from './fetch-home-data';
 
 const Home = async () => {
   const {
@@ -14,7 +14,9 @@ const Home = async () => {
     latestBlocks,
     latestTransactions,
     latestTransactionsEnqueued,
+    transactionHistory,
   } = await fetchHomeData();
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="grid gap-4 lg:grid-cols-3">
@@ -26,7 +28,7 @@ const Home = async () => {
           <LatestBlockAndTxs blockNumber={latestBlocks[0]?.number} />
           <LatestL1TxBatch />
         </div>
-        <TransactionHistory />
+        <TransactionHistory history={transactionHistory} />
       </div>
       <div className="grid gap-4 md:gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <LatestBlocks blocks={latestBlocks} />

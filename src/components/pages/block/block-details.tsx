@@ -6,6 +6,7 @@ import TimestampListItem from "@/components/lib/timestamp-list-item";
 import { Block } from "@/lib/types";
 import BlockHeight from "@/components/pages/block/block-height";
 import BlockExtraData from "@/components/pages/block/block-extra-data";
+import CopyButton from "@/components/lib/copy-button";
 
 const BlockDetails = ({ block }: { block: Block }) => (
   <dl>
@@ -33,7 +34,10 @@ const BlockDetails = ({ block }: { block: Block }) => (
     </DescriptionListItem>
     <BlockExtraData extraData={block.extraData} />
     <Separator />
-    <DescriptionListItem title="Hash">{block.hash}</DescriptionListItem>
+    <DescriptionListItem title="Hash">
+      {block.hash}
+      <CopyButton content="Copy Hash to clipboard" copy={block.hash} />
+    </DescriptionListItem>
     <DescriptionListItem title="Parent Hash">
       <Link
         href={`/block/${block.parentHash}`}
@@ -41,6 +45,10 @@ const BlockDetails = ({ block }: { block: Block }) => (
       >
         {block.parentHash}
       </Link>
+      <CopyButton
+        content="Copy Parent Hash to clipboard"
+        copy={block.parentHash}
+      />
     </DescriptionListItem>
   </dl>
 );
