@@ -19,6 +19,7 @@ const TransactionTo = ({
       <AddressLink
         href={`/address/${transaction.to}`}
         address={transaction.to}
+        className="text-primary hover:brightness-150"
       />
       <CopyButton content="Copy Address to clipboard" copy={transaction.to} />
       {transaction.input !== "0x" && (

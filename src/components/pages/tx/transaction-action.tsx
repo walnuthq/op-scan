@@ -27,6 +27,7 @@ const TransactionAction = ({
           <AddressLink
             href={`/address/${transaction.to}`}
             address={formatAddress(transaction.to)}
+            className="text-primary hover:brightness-150"
           />
         </>
       ) : (
@@ -40,12 +41,14 @@ const TransactionAction = ({
           <AddressLink
             href={`/address/${transaction.from}`}
             address={formatAddress(transaction.from)}
-         />
-            
+            className="text-primary hover:brightness-150"
+          />
+
           <span className="mx-2">on</span>
           <AddressLink
             href={`/address/${transaction.to}`}
             address={formatAddress(transaction.to)}
+            className="text-primary hover:brightness-150"
           />
         </>
       )}

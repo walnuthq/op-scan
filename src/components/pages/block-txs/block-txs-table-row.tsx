@@ -39,25 +39,31 @@ const BlockTxsTableRow = ({
         />
       </TableCell>
       <TableCell>{timestampFormattedAsDate ? utc : distance}</TableCell>
-      <TableCell className="max-w-40 flex truncate text-primary hover:brightness-150">
-        <AddressLink
-          href={`/address/${transaction.from}`}
-          address={transaction.from}
-        />
-       <CopyButton
-          content="Copy Address to clipboard"
-          copy={transaction.from}
-        />
+      <TableCell className="max-w-40">
+        <div className="flex">
+          <AddressLink
+            href={`/address/${transaction.from}`}
+            address={transaction.from}
+            className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
+          />
+          <CopyButton
+            content="Copy Address to clipboard"
+            copy={transaction.from}
+          />
+        </div>
       </TableCell>
-      <TableCell className="max-w-40 flex truncate text-primary hover:brightness-150">
-        <AddressLink
-          href={`/address/${transaction.to}`}
-          address={transaction.to}
-        />
-        <CopyButton
-           content="Copy Address to clipboard"
-           copy={transaction.to ?? ""}
-        />
+      <TableCell className="max-w-40">
+        <div className="flex">
+          <AddressLink
+            href={`/address/${transaction.to}`}
+            address={transaction.to}
+            className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
+          />
+          <CopyButton
+            content="Copy Address to clipboard"
+            copy={transaction.to ?? ""}
+          />
+        </div>
       </TableCell>
       <TableCell>{formatEther(transaction.value, 15)} ETH</TableCell>
       <TableCell>

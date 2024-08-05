@@ -49,11 +49,12 @@ const LatestTxsTableRow = ({
       <TableCell suppressHydrationWarning>
         {timestampFormattedAsDate ? utc : distance}
       </TableCell>
-      <TableCell>
+      <TableCell className="max-w-40">
         <div className="flex">
           <AddressLink
             href={`/address/${transaction.from}`}
             address={transaction.from}
+            className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
           />
           <CopyButton
             content="Copy Address to clipboard"
@@ -61,11 +62,12 @@ const LatestTxsTableRow = ({
           />
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="max-w-40">
         <div className="flex">
           <AddressLink
             href={`/address/${transaction.to}`}
             address={transaction.to}
+            className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
           />
           <CopyButton
             content="Copy Address to clipboard"
