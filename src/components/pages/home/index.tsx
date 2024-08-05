@@ -7,18 +7,16 @@ import LatestBlocks from "@/components/pages/home/latest-blocks";
 import LatestTransactions from "@/components/pages/home/latest-transactions";
 import LatestL1L2Transactions from "@/components/pages/home/latest-l1-l2-transactions";
 import fetchLatestBlocks from "../blocks/fetch-blocks";
-import { fetchHomeData } from './fetch-home-data';
+import { fetchHomeData } from "./fetch-home-data";
 
 const Home = async () => {
   const {
     tokensPrices,
-    latestBlocks,
     latestTransactions,
     latestTransactionsEnqueued,
     transactionHistory,
   } = await fetchHomeData();
-  const start = BigInt(0);
- 
+  const start = BigInt(1);
   const latestBlocks = await fetchLatestBlocks(start);
 
   return (

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { fromViemBlock, Block } from "@/lib/types";
 import { range } from "lodash";
 
+type Hash = `0x${string}`;
+
 const fetchLatestBlocksFromJsonRpc = async (
   start: bigint,
 ): Promise<Block[]> => {
@@ -30,6 +32,13 @@ const fetchLatestBlocksFromDatabase = async (
       number: "desc",
     },
     take: Number(blocksPerPage),
+    include: {
+      transactions: {
+        select: {
+          hash: true,
+        },
+      },
+    },
   });
 
   if (blocks.length === 0) {
@@ -44,10 +53,9 @@ const fetchLatestBlocksFromDatabase = async (
     gasLimit: BigInt(block.gasLimit),
     gasUsed: BigInt(block.gasUsed),
     extraData: block.extraData as `0x${string}`,
-    transactions: [],
+    transactions: block.transactions.map((tx) => tx.hash as `0x${string}`),
   }));
 };
-
 const fetchLatestBlocks = process.env.DATABASE_URL
   ? fetchLatestBlocksFromDatabase
   : fetchLatestBlocksFromJsonRpc;
