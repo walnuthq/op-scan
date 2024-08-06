@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import AddressLink from "@/components/pages/home/AddressLink";
+import AddressLink from "@/components/lib/address-link";
 import { formatEther } from "@/lib/utils";
 import { ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -34,22 +34,18 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
         <div className="flex items-center gap-1">
           From{" "}
           <AddressLink
-            addressClassName={"truncate max-w-36 md:max-w-48 xl:max-w-36"}
+            className="truncate max-w-36 md:max-w-48 xl:max-w-36"
             address={transaction.from}
-            href={`/address/${transaction.from}`}
-          >
-            {transaction.from}
-          </AddressLink>
+            href={`/address/${transaction.from}`} 
+          />
         </div>
         <div className="flex items-center gap-1">
           To{" "}
           <AddressLink
-            addressClassName={"truncate max-w-36 md:max-w-48 xl:max-w-36"}
+            className="truncate max-w-36 md:max-w-48 xl:max-w-36"
             address={transaction.to}
             href={`/address/${transaction.to}`}
-          >
-            {transaction.to}
-          </AddressLink>
+          />
         </div>
       </div>
       <div className="flex items-center gap-1 text-sm">
