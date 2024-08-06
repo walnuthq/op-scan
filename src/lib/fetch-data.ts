@@ -1,6 +1,6 @@
 import { range } from "lodash";
 import { subDays, formatISO } from "date-fns";
-import { Hash } from "viem";
+import { Address, Hash } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
@@ -257,6 +257,7 @@ export const fetchHomePageDataFromDatabase = async () => {
       take: 10,
     }),
   ]);
+  console.log(latestTransactions[0]);
   return {
     tokensPrices,
     latestBlocks: latestBlocks.map(fromPrismaBlock),
@@ -270,3 +271,32 @@ export const fetchHomePageDataFromDatabase = async () => {
 export const fetchHomePageData = process.env.DATABASE_URL
   ? fetchHomePageDataFromDatabase
   : fetchHomePageDataFromJsonRpc;
+
+
+
+  
+// export async function getLatestTransferEvents(
+//   contractAddress: Address,
+//   limit: number = 100
+// ) {
+//   console.log(contractAddress);
+
+//   try {
+//     const transferEvents = await prisma.transferEvent.findMany({
+//       where: {
+//         contractAddress: contractAddress.toLowerCase(),
+//       },
+//       orderBy: {
+//         blockNumber: 'desc',
+//       },
+//       take: limit,
+//     });
+
+//     console.log("The number of events found:", transferEvents.length);
+
+//     return transferEvents;
+//   } catch (error) {
+//     console.error("Error Transfer:", error);
+//     throw error;
+//   }
+// }

@@ -7,12 +7,12 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx}",
     "lint": "next lint",
-    "prisma:generate": "prisma generate",
-    "prisma:db:push": ". .env.local && export DATABASE_URL && prisma db push",
-    "prisma:studio": ". .env.local && export DATABASE_URL && prisma studio",
-    "op-indexer": ". .env.local && export DATABASE_URL && export NEXT_PUBLIC_L1_RPC_URL && export NEXT_PUBLIC_L2_RPC_URL && export L1_RPC_WSS && export L2_RPC_WSS && bun op-indexer/index.ts"
+    "prism:generate": "prism-generate",
+    "prisma:db:push": "cross-env prisma db push",
+    "prisma:studio": "cross-env prisma studio",
+    "op-indexer": "cross-env bun op-indexer/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",
@@ -26,6 +26,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.1.3",
     "lodash": "^4.17.21",
