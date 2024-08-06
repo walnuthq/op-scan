@@ -34,15 +34,15 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
         <div className="flex items-center gap-1">
           From{" "}
           <AddressLink
-            className="truncate max-w-36 md:max-w-48 xl:max-w-36"
+            className="max-w-36 truncate md:max-w-48 xl:max-w-36"
             address={transaction.from}
-            href={`/address/${transaction.from}`} 
+            href={`/address/${transaction.from}`}
           />
         </div>
         <div className="flex items-center gap-1">
           To{" "}
           <AddressLink
-            className="truncate max-w-36 md:max-w-48 xl:max-w-36"
+            className="max-w-36 truncate md:max-w-48 xl:max-w-36"
             address={transaction.to}
             href={`/address/${transaction.to}`}
           />

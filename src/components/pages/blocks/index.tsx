@@ -1,5 +1,5 @@
 import { formatNumber } from "@/lib/utils";
-import  fetchLatestBlocks  from "./fetch-blocks";
+import fetchLatestBlocks from "./fetch-blocks";
 import {
   Card,
   CardContent,

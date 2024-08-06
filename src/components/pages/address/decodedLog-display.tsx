@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { DecodedArgs } from "@/interfaces";
 import {
   Select,
@@ -7,15 +7,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { useState } from "react";
 
 interface Props {
-  args: DecodedArgs
+  args: DecodedArgs;
 }
 
 export const DecodedLogDisplay = ({ args }: Props) => {
-
   const [selectedFormat, setSelectedFormat] = useState("hex");
 
   const handleChange = (value: string) => {
@@ -35,16 +34,18 @@ export const DecodedLogDisplay = ({ args }: Props) => {
 
   return (
     <div>
-      <span className="tracking-widest text-primary opacity-70">*** {args.function}</span>
+      <span className="tracking-widest text-primary opacity-70">
+        *** {args.function}
+      </span>
       <div className="flex flex-col gap-1 py-2">
         {args.topics.map((topic, index) => (
-          <div key={index} className="flex justify-start items-center gap-3">
-            <strong>[topic{index}]</strong> 
+          <div key={index} className="flex items-center justify-start gap-3">
+            <strong>[topic{index}]</strong>
             <p className="opacity-50">{topic}</p>
           </div>
         ))}
       </div>
-      <div className="flex justify-start items-center gap-1">
+      <div className="flex items-center justify-start gap-1">
         <Select onValueChange={handleChange}>
           <SelectTrigger className="w-[100px]">
             <SelectValue placeholder="Hex" />
@@ -57,10 +58,8 @@ export const DecodedLogDisplay = ({ args }: Props) => {
             </SelectGroup>
           </SelectContent>
         </Select>
-        <div className="ml-2">
-          {getSelectedValue()}
-        </div>
+        <div className="ml-2">{getSelectedValue()}</div>
       </div>
     </div>
   );
-}
+};

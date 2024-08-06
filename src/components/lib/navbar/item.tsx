@@ -24,7 +24,7 @@ const Item = ({ selectedCategory, setOpen, value, index }: ItemProps) => {
   // Handle click
   const handleItemClick = (value: string) => {
     setOpen(false);
-router.push(`/${categoryToRedirect}/${value}`);
+    router.push(`/${categoryToRedirect}/${value}`);
   };
 
   return (

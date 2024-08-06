@@ -71,7 +71,8 @@ export function CommandDemo({
                           resultValue.category === selectedCategory,
                       )
                       ?.values.map((value, index) => (
-                        <Item key={index}
+                        <Item
+                          key={index}
                           selectedCategory={selectedCategory}
                           setOpen={setOpen}
                           value={value}
