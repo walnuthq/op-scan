@@ -24,13 +24,13 @@ const Item = ({ selectedCategory, setOpen, value, index }: ItemProps) => {
   // Handle click
   const handleItemClick = (value: string) => {
     setOpen(false);
-    router.push(⁠ /${categoryToRedirect}/${value} ⁠);
+router.push(`/${categoryToRedirect}/${value}`);
   };
 
   return (
     <Link
       key={index}
-      href={⁠ /${categoryToRedirect}/${value} ⁠}
+      href={`/${categoryToRedirect}/${value}`}
       onClick={() => setOpen(false)}
     >
       <CommandItem value={value} onSelect={() => handleItemClick(value)}>

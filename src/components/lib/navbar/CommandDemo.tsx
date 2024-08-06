@@ -9,7 +9,7 @@ import {
 import { SearchInputResult } from "@/interfaces";
 import { useState, useCallback } from "react";
 import { CornerDownLeft } from "lucide-react";
-import Item from "./Item";
+import Item from "./item";
 
 type CommandDemoProps = {
   searchResult: SearchInputResult[];
@@ -71,7 +71,7 @@ export function CommandDemo({
                           resultValue.category === selectedCategory,
                       )
                       ?.values.map((value, index) => (
-                        <Item
+                        <Item key={index}
                           selectedCategory={selectedCategory}
                           setOpen={setOpen}
                           value={value}
