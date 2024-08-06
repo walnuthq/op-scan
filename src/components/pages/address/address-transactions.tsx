@@ -1,32 +1,44 @@
-import { Address } from "viem";
+import { Address, getAddress } from "viem";
 import { prisma } from "@/lib/prisma";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { fromPrismaTransactionWithReceipt, TransactionWithReceipt } from "@/lib/types";
 import { loadFunctions } from "@/lib/signatures";
 import TxsTable from "@/components/lib/txs-table";
 
-const TRANSACTION_LIMIT = 25;
+const TXS_PER_PAGE = Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE) || 10;
 interface TransactionQueryResult {
   transactions: TransactionWithReceipt[];
   totalCount: number;
 }
 
 const fetchTransactionsData = async (address: Address): Promise<TransactionQueryResult> => {
-  const associatedTransactions = await prisma.transaction.findMany({
-    where: {
-      OR: [
-        { from: { contains: address } },
-        { to: { contains: address } },
-      ],
-    },
-    orderBy: { timestamp: 'desc' },
-    include: { receipt: true },
-  });
-  
-//Filter null reciept
-  const transactionsWithReceipts = associatedTransactions.filter(tx => tx.receipt !== null);
+  const checksumAddress = getAddress(address);
+  const [associatedTransactions, totalCount] = await Promise.all([
+    prisma.transaction.findMany({
+      where: {
+        OR: [
+          { from: checksumAddress },
+          { to: checksumAddress },
+        ],
+        receipt: { isNot: null },
+      },
+      orderBy: { timestamp: 'desc' },
+      include: { receipt: true },
+      take: TXS_PER_PAGE,
+    }),
+    prisma.transaction.count({
+      where: {
+        OR: [
+          { from: checksumAddress },
+          { to: checksumAddress },
+        ],
+        receipt: { isNot: null },
+      },
+    }),
+  ]);
+
   const validTransactions = await Promise.all(
-    transactionsWithReceipts.map(async (tx) => {
+    associatedTransactions.map(async (tx) => {
       try {
         const signature = await loadFunctions(tx.input.slice(0, 10));
         return fromPrismaTransactionWithReceipt(tx, tx.receipt!, signature);
@@ -37,10 +49,10 @@ const fetchTransactionsData = async (address: Address): Promise<TransactionQuery
     })
   );
 
-  const filteredValidTransactions = validTransactions.filter(tx => tx !== null) as TransactionWithReceipt[];
+  const filteredValidTransactions = validTransactions.filter((tx): tx is TransactionWithReceipt => tx !== null);
   return {
-    transactions: filteredValidTransactions.slice(0, TRANSACTION_LIMIT),
-    totalCount: filteredValidTransactions.length,
+    transactions: filteredValidTransactions,
+    totalCount,
   };
 };
 
@@ -49,7 +61,7 @@ const AddressTransactions: React.FC<{ address: Address }> = async ({ address }) 
   return (
     <Card>
       <CardHeader>
-        Latest {transactions.length >= TRANSACTION_LIMIT ? TRANSACTION_LIMIT : transactions.length} from a total of {totalCount} valid transactions
+        Latest {transactions.length} from a total of {totalCount} valid transactions
       </CardHeader>
       <CardContent>
         <h1>TRANSACTIONS</h1>
@@ -62,5 +74,4 @@ const AddressTransactions: React.FC<{ address: Address }> = async ({ address }) 
     </Card>
   );
 };
-
 export default AddressTransactions;
