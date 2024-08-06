@@ -17,15 +17,15 @@ import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 import { loadFunctions } from "@/lib/signatures";
 
-export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
-  const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
-  const blocks = await Promise.all(
-    range(Number(start), Math.max(Number(start - blocksPerPage), -1)).map((i) =>
-      l2PublicClient.getBlock({ blockNumber: BigInt(i) }),
-    ),
-  );
-  return blocks.map(fromViemBlock);
-};
+// export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
+//   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
+//   const blocks = await Promise.all(
+//     range(Number(start), Math.max(Number(start - blocksPerPage), -1)).map((i) =>
+//       l2PublicClient.getBlock({ blockNumber: BigInt(i) }),
+//     ),
+//   );
+//   return blocks.map(fromViemBlock);
+// };
 
 export const fetchLatestTransactions = async (
   start: bigint,
