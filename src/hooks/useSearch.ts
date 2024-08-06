@@ -5,9 +5,9 @@ import { SearchInputResult } from "@/interfaces";
 
 export function useSearch() {
   const debounceRef = useRef<NodeJS.Timeout>();
-  const [showResult, setShowResult] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchResult, setSearchResult] = useState<SearchInputResult[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const selectedDefaultCategory =
@@ -15,13 +15,15 @@ export function useSearch() {
     setSelectedCategory(selectedDefaultCategory);
   }, [searchResult]);
 
-  const onQueryChanged = (event: ChangeEvent<HTMLInputElement>) => {
+  const onQueryChanged = (searchValue: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(async () => {
-      const searchInputValue = event.target.value.trim();
+      const searchInputValue = searchValue.trim();
+
       setSearchResult([]);
       if (searchInputValue) {
+        setLoading(true);
         try {
           let updatedSearchResult = [...searchResult];
           updatedSearchResult = await handleBlockSearch(
@@ -40,10 +42,8 @@ export function useSearch() {
         } catch (err) {
           console.error("Error fetching data:", err);
         } finally {
-          handleShowResult(true);
+          setLoading(false);
         }
-      } else {
-        handleShowResult(false);
       }
     }, 500);
   };
@@ -86,7 +86,6 @@ export function useSearch() {
     searchValue: string,
   ) => {
     if (!isAddress(searchValue)) return results;
-
     // const code = await l2PublicClient.getCode({ address: searchValue }); 👈 obtain additional address data if needed
     setSelectedCategory("Addresses");
     return updateSearchResult(results, "Addresses", searchValue);
@@ -114,19 +113,14 @@ export function useSearch() {
     setSelectedCategory(category);
   };
 
-  const handleShowResult = (value: boolean) => {
-    setShowResult(value);
-  };
-
   return {
     // Variables
-    showResult,
     selectedCategory,
     searchResult,
+    loading,
 
     // Functions
     handleCategorySelect,
     onQueryChanged,
-    handleShowResult,
   };
 }
