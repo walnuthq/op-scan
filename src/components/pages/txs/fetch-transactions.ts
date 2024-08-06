@@ -22,46 +22,37 @@ const fetchLatestTransactionsFromDatabase = async (
 }> => {
   const txsPerPage = BigInt(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
 
-  const blocksDatabase = await Promise.all(
+  const transactionsFromPrisma = await Promise.all(
     range(
       Math.min(Number(start + txsPerPage), Number(latest)),
       Math.max(Number(start - BigInt(2) * txsPerPage), -1),
     ).map(async (i) => {
-      const block = await prisma.block.findUnique({
-        where: { number: BigInt(i) },
-        include: { transactions: true },
+      return await prisma.transaction.findMany({
+        where: {
+          blockNumber: BigInt(i),
+        },
+        orderBy: [{ blockNumber: "desc" }, { transactionIndex: "desc" }],
+        select: {
+          hash: true,
+          blockNumber: true,
+          transactionIndex: true,
+          receipt: true,
+          timestamp: true,
+        },
       });
-
-      if (block) {
-        return {
-          ...block,
-          transactions: block.transactions.map((tx) => tx.hash as Hash),
-        };
-      } else {
-        return null;
-      }
     }),
   );
-  const blocks = blocksDatabase.filter((block) => block !== null);
 
-  type TransactionPaginationItem = {
-    hash: Hash;
-    transactionIndex: number;
-    blockNumber: bigint;
-    timestamp: bigint;
-  };
-  const transactionPaginationItems = blocks.reduce<TransactionPaginationItem[]>(
-    (previousValue, block) => {
-      const items = block.transactions.map((hash, i) => ({
-        hash,
-        transactionIndex: i,
-        blockNumber: block.number,
-        timestamp: block.timestamp,
-      }));
-      return [...previousValue, ...items];
-    },
-    [],
-  );
+  const transactionPaginationItems = transactionsFromPrisma
+    .flat()
+    .map((transaction) => ({
+      hash: transaction.hash,
+      transactionIndex: transaction.transactionIndex,
+      blockNumber: transaction.blockNumber,
+      timestamp: transaction.timestamp,
+      receipt: transaction.receipt,
+    }));
+
   const startItemIndex = transactionPaginationItems.findIndex(
     ({ blockNumber, transactionIndex }) =>
       blockNumber === start && transactionIndex === index,
