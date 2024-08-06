@@ -9,10 +9,11 @@
     "start": "next start",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}",
     "lint": "next lint",
-    "prism:generate": "prism-generate",
-    "prisma:db:push": "cross-env prisma db push",
-    "prisma:studio": "cross-env prisma studio",
-    "op-indexer": "cross-env bun op-indexer/index.ts"
+    "prisma:generate": "prisma generate",
+    "prisma:db:push2": ". .env.local && export DATABASE_URL && prisma db push",
+    "prisma:db:push": "dotenvx run -f .env.local -- prisma db push",
+    "prisma:studio": "dotenvx run -f .env.local -- prisma studio",
+    "op-indexer": "dotenvx run -f .env.local -- bun op-indexer/index.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",
@@ -24,6 +25,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@shazow/whatsabi": "^0.13.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
@@ -39,11 +41,12 @@
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.18.2"
+    "viem": "^2.18.7"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.6.4",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^22.0.0",
+    "@types/node": "^22.0.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-syntax-highlighter": "^15.5.13",

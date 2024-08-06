@@ -11,9 +11,9 @@ import useGlobalContext from "@/components/lib/context/hook";
 import LatestTxsEnqueuedTableRow from "@/components/pages/txs-enqueued/latest-txs-enqueued-table-row";
 
 const LatestTxsEnqueuedTable = ({
-  transactions,
+  transactionsEnqueued,
 }: {
-  transactions: TransactionEnqueued[];
+  transactionsEnqueued: TransactionEnqueued[];
 }) => {
   const {
     state: { timestampFormattedAsDate },
@@ -40,10 +40,10 @@ const LatestTxsEnqueuedTable = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {transactions.map((transaction) => (
+        {transactionsEnqueued.map((transactionEnqueued) => (
           <LatestTxsEnqueuedTableRow
-            key={transaction.l1TxHash}
-            transaction={transaction}
+            key={transactionEnqueued.l1TxHash}
+            transactionEnqueued={transactionEnqueued}
             timestampFormattedAsDate={timestampFormattedAsDate}
           />
         ))}

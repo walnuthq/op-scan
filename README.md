@@ -94,8 +94,8 @@ To run the indexer, you first need to setup your `DATABASE_URL` in `.env.local` 
 
 ```
 DATABASE_URL="file:dev.db"
-L1_RPC_WSS="wss://eth-mainnet.g.alchemy.com/v2/..."
-L2_RPC_WSS="wss://opt-mainnet.g.alchemy.com/v2/..."
+L1_RPC_WSS="wss://eth-mainnet.g.alchemy.com/v2/API_KEY"
+L2_RPC_WSS="wss://opt-mainnet.g.alchemy.com/v2/API_KEY"
 ```
 
 Then you can sync your local database with the Prisma schema:
@@ -122,6 +122,30 @@ If you need to change the Prisma schema at some point, make sure to regenerate t
 ```
 pnpm prisma:generate
 pnpm prisma:db:push
+```
+
+Indexing a blockchain is putting a heavy load on the RPC as you need to perform a large number of JSON-RPC requests to fully index a block (along with transactions and logs).
+You will probably meet 429 errors related to rate-limiting, you may provide up to 2 fallback RPC URLs in case this happens:
+
+```
+NEXT_PUBLIC_L1_FALLBACK1_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK1_API_KEY"
+NEXT_PUBLIC_L2_FALLBACK1_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK1_API_KEY"
+NEXT_PUBLIC_L1_FALLBACK2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK2_API_KEY"
+NEXT_PUBLIC_L2_FALLBACK2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK2_API_KEY"
+```
+
+You can pass several parameters to the indexer to control the indexing range and execution:
+
+- `--l2-from-block` (short `-f`, defaults to latest block) start indexing from this L2 block.
+- `--l2-index-block` (short `-b`) index this particular L2 block number.
+- `--l1-from-block` (defaults to latest block) start indexing from this L1 block.
+- `--l1-index-block` index this particular L1 block number.
+- `--index-delay` (short `-d`, defaults to 1000) delay in ms between indexing 2 blocks to avoid overloading the RPC.
+
+Example of running the indexer:
+
+```
+pnpm op-indexer -f 123416717 --l1-index-block 20426733 --l1-index-block 20426726 -d 500
 ```
 
 # 🚀 Deploying

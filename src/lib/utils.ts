@@ -5,15 +5,19 @@ import { formatInTimeZone } from "date-fns-tz";
 import {
   formatEther as viemFormatEther,
   formatGwei as viemFormatGwei,
-  Log,
-  formatUnits,
   Address,
   Hex,
   TransactionType,
+  Log,
+  getAddress,
+  parseEventLogs,
 } from "viem";
-import { TokenTransfer } from "@/lib/types";
 import { capitalize } from "lodash";
-import { getERC20Contract } from "@/lib/contracts/erc-20/contract";
+import { ERC20Transfer, ERC721Transfer, ERC1155Transfer } from "@/lib/types";
+import erc20Abi from "@/lib/contracts/erc-20/abi";
+import getERC20Contract from "@/lib/contracts/erc-20/contract";
+import erc721Abi from "@/lib/contracts/erc-721/abi";
+import erc1155Abi from "@/lib/contracts/erc-1155/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -81,51 +85,75 @@ export const formatTransactionType = (type: TransactionType, typeHex: Hex) => {
   return `${Number(typeHex)} (${typeString})`;
 };
 
-const ERC20_TRANSFER_EVENT_TOPIC =
-  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-
-export const parseTokenTransfers = async (
-  logs: Log[],
-): Promise<TokenTransfer[]> => {
-  const transfers = logs
-    .filter((log) => log.topics[0] === ERC20_TRANSFER_EVENT_TOPIC)
-    .map((log) => {
-      const [, fromTopic, toTopic] = log.topics;
-      const from = `0x${fromTopic?.slice(26)}` as Address;
-      const to = `0x${toTopic?.slice(26)}` as Address;
-      const amount = BigInt(log.data);
+export const parseERC20Transfers = (logs: Log[]): Promise<ERC20Transfer[]> =>
+  Promise.all(
+    parseEventLogs({
+      abi: erc20Abi,
+      eventName: "Transfer",
+      logs,
+    }).map(async ({ transactionHash, logIndex, args, address }) => {
+      const contract = getERC20Contract(address);
+      const decimals = await contract.read.decimals();
       return {
-        from,
-        to,
-        tokenAddress: log.address,
-        amount,
+        transactionHash,
+        logIndex,
+        address: getAddress(address),
+        from: args.from,
+        to: args.to,
+        value: args.value,
+        decimals,
       };
-    });
-
-  const transfersWithDecimals = await Promise.all(
-    transfers.map(async (transfer) => {
-      try {
-        const contract = getERC20Contract(transfer.tokenAddress);
-        const decimals = await contract.read.decimals();
-        const formattedAmount = formatUnits(transfer.amount, decimals);
-        return {
-          ...transfer,
-          amount: formattedAmount,
-          decimals,
-        };
-      } catch (error) {
-        console.error(
-          `Error processing transfer for ${transfer.tokenAddress}:`,
-          error,
-        );
-        const defaultDecimals = 18;
-        return {
-          ...transfer,
-          amount: formatUnits(transfer.amount, defaultDecimals),
-          decimals: defaultDecimals,
-        };
-      }
     }),
   );
-  return transfersWithDecimals;
+
+export const parseERC721Transfers = (logs: Log[]): ERC721Transfer[] =>
+  parseEventLogs({
+    abi: erc721Abi,
+    eventName: "Transfer",
+    logs,
+  }).map(({ transactionHash, logIndex, args, address }) => ({
+    transactionHash,
+    logIndex,
+    address: getAddress(address),
+    from: args.from,
+    to: args.to,
+    tokenId: args.tokenId,
+  }));
+
+export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
+  const transfersSingle = parseEventLogs({
+    abi: erc1155Abi,
+    eventName: "TransferSingle",
+    logs,
+  }).map(({ transactionHash, logIndex, args, address }) => ({
+    transactionHash,
+    logIndex,
+    address: getAddress(address),
+    operator: args.operator,
+    from: args.from,
+    to: args.to,
+    id: args.id,
+    value: args.value,
+  }));
+  const transfersBatch = parseEventLogs({
+    abi: erc1155Abi,
+    eventName: "TransferBatch",
+    logs,
+  }).reduce<ERC1155Transfer[]>(
+    (previousValue, { transactionHash, logIndex, args, address }) => [
+      ...previousValue,
+      ...args.ids.map((id, i) => ({
+        transactionHash,
+        logIndex,
+        address: getAddress(address),
+        operator: args.operator,
+        from: args.from,
+        to: args.to,
+        id,
+        value: args.values[i],
+      })),
+    ],
+    [],
+  );
+  return [...transfersSingle, ...transfersBatch];
 };

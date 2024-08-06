@@ -1,3 +1,4 @@
+import { formatEther as viemFormatEther } from "viem";
 import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatEther, formatPrice } from "@/lib/utils";
@@ -29,7 +30,7 @@ const AddressDetailsSection = ({
             ETH VALUE
           </span>
           <div className="flex items-center text-sm font-semibold">
-            {formatPrice(Number(formatEther(balance)) * ethPriceToday)} (@{" "}
+            {formatPrice(Number(viemFormatEther(balance)) * ethPriceToday)} (@{" "}
             {formatPrice(ethPriceToday)}/ETH)
           </div>
         </div>
