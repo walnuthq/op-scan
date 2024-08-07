@@ -1,12 +1,16 @@
-import { formatEther as viemFormatEther } from "viem";
+import { Address, formatEther as viemFormatEther } from "viem";
 import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatEther, formatPrice } from "@/lib/utils";
+import AddressTokenHoldings from "./address-tokens";
+import { TokenHoldings } from "./fetch-token-holdings";
 
 const AddressDetailsSection = ({
+  tokenHoldings,
   balance,
   ethPriceToday,
 }: {
+  tokenHoldings: TokenHoldings;
   balance: bigint;
   ethPriceToday: number;
 }) => (
@@ -32,6 +36,14 @@ const AddressDetailsSection = ({
           <div className="flex items-center text-sm font-semibold">
             {formatPrice(Number(viemFormatEther(balance)) * ethPriceToday)} (@{" "}
             {formatPrice(ethPriceToday)}/ETH)
+          </div>
+        </div>
+        <div className="space-y-0.5">
+          <span className="text-xs font-semibold text-muted-foreground">
+            TOKEN HOLDINGS
+          </span>
+          <div className="flex items-center text-sm font-semibold">
+            <AddressTokenHoldings tokenHoldings={tokenHoldings} />
           </div>
         </div>
       </CardContent>
