@@ -145,6 +145,8 @@ const toPrismaERC20Transfer = ({
   to,
   value,
   decimals,
+  name,
+  symbol,
 }: ERC20Transfer): PrismaERC20Transfer => ({
   transactionHash,
   logIndex,
@@ -153,6 +155,8 @@ const toPrismaERC20Transfer = ({
   to,
   value: `0x${value.toString(16)}`,
   decimals,
+  name,
+  symbol,
 });
 
 const toPrismaERC721Transfer = ({
@@ -162,6 +166,8 @@ const toPrismaERC721Transfer = ({
   from,
   to,
   tokenId,
+  name,
+  symbol,
 }: ERC721Transfer): PrismaERC721Transfer => ({
   transactionHash,
   logIndex,
@@ -169,6 +175,8 @@ const toPrismaERC721Transfer = ({
   from,
   to,
   tokenId: `0x${tokenId.toString(16)}`,
+  name,
+  symbol,
 });
 
 const toPrismaERC1155Transfer = ({

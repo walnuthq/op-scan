@@ -94,6 +94,8 @@ model erc20Transfer {
   to              String
   value           String
   decimals        Int
+  name            String
+  symbol          String
   receipt         TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
 
   @@id([transactionHash, logIndex])
@@ -106,6 +108,8 @@ model erc721Transfer {
   from            String
   to              String
   tokenId         String
+  name            String
+  symbol          String
   receipt         TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
 
   @@id([transactionHash, logIndex])

@@ -1,14 +1,14 @@
-import { Hash, Address, Hex, TransactionType, getAddress } from "viem";
 import {
   Block as PrismaBlock,
-  Transaction as PrismaTransaction,
-  TransactionReceipt as PrismaTransactionReceipt,
-  Log as PrismaLog,
+  erc1155Transfer as PrismaERC1155Transfer,
   erc20Transfer as PrismaERC20Transfer,
   erc721Transfer as PrismaERC721Transfer,
-  erc1155Transfer as PrismaERC1155Transfer,
+  Log as PrismaLog,
+  Transaction as PrismaTransaction,
   TransactionEnqueued as PrismaTransactionEnqueued,
+  TransactionReceipt as PrismaTransactionReceipt,
 } from "@/prisma/generated/client";
+import { Address, Hash, Hex, TransactionType, getAddress } from "viem";
 
 export type Block = {
   number: bigint;
@@ -90,6 +90,8 @@ export type ERC20Transfer = {
   to: Address;
   value: bigint;
   decimals: number;
+  name: string;
+  symbol: string;
 };
 
 export type ERC721Transfer = {
@@ -99,6 +101,8 @@ export type ERC721Transfer = {
   from: Address;
   to: Address;
   tokenId: bigint;
+  name: string;
+  symbol: string;
 };
 
 export type ERC1155Transfer = {
@@ -393,6 +397,8 @@ export const fromPrismaERC20Transfer = (
   to: erc20Transfer.to as Address,
   value: BigInt(erc20Transfer.value),
   decimals: erc20Transfer.decimals,
+  name: erc20Transfer.name,
+  symbol: erc20Transfer.symbol,
 });
 
 export const fromPrismaERC721Transfer = (
@@ -404,6 +410,8 @@ export const fromPrismaERC721Transfer = (
   from: erc721Transfer.from as Address,
   to: erc721Transfer.to as Address,
   tokenId: BigInt(erc721Transfer.tokenId),
+  name: erc721Transfer.name,
+  symbol: erc721Transfer.symbol,
 });
 
 export const fromPrismaERC1155Transfer = (
