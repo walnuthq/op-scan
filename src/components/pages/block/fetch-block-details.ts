@@ -7,19 +7,18 @@ const fetchBlockDetailsFromDatabase = async (
 ): Promise<Block | null> => {
   const block = await prisma.block.findUnique({
     where: { number },
-    include: { transactions: true },
+    include: { transactions: { select: { hash: true } } },
   });
   if (!block) {
     return fetchBlockDetailsFromJsonRpc(number);
   }
-  return fromPrismaBlock(block, block.transactions);
+  return fromPrismaBlock(block);
 };
 
 const fetchBlockDetailsFromJsonRpc = async (
   number: bigint,
 ): Promise<Block | null> => {
   const block = await l2PublicClient.getBlock({ blockNumber: number });
-
   return block ? fromViemBlock(block) : null;
 };
 const fetchBlockDetails = process.env.DATABASE_URL

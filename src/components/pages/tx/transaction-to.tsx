@@ -16,12 +16,10 @@ const TransactionTo = ({
     <DescriptionListItem
       title={transaction.input === "0x" ? "To" : "Interacted With (To)"}
     >
-      <AddressLink
-        href={`/address/${transaction.to}`}
-        address={transaction.to}
-        className="text-primary hover:brightness-150"
-      />
-      <CopyButton content="Copy Address to clipboard" copy={transaction.to} />
+      <div className="flex items-center gap-2">
+        <AddressLink address={transaction.to} />
+        <CopyButton content="Copy To" copy={transaction.to} />
+      </div>
       {transaction.input !== "0x" && (
         <>
           {transaction.receipt.status === "success" ? (

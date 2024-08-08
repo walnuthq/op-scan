@@ -12,7 +12,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 
-const LatestL1L2Transaction = ({
+const LatestTransactionEnqueued = ({
   transaction,
 }: {
   transaction: TransactionEnqueued;
@@ -23,32 +23,36 @@ const LatestL1L2Transaction = ({
     </div>
     <div className="grid gap-1">
       <div className="flex items-center gap-1 text-sm">
-        Block#{" "}
+        Block#
         <a
-          className="flex max-w-60 items-center truncate text-primary hover:brightness-150 md:max-w-96 xl:max-w-60"
+          className="flex max-w-60 items-center gap-1 truncate text-primary hover:brightness-150 md:max-w-96 xl:max-w-60"
           href={`${l1Chain.blockExplorers.default.url}/block/${transaction.l1BlockNumber}`}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {transaction.l1BlockNumber.toString()}
-          <SquareArrowOutUpRight className="ml-1 size-4" />
+          <SquareArrowOutUpRight className="size-4" />
         </a>
       </div>
-      <div className="flex items-center gap-1 text-sm">
+      <div className="flex items-center gap-2 text-sm">
         <div className="flex items-center gap-1">
-          L1 Tx#{" "}
-          <Link
-            className="flex items-center text-primary hover:brightness-150"
+          L1 Tx#
+          <a
+            className="flex items-center gap-1 text-primary hover:brightness-150"
             href={`${l1Chain.blockExplorers.default.url}/tx/${transaction.l1TxHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <span className="max-w-28 truncate md:max-w-48 xl:max-w-28">
+            <span className="max-w-28 truncate md:max-w-36 xl:max-w-28">
               {transaction.l1TxHash}
             </span>
             <SquareArrowOutUpRight className="size-4" />
-          </Link>
+          </a>
         </div>
         <div className="flex items-center gap-1">
-          L2 Tx#{" "}
+          L2 Tx#
           <Link
-            className="max-w-28 truncate text-primary hover:brightness-150 md:max-w-48 xl:max-w-28"
+            className="max-w-28 truncate text-primary hover:brightness-150 md:max-w-36 xl:max-w-28"
             href={`/tx/${transaction.l2TxHash}`}
           >
             {transaction.l2TxHash}
@@ -59,18 +63,18 @@ const LatestL1L2Transaction = ({
   </div>
 );
 
-const LatestL1L2Transactions = ({
+const LatestTransactionsEnqueued = ({
   transactions,
 }: {
   transactions: TransactionEnqueued[];
 }) => (
   <Card>
     <CardHeader className="border-b">
-      <CardTitle>Latest L1→L2 Transactions</CardTitle>
+      <CardTitle>Latest L1 → L2 Transactions</CardTitle>
     </CardHeader>
     <CardContent className="grid max-h-[557px] gap-6 divide-y overflow-x-hidden overflow-y-scroll">
       {transactions.map((transaction) => (
-        <LatestL1L2Transaction
+        <LatestTransactionEnqueued
           key={transaction.l1TxHash}
           transaction={transaction}
         />
@@ -81,10 +85,10 @@ const LatestL1L2Transactions = ({
         href="/txs-enqueued"
         className="pt-6 text-primary hover:brightness-150"
       >
-        View all L1→L2 transactions →
+        View all L1 → L2 transactions →
       </Link>
     </CardFooter>
   </Card>
 );
 
-export default LatestL1L2Transactions;
+export default LatestTransactionsEnqueued;

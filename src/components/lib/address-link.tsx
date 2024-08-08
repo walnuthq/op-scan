@@ -1,55 +1,61 @@
+"use client";
 import Link from "next/link";
+import { Address } from "viem";
 import { SquareArrowOutUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn, formatAddress } from "@/lib/utils";
+import { l1Chain } from "@/lib/chains";
 import useGlobalContext from "@/components/lib/context/hook";
-
-interface AddressLinkProps {
-  address: string | null;
-  href: string;
-  isExternal?: boolean;
-  className?: string;
-}
 
 const AddressLink = ({
   address,
-  href,
-  isExternal = false,
-  className,
-}: AddressLinkProps) => {
+  formatted = false,
+  external = false,
+}: {
+  address: Address;
+  formatted?: boolean;
+  external?: boolean;
+}) => {
   const {
     state: { hoveredAddress },
     setHoveredAddress,
   } = useGlobalContext();
-
+  const displayedAddress = formatted ? formatAddress(address) : address;
   return (
     <TooltipProvider>
       <Tooltip
         delayDuration={100}
-        onOpenChange={(open) =>
-          setHoveredAddress(open && address ? address : "")
-        }
+        onOpenChange={(open) => setHoveredAddress(open ? address : "")}
       >
-        <TooltipTrigger>
-          <Link href={href} className={cn("flex items-center", className)}>
-            <div
-              className={cn(
-                "w-28 rounded-md border px-2 py-1 text-xs transition-colors hover:border-dashed hover:border-yellow-500 hover:bg-yellow-500/15",
-                {
-                  "border-dashed border-yellow-500 bg-yellow-500/15":
-                    hoveredAddress === address,
-                },
-              )}
+        <TooltipTrigger
+          className={cn(
+            "truncate rounded-md border border-transparent px-2 py-1 text-primary transition-colors hover:border hover:border-dashed hover:border-yellow-500 hover:bg-yellow-500/15 hover:brightness-150",
+            {
+              "border-dashed border-yellow-500 bg-yellow-500/15":
+                hoveredAddress === address,
+            },
+          )}
+        >
+          {external ? (
+            <a
+              href={`${l1Chain.blockExplorers.default.url}/address/${address}`}
+              className="flex items-center gap-1"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {address?.slice(0, 10).concat("...")}
-            </div>
-            {isExternal && <SquareArrowOutUpRight className="ml-1 size-4" />}
-          </Link>
+              <span className="truncate">{displayedAddress}</span>
+              <SquareArrowOutUpRight className="size-4" />
+            </a>
+          ) : (
+            <Link href={`/address/${address}`}>
+              <span className="truncate">{displayedAddress}</span>
+            </Link>
+          )}
         </TooltipTrigger>
         <TooltipContent>
           <p>{address}</p>

@@ -29,8 +29,10 @@ const TransactionDetails = ({
 }) => (
   <dl>
     <DescriptionListItem title="Transaction Hash">
-      {transaction.hash}
-      <CopyButton content="Copy TxHash to clipboard" copy={transaction.hash} />
+      <div className="flex items-center gap-2">
+        {transaction.hash}
+        <CopyButton content="Copy Transaction Hash" copy={transaction.hash} />
+      </div>
     </DescriptionListItem>
     <DescriptionListItem title="Status">
       <TxStatusBadge success={transaction.receipt.status === "success"} />

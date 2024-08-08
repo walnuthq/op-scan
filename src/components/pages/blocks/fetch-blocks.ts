@@ -1,13 +1,9 @@
 import { l2PublicClient } from "@/lib/chains";
 import { prisma } from "@/lib/prisma";
-import { fromViemBlock, Block } from "@/lib/types";
+import { fromViemBlock, Block, fromPrismaBlock } from "@/lib/types";
 import { range } from "lodash";
 
-type Hash = `0x${string}`;
-
-const fetchLatestBlocksFromJsonRpc = async (
-  start: bigint,
-): Promise<Block[]> => {
+const fetchBlocksFromJsonRpc = async (start: bigint): Promise<Block[]> => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
   const blocks = await Promise.all(
     range(Number(start), Math.max(Number(start - blocksPerPage), -1)).map((i) =>
@@ -17,47 +13,24 @@ const fetchLatestBlocksFromJsonRpc = async (
   return blocks.map(fromViemBlock);
 };
 
-const fetchLatestBlocksFromDatabase = async (
-  start: bigint,
-): Promise<Block[]> => {
+const fetchBlocksFromDatabase = async (start: bigint): Promise<Block[]> => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
   const blocks = await prisma.block.findMany({
     where: {
-      number: {
-        lte: start,
-        gt: start - blocksPerPage,
-      },
+      number: { lte: start, gt: start - blocksPerPage },
     },
-    orderBy: {
-      number: "desc",
-    },
+    orderBy: { number: "desc" },
     take: Number(blocksPerPage),
-    include: {
-      transactions: {
-        select: {
-          hash: true,
-        },
-      },
-    },
+    include: { transactions: { select: { hash: true } } },
   });
-
   if (blocks.length === 0) {
-    return fetchLatestBlocksFromJsonRpc(start);
+    return fetchBlocksFromJsonRpc(start);
   }
-
-  return blocks.map((block) => ({
-    number: BigInt(block.number),
-    hash: block.hash as `0x${string}`,
-    parentHash: block.parentHash as `0x${string}`,
-    timestamp: BigInt(block.timestamp),
-    gasLimit: BigInt(block.gasLimit),
-    gasUsed: BigInt(block.gasUsed),
-    extraData: block.extraData as `0x${string}`,
-    transactions: block.transactions.map((tx) => tx.hash as `0x${string}`),
-  }));
+  return blocks.map(fromPrismaBlock);
 };
-const fetchLatestBlocks = process.env.DATABASE_URL
-  ? fetchLatestBlocksFromDatabase
-  : fetchLatestBlocksFromJsonRpc;
 
-export default fetchLatestBlocks;
+const fetchBlocks = process.env.DATABASE_URL
+  ? fetchBlocksFromDatabase
+  : fetchBlocksFromJsonRpc;
+
+export default fetchBlocks;

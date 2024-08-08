@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@prisma/client':
-        specifier: ^5.17.0
-        version: 5.17.0(prisma@5.17.0)
+        specifier: ^5.18.0
+        version: 5.18.0(prisma@5.18.0)
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
         version: 1.1.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -88,10 +88,10 @@ importers:
         version: 2.4.0
       tailwindcss-animate:
         specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@3.4.7)
+        version: 1.0.7(tailwindcss@3.4.9)
       viem:
-        specifier: ^2.18.7
-        version: 2.18.7(typescript@5.5.4)
+        specifier: ^2.19.2
+        version: 2.19.4(typescript@5.5.4)
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: ^1.6.4
@@ -100,7 +100,7 @@ importers:
         specifier: ^4.17.7
         version: 4.17.7
       '@types/node':
-        specifier: ^22.0.2
+        specifier: ^22.1.0
         version: 22.1.0
       '@types/react':
         specifier: ^18.3.3
@@ -121,8 +121,8 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0(eslint@8.57.0)
       postcss:
-        specifier: ^8.4.40
-        version: 8.4.40
+        specifier: ^8.4.41
+        version: 8.4.41
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
@@ -130,11 +130,11 @@ importers:
         specifier: ^0.6.5
         version: 0.6.5(prettier@3.3.3)
       prisma:
-        specifier: ^5.17.0
-        version: 5.17.0
+        specifier: ^5.18.0
+        version: 5.18.0
       tailwindcss:
-        specifier: ^3.4.7
-        version: 3.4.7
+        specifier: ^3.4.9
+        version: 3.4.9
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -330,8 +330,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@prisma/client@5.17.0':
-    resolution: {integrity: sha512-N2tnyKayT0Zf7mHjwEyE8iG7FwTmXDHFZ1GnNhQp0pJUObsuel4ZZ1XwfuAYkq5mRIiC/Kot0kt0tGCfLJ70Jw==}
+  '@prisma/client@5.18.0':
+    resolution: {integrity: sha512-BWivkLh+af1kqC89zCJYkHsRcyWsM8/JHpsDMM76DjP3ZdEquJhXa4IeX+HkWPnwJ5FanxEJFZZDTWiDs/Kvyw==}
     engines: {node: '>=16.13'}
     peerDependencies:
       prisma: '*'
@@ -339,20 +339,20 @@ packages:
       prisma:
         optional: true
 
-  '@prisma/debug@5.17.0':
-    resolution: {integrity: sha512-l7+AteR3P8FXiYyo496zkuoiJ5r9jLQEdUuxIxNCN1ud8rdbH3GTxm+f+dCyaSv9l9WY+29L9czaVRXz9mULfg==}
+  '@prisma/debug@5.18.0':
+    resolution: {integrity: sha512-f+ZvpTLidSo3LMJxQPVgAxdAjzv5OpzAo/eF8qZqbwvgi2F5cTOI9XCpdRzJYA0iGfajjwjOKKrVq64vkxEfUw==}
 
-  '@prisma/engines-version@5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053':
-    resolution: {integrity: sha512-tUuxZZysZDcrk5oaNOdrBnnkoTtmNQPkzINFDjz7eG6vcs9AVDmA/F6K5Plsb2aQc/l5M2EnFqn3htng9FA4hg==}
+  '@prisma/engines-version@5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169':
+    resolution: {integrity: sha512-a/+LpJj8vYU3nmtkg+N3X51ddbt35yYrRe8wqHTJtYQt7l1f8kjIBcCs6sHJvodW/EK5XGvboOiwm47fmNrbgg==}
 
-  '@prisma/engines@5.17.0':
-    resolution: {integrity: sha512-+r+Nf+JP210Jur+/X8SIPLtz+uW9YA4QO5IXA+KcSOBe/shT47bCcRMTYCbOESw3FFYFTwe7vU6KTWHKPiwvtg==}
+  '@prisma/engines@5.18.0':
+    resolution: {integrity: sha512-ofmpGLeJ2q2P0wa/XaEgTnX/IsLnvSp/gZts0zjgLNdBhfuj2lowOOPmDcfKljLQUXMvAek3lw5T01kHmCG8rg==}
 
-  '@prisma/fetch-engine@5.17.0':
-    resolution: {integrity: sha512-ESxiOaHuC488ilLPnrv/tM2KrPhQB5TRris/IeIV4ZvUuKeaicCl4Xj/JCQeG9IlxqOgf1cCg5h5vAzlewN91Q==}
+  '@prisma/fetch-engine@5.18.0':
+    resolution: {integrity: sha512-I/3u0x2n31rGaAuBRx2YK4eB7R/1zCuayo2DGwSpGyrJWsZesrV7QVw7ND0/Suxeo/vLkJ5OwuBqHoCxvTHpOg==}
 
-  '@prisma/get-platform@5.17.0':
-    resolution: {integrity: sha512-UlDgbRozCP1rfJ5Tlkf3Cnftb6srGrEQ4Nm3og+1Se2gWmCZ0hmPIi+tQikGDUVLlvOWx3Gyi9LzgRP+HTXV9w==}
+  '@prisma/get-platform@5.18.0':
+    resolution: {integrity: sha512-Tk+m7+uhqcKDgnMnFN0lRiH7Ewea0OEsZZs9pqXa7i3+7svS3FSCqDBCaM9x5fmhhkufiG0BtunJVDka+46DlA==}
 
   '@radix-ui/number@1.1.0':
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
@@ -2347,8 +2347,8 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.4.40:
-    resolution: {integrity: sha512-YF2kKIUzAofPMpfH6hOi2cGnv/HrUlfucspc7pDyvv7kGdqXrfj8SCl/t8owkEgKEuu8ZcRjSOxFxVLqwChZ2Q==}
+  postcss@8.4.41:
+    resolution: {integrity: sha512-TesUflQ0WKZqAvg52PWL6kHgLKP6xB6heTOdoYM0Wt2UHyxNa4K25EZZMgKns3BH1RLVbZCREPpLY0rhnNoHVQ==}
     engines: {node: ^10 || ^12 || >=14}
 
   prelude-ls@1.2.1:
@@ -2412,8 +2412,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  prisma@5.17.0:
-    resolution: {integrity: sha512-m4UWkN5lBE6yevqeOxEvmepnL5cNPEjzMw2IqDB59AcEV6w7D8vGljDLd1gPFH+W6gUxw9x7/RmN5dCS/WTPxA==}
+  prisma@5.18.0:
+    resolution: {integrity: sha512-+TrSIxZsh64OPOmaSgVPH7ALL9dfU0jceYaMJXsNrTkFHO7/3RANi5K2ZiPB1De9+KDxCWn7jvRq8y8pvk+o9g==}
     engines: {node: '>=16.13'}
     hasBin: true
 
@@ -2738,8 +2738,8 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
 
-  tailwindcss@3.4.7:
-    resolution: {integrity: sha512-rxWZbe87YJb4OcSopb7up2Ba4U82BoiSGUdoDr3Ydrg9ckxFS/YWsvhN323GMcddgU65QRy7JndC7ahhInhvlQ==}
+  tailwindcss@3.4.9:
+    resolution: {integrity: sha512-1SEOvRr6sSdV5IDf9iC+NU4dhwdqzF4zKKq3sAbasUWHEM6lsMhX+eNN5gkPx1BvLFEnZQEUFbXnGj8Qlp83Pg==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -2853,8 +2853,8 @@ packages:
   victory-vendor@36.9.2:
     resolution: {integrity: sha512-PnpQQMuxlwYdocC8fIJqVXvkeViHYzotI+NJrCuav0ZYFoq912ZHBk3mCeuj+5/VpodOjPe1z0Fk2ihgzlXqjQ==}
 
-  viem@2.18.7:
-    resolution: {integrity: sha512-0Xy5ypk+n4lYthsvC96jsZE97quKoq1t53RrbhKElmq84Dt705uUjQDgH0/LqAV02Oe6341M3jPTU9JLbs2K2Q==}
+  viem@2.19.4:
+    resolution: {integrity: sha512-JdhK3ui3uPD2tnpqGNkJaDQV4zTfOeKXcF+VrU8RG88Dn2e0lFjv6l7m0YNmYLsHm+n5vFFfCLcUrTk6xcYv5w==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:
@@ -3121,30 +3121,30 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@prisma/client@5.17.0(prisma@5.17.0)':
+  '@prisma/client@5.18.0(prisma@5.18.0)':
     optionalDependencies:
-      prisma: 5.17.0
+      prisma: 5.18.0
 
-  '@prisma/debug@5.17.0': {}
+  '@prisma/debug@5.18.0': {}
 
-  '@prisma/engines-version@5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053': {}
+  '@prisma/engines-version@5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169': {}
 
-  '@prisma/engines@5.17.0':
+  '@prisma/engines@5.18.0':
     dependencies:
-      '@prisma/debug': 5.17.0
-      '@prisma/engines-version': 5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053
-      '@prisma/fetch-engine': 5.17.0
-      '@prisma/get-platform': 5.17.0
+      '@prisma/debug': 5.18.0
+      '@prisma/engines-version': 5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169
+      '@prisma/fetch-engine': 5.18.0
+      '@prisma/get-platform': 5.18.0
 
-  '@prisma/fetch-engine@5.17.0':
+  '@prisma/fetch-engine@5.18.0':
     dependencies:
-      '@prisma/debug': 5.17.0
-      '@prisma/engines-version': 5.17.0-31.393aa359c9ad4a4bb28630fb5613f9c281cde053
-      '@prisma/get-platform': 5.17.0
+      '@prisma/debug': 5.18.0
+      '@prisma/engines-version': 5.18.0-25.4c784e32044a8a016d99474bd02a3b6123742169
+      '@prisma/get-platform': 5.18.0
 
-  '@prisma/get-platform@5.17.0':
+  '@prisma/get-platform@5.18.0':
     dependencies:
-      '@prisma/debug': 5.17.0
+      '@prisma/debug': 5.18.0
 
   '@radix-ui/number@1.1.0': {}
 
@@ -5275,28 +5275,28 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-import@15.1.0(postcss@8.4.40):
+  postcss-import@15.1.0(postcss@8.4.41):
     dependencies:
-      postcss: 8.4.40
+      postcss: 8.4.41
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.8
 
-  postcss-js@4.0.1(postcss@8.4.40):
+  postcss-js@4.0.1(postcss@8.4.41):
     dependencies:
       camelcase-css: 2.0.1
-      postcss: 8.4.40
+      postcss: 8.4.41
 
-  postcss-load-config@4.0.2(postcss@8.4.40):
+  postcss-load-config@4.0.2(postcss@8.4.41):
     dependencies:
       lilconfig: 3.1.2
       yaml: 2.5.0
     optionalDependencies:
-      postcss: 8.4.40
+      postcss: 8.4.41
 
-  postcss-nested@6.2.0(postcss@8.4.40):
+  postcss-nested@6.2.0(postcss@8.4.41):
     dependencies:
-      postcss: 8.4.40
+      postcss: 8.4.41
       postcss-selector-parser: 6.1.1
 
   postcss-selector-parser@6.1.1:
@@ -5312,7 +5312,7 @@ snapshots:
       picocolors: 1.0.1
       source-map-js: 1.2.0
 
-  postcss@8.4.40:
+  postcss@8.4.41:
     dependencies:
       nanoid: 3.3.7
       picocolors: 1.0.1
@@ -5326,9 +5326,9 @@ snapshots:
 
   prettier@3.3.3: {}
 
-  prisma@5.17.0:
+  prisma@5.18.0:
     dependencies:
-      '@prisma/engines': 5.17.0
+      '@prisma/engines': 5.18.0
 
   prismjs@1.27.0: {}
 
@@ -5682,11 +5682,11 @@ snapshots:
 
   tailwind-merge@2.4.0: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@3.4.7):
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.9):
     dependencies:
-      tailwindcss: 3.4.7
+      tailwindcss: 3.4.9
 
-  tailwindcss@3.4.7:
+  tailwindcss@3.4.9:
     dependencies:
       '@alloc/quick-lru': 5.2.0
       arg: 5.0.2
@@ -5702,11 +5702,11 @@ snapshots:
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.0.1
-      postcss: 8.4.40
-      postcss-import: 15.1.0(postcss@8.4.40)
-      postcss-js: 4.0.1(postcss@8.4.40)
-      postcss-load-config: 4.0.2(postcss@8.4.40)
-      postcss-nested: 6.2.0(postcss@8.4.40)
+      postcss: 8.4.41
+      postcss-import: 15.1.0(postcss@8.4.41)
+      postcss-js: 4.0.1(postcss@8.4.41)
+      postcss-load-config: 4.0.2(postcss@8.4.41)
+      postcss-nested: 6.2.0(postcss@8.4.41)
       postcss-selector-parser: 6.1.1
       resolve: 1.22.8
       sucrase: 3.35.0
@@ -5839,7 +5839,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  viem@2.18.7(typescript@5.5.4):
+  viem@2.19.4(typescript@5.5.4):
     dependencies:
       '@adraffy/ens-normalize': 1.10.0
       '@noble/curves': 1.4.0

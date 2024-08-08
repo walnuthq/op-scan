@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import {
   Pagination,
   PaginationContent,
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { RotateCw } from "lucide-react";
-import { l2PublicClient } from "@/lib/chains";
+import { refresh } from "@/components/pages/blocks/actions";
 
 const LatestBlocksPagination = ({
   start,
@@ -19,7 +18,6 @@ const LatestBlocksPagination = ({
   start: bigint;
   latest: bigint;
 }) => {
-  const router = useRouter();
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
   const totalBlocks = latest + BigInt(1);
   const page = (latest - start) / blocksPerPage + BigInt(1);
@@ -33,12 +31,7 @@ const LatestBlocksPagination = ({
           <Button
             variant="ghost"
             className="text-primary hover:bg-primary"
-            onClick={async () => {
-              const latestBlockNumber = await l2PublicClient.getBlockNumber();
-              router.push(
-                `/blocks?start=${latestBlockNumber}&latest=${latestBlockNumber}`,
-              );
-            }}
+            onClick={() => refresh()}
           >
             <RotateCw className="size-4" />
           </Button>

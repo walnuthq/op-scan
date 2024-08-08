@@ -10,13 +10,12 @@
     "prettier": "prettier --write \"src/**/*.{ts,tsx}",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
-    "prisma:db:push2": ". .env.local && export DATABASE_URL && prisma db push",
     "prisma:db:push": "dotenvx run -f .env.local -- prisma db push",
     "prisma:studio": "dotenvx run -f .env.local -- prisma studio",
     "op-indexer": "dotenvx run -f .env.local -- bun op-indexer/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.17.0",
+    "@prisma/client": "^5.18.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
@@ -43,23 +42,23 @@
     "recharts": "^2.12.7",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.18.7"
+    "viem": "^2.19.2"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.6.4",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^22.0.2",
+    "@types/node": "^22.1.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.5",
     "eslint-config-prettier": "^9.1.0",
-    "postcss": "^8.4.40",
+    "postcss": "^8.4.41",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "prisma": "^5.17.0",
-    "tailwindcss": "^3.4.7",
+    "prisma": "^5.18.0",
+    "tailwindcss": "^3.4.9",
     "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@9.4.0"

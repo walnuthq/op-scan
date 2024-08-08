@@ -24,7 +24,7 @@ const BlockDetails = ({ block }: { block: Block }) => (
     </DescriptionListItem>
     <Separator />
     <DescriptionListItem title="Gas Used">
-      {formatGas(block.gasUsed).value}{" "}
+      {formatGas(block.gasUsed).value}
       <span className="ml-1 text-muted-foreground">
         ({formatGas(block.gasUsed, block.gasLimit).percentageFormatted})
       </span>
@@ -35,20 +35,21 @@ const BlockDetails = ({ block }: { block: Block }) => (
     <BlockExtraData extraData={block.extraData} />
     <Separator />
     <DescriptionListItem title="Hash">
-      {block.hash}
-      <CopyButton content="Copy Hash to clipboard" copy={block.hash} />
+      <div className="flex items-center gap-2">
+        {block.hash}
+        <CopyButton content="Copy Hash" copy={block.hash} />
+      </div>
     </DescriptionListItem>
     <DescriptionListItem title="Parent Hash">
-      <Link
-        href={`/block/${block.parentHash}`}
-        className="text-primary hover:brightness-150"
-      >
-        {block.parentHash}
-      </Link>
-      <CopyButton
-        content="Copy Parent Hash to clipboard"
-        copy={block.parentHash}
-      />
+      <div className="flex items-center gap-2">
+        <Link
+          href={`/block/${block.parentHash}`}
+          className="text-primary hover:brightness-150"
+        >
+          {block.parentHash}
+        </Link>
+        <CopyButton content="Copy Parent Hash" copy={block.parentHash} />
+      </div>
     </DescriptionListItem>
   </dl>
 );

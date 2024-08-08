@@ -35,7 +35,7 @@ const Navbar = () => (
         <nav className="grid gap-6 text-lg font-medium">
           <Link
             href="/"
-            className="flex items-center gap-2 text-lg font-semibold"
+            className="inline-flex items-center gap-2 text-lg font-semibold"
           >
             <Image src={logoImg} alt="OP Scan logo" className="size-8" />
             <span className="sr-only">OP Scan</span>
