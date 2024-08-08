@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import { ThemeProvider } from "@/components/lib/theme-provider";
 import ContextProvider from "@/components/lib/context/provider";
-import { AddressProvider } from "@/components/lib/context/AddressContext";
 
 const Providers = ({ children }: { children: ReactNode }) => (
   <ThemeProvider
@@ -10,9 +9,7 @@ const Providers = ({ children }: { children: ReactNode }) => (
     enableSystem
     disableTransitionOnChange
   >
-    <ContextProvider>
-      <AddressProvider>{children}</AddressProvider>
-    </ContextProvider>
+    <ContextProvider>{children}</ContextProvider>
   </ThemeProvider>
 );
 

@@ -1,4 +1,4 @@
-import { l2PublicClient } from "@/lib/chains";
+import { fetchL2BlockNumber } from "@/lib/fetch-data";
 import Blocks from "@/components/pages/blocks";
 
 const BlocksPage = async ({
@@ -6,7 +6,7 @@ const BlocksPage = async ({
 }: {
   searchParams: { start?: string; latest?: string };
 }) => {
-  const latestBlockNumber = await l2PublicClient.getBlockNumber();
+  const latestBlockNumber = await fetchL2BlockNumber();
   return (
     <Blocks
       start={

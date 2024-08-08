@@ -14,7 +14,7 @@ import {
   parseEventLogs,
   toHex,
   isHex,
-  toBytes 
+  toBytes,
 } from "viem";
 import { capitalize } from "lodash";
 import { ERC20Transfer, ERC721Transfer, ERC1155Transfer } from "@/lib/types";
@@ -22,10 +22,13 @@ import erc20Abi from "@/lib/contracts/erc-20/abi";
 import getERC20Contract from "@/lib/contracts/erc-20/contract";
 import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
-import { l2PublicClient } from "./chains";
-import { loadEvents } from "./signatures";
+import { l2PublicClient } from "@/lib/chains";
+import { loadEvents } from "@/lib/signatures";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 export const formatEther = (wei: bigint, precision = 5) =>
   new Intl.NumberFormat("en-US", {
@@ -74,7 +77,7 @@ export const formatTimestamp = (timestamp: bigint) => {
 };
 
 export const formatAddress = (address: Address) =>
-  `${address.slice(0, 10)}...${address.slice(-8)}`;
+  `${address.slice(0, 10)}…${address.slice(-8)}`;
 
 export const formatNumber = (value: bigint) =>
   new Intl.NumberFormat("en-US").format(value);
@@ -165,7 +168,9 @@ export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
   return [...transfersSingle, ...transfersBatch];
 };
 
-const decodeData = (data: string): { hex: string; number: string; address: string }[] => {
+const decodeData = (
+  data: string,
+): { hex: string; number: string; address: string }[] => {
   const decoded: { hex: string; number: string; address: string }[] = [];
 
   if (!isHex(data)) {
@@ -180,8 +185,8 @@ const decodeData = (data: string): { hex: string; number: string; address: strin
 
     let formattedValue: { hex: string; number: string; address: string } = {
       hex: hexValue,
-      number: 'N/A',
-      address: 'N/A'
+      number: "N/A",
+      address: "N/A",
     };
 
     try {
@@ -213,13 +218,15 @@ export const formatEventLog = async (
   log: Log,
   abi: ABIEventExtended[],
 ): Promise<{ eventName: string; method: string; args: DecodedArgs }> => {
-  const eventFragment = abi.find(item => item.type === 'event' && item.hash === log.topics[0]);
+  const eventFragment = abi.find(
+    (item) => item.type === "event" && item.hash === log.topics[0],
+  );
   if (!eventFragment) {
     return {
-      eventName: 'Unknown',
-      method: log.topics?.[0]?.slice(0, 10) || 'Unknown',
+      eventName: "Unknown",
+      method: log.topics?.[0]?.slice(0, 10) || "Unknown",
       args: {
-        function: 'Unknown function',
+        function: "Unknown function",
         topics: log.topics,
         data: log.data,
         decoded: decodeData(log.data),
@@ -228,15 +235,20 @@ export const formatEventLog = async (
   }
 
   const eventSignatures = await loadEvents(log.topics[0] as Address);
-  const eventName = eventSignatures.length > 0 ? eventSignatures : 'Unknown';
+  const eventName = eventSignatures.length > 0 ? eventSignatures : "Unknown";
 
-  let methodID = 'Unknown';
+  let methodID = "Unknown";
   if (log.transactionHash) {
     try {
-      const transaction = await l2PublicClient.getTransaction({ hash: log.transactionHash as Address });
+      const transaction = await l2PublicClient.getTransaction({
+        hash: log.transactionHash as Address,
+      });
       methodID = transaction.input.slice(0, 10);
     } catch (error) {
-      console.error(`Error fetching transaction for log: ${log.transactionHash}`, error);
+      console.error(
+        `Error fetching transaction for log: ${log.transactionHash}`,
+        error,
+      );
     }
   }
 

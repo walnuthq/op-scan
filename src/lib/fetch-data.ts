@@ -1,31 +1,34 @@
 import { range } from "lodash";
-import { subDays, formatISO } from "date-fns";
 import { Hash } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
 } from "viem/op-stack";
 import {
-  Block,
   TransactionWithReceipt,
-  fromViemBlock,
   fromViemTransactionWithReceipt,
+  TransactionEnqueued,
 } from "@/lib/types";
-import { TransactionEnqueued } from "@/lib/types";
+import { prisma } from "@/lib/prisma";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 import { loadFunctions } from "@/lib/signatures";
 
-// export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
-//   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
-//   const blocks = await Promise.all(
-//     range(Number(start), Math.max(Number(start - blocksPerPage), -1)).map((i) =>
-//       l2PublicClient.getBlock({ blockNumber: BigInt(i) }),
-//     ),
-//   );
-//   return blocks.map(fromViemBlock);
-// };
+const fetchL2BlockNumberFromJsonRpc = () => l2PublicClient.getBlockNumber();
+
+const fetchL2BlockNumberFromDatabase = async () => {
+  const {
+    _max: { number: latestBlockNumber },
+  } = await prisma.block.aggregate({
+    _max: { number: true },
+  });
+  return latestBlockNumber ?? fetchL2BlockNumberFromJsonRpc();
+};
+
+export const fetchL2BlockNumber = process.env.DATABASE_URL
+  ? fetchL2BlockNumberFromDatabase
+  : fetchL2BlockNumberFromJsonRpc;
 
 export const fetchLatestTransactions = async (
   start: bigint,
@@ -167,45 +170,28 @@ export const fetchLatestTransactionsEnqueued = async (
   };
 };
 
-export const fetchTokensPrices = async () => {
-  const date = formatISO(subDays(new Date(), 1), {
-    representation: "date",
+type GetSpotPriceResult = Record<string, number>;
+
+export const fetchSpotPrices = async (date?: string) => {
+  const url = date
+    ? `https://api.coinbase.com/v2/prices/USD/spot?date=${date}`
+    : "https://api.coinbase.com/v2/prices/USD/spot";
+  const response = await fetch(url, {
+    cache: date ? "force-cache" : "no-store",
   });
-  const [
-    ethResponseToday,
-    ethResponseYesterday,
-    opResponseToday,
-    opResponseYesterday,
-  ] = await Promise.all([
-    fetch("https://api.coinbase.com/v2/prices/ETH-USD/spot"),
-    fetch(`https://api.coinbase.com/v2/prices/ETH-USD/spot?date=${date}`),
-    fetch("https://api.coinbase.com/v2/prices/OP-USD/spot"),
-    fetch(`https://api.coinbase.com/v2/prices/OP-USD/spot?date=${date}`),
-  ]);
-  const [ethJsonToday, ethJsonYesterday, opJsonToday, opJsonYesterday] =
-    await Promise.all([
-      ethResponseToday.json(),
-      ethResponseYesterday.json(),
-      opResponseToday.json(),
-      opResponseYesterday.json(),
-    ]);
-  type GetSpotPriceResponse = {
-    data: { amount: string; base: string; currency: string };
+  const json = await response.json();
+  const { data } = json as {
+    data: {
+      amount: string;
+      base: string;
+      currency: "USD";
+    }[];
   };
-  const {
-    data: { amount: ethPriceToday },
-  } = ethJsonToday as GetSpotPriceResponse;
-  const {
-    data: { amount: ethPriceYesterday },
-  } = ethJsonYesterday as GetSpotPriceResponse;
-  const {
-    data: { amount: opPriceToday },
-  } = opJsonToday as GetSpotPriceResponse;
-  const {
-    data: { amount: opPriceYesterday },
-  } = opJsonYesterday as GetSpotPriceResponse;
-  return {
-    eth: { today: Number(ethPriceToday), yesterday: Number(ethPriceYesterday) },
-    op: { today: Number(opPriceToday), yesterday: Number(opPriceYesterday) },
-  };
+  return data.reduce<GetSpotPriceResult>(
+    (previousValue, currentValue) => ({
+      ...previousValue,
+      [currentValue.base]: Number(currentValue.amount),
+    }),
+    {},
+  );
 };
