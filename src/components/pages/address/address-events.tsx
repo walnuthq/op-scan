@@ -14,27 +14,35 @@ const AddressEvents = async ({ address }: { address: Address }) => {
     const fromBlock: bigint = latestBlockNumber - BigInt(10);
     const [bytecode, logs] = await Promise.all([
       l2PublicClient.getCode({ address }) as Promise<string>,
-      l2PublicClient.getLogs({ address, fromBlock, toBlock: 'latest' }),
+      l2PublicClient.getLogs({ address, fromBlock, toBlock: "latest" }),
     ]);
 
     const abi = abiFromBytecode(bytecode) as ABIEventExtended[];
 
-    const blockTimestamps = await Promise.all(logs.map(async log => {
-      const block: Block = await l2PublicClient.getBlock({ blockNumber: log.blockNumber });
-      return block.timestamp;
-    }));
+    const blockTimestamps = await Promise.all(
+      logs.map(async (log) => {
+        const block: Block = await l2PublicClient.getBlock({
+          blockNumber: log.blockNumber,
+        });
+        return block.timestamp;
+      }),
+    );
 
-    const decodedLogs: FormattedLog[] = await Promise.all(logs.map(async (log, index) => {
-      const formattedLog = await formatEventLog(log, abi);
-      return {
-        ...formattedLog,
-        transactionHash: log.transactionHash,
-        blockNumber: log.blockNumber,
-        timestamp: blockTimestamps[index],
-      };
-    }));
+    const decodedLogs: FormattedLog[] = await Promise.all(
+      logs.map(async (log, index) => {
+        const formattedLog = await formatEventLog(log, abi);
+        return {
+          ...formattedLog,
+          transactionHash: log.transactionHash,
+          blockNumber: log.blockNumber,
+          timestamp: blockTimestamps[index],
+        };
+      }),
+    );
 
-    decodedLogs.sort((a, b) => Number(BigInt(b.timestamp) - BigInt(a.timestamp)));
+    decodedLogs.sort((a, b) =>
+      Number(BigInt(b.timestamp) - BigInt(a.timestamp)),
+    );
 
     return (
       <Card>
@@ -45,7 +53,11 @@ const AddressEvents = async ({ address }: { address: Address }) => {
     );
   } catch (error) {
     console.error("Error fetching contract details:", error);
-    return <div className="w-full flex justify-center items-center">Error loading contract details. Please try again later.</div>;
+    return (
+      <div className="flex w-full items-center justify-center">
+        Error loading contract details. Please try again later.
+      </div>
+    );
   }
 };
 

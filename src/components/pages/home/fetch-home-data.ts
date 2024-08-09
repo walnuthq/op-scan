@@ -110,6 +110,6 @@ const fetchHomeDataFromDatabase = async () => {
   };
 };
 
-export  const fetchHomeData = process.env.DATABASE_URL
+export const fetchHomeData = process.env.DATABASE_URL
   ? fetchHomeDataFromDatabase
   : fetchHomeDataFromJsonRpc;

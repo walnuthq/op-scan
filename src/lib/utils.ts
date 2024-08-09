@@ -14,7 +14,7 @@ import {
   parseEventLogs,
   toHex,
   isHex,
-  toBytes 
+  toBytes,
 } from "viem";
 import { capitalize } from "lodash";
 import { ERC20Transfer, ERC721Transfer, ERC1155Transfer } from "@/lib/types";
@@ -165,7 +165,9 @@ export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
   return [...transfersSingle, ...transfersBatch];
 };
 
-const decodeData = (data: string): { hex: string; number: string; address: string }[] => {
+const decodeData = (
+  data: string,
+): { hex: string; number: string; address: string }[] => {
   const decoded: { hex: string; number: string; address: string }[] = [];
 
   if (!isHex(data)) {
@@ -180,8 +182,8 @@ const decodeData = (data: string): { hex: string; number: string; address: strin
 
     let formattedValue: { hex: string; number: string; address: string } = {
       hex: hexValue,
-      number: 'N/A',
-      address: 'N/A'
+      number: "N/A",
+      address: "N/A",
     };
 
     try {
@@ -213,13 +215,15 @@ export const formatEventLog = async (
   log: Log,
   abi: ABIEventExtended[],
 ): Promise<{ eventName: string; method: string; args: DecodedArgs }> => {
-  const eventFragment = abi.find(item => item.type === 'event' && item.hash === log.topics[0]);
+  const eventFragment = abi.find(
+    (item) => item.type === "event" && item.hash === log.topics[0],
+  );
   if (!eventFragment) {
     return {
-      eventName: 'Unknown',
-      method: log.topics?.[0]?.slice(0, 10) || 'Unknown',
+      eventName: "Unknown",
+      method: log.topics?.[0]?.slice(0, 10) || "Unknown",
       args: {
-        function: 'Unknown function',
+        function: "Unknown function",
         topics: log.topics,
         data: log.data,
         decoded: decodeData(log.data),
@@ -228,15 +232,20 @@ export const formatEventLog = async (
   }
 
   const eventSignatures = await loadEvents(log.topics[0] as Address);
-  const eventName = eventSignatures.length > 0 ? eventSignatures : 'Unknown';
+  const eventName = eventSignatures.length > 0 ? eventSignatures : "Unknown";
 
-  let methodID = 'Unknown';
+  let methodID = "Unknown";
   if (log.transactionHash) {
     try {
-      const transaction = await l2PublicClient.getTransaction({ hash: log.transactionHash as Address });
+      const transaction = await l2PublicClient.getTransaction({
+        hash: log.transactionHash as Address,
+      });
       methodID = transaction.input.slice(0, 10);
     } catch (error) {
-      console.error(`Error fetching transaction for log: ${log.transactionHash}`, error);
+      console.error(
+        `Error fetching transaction for log: ${log.transactionHash}`,
+        error,
+      );
     }
   }
 

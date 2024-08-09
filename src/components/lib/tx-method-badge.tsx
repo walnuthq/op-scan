@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { startCase } from "lodash";
 import { cn } from "@/lib/utils";
 import {
