@@ -1,18 +1,11 @@
-import { range } from "lodash";
 import { subDays, formatISO } from "date-fns";
-import { Address, Hash } from "viem";
+import { Address, formatUnits, Hash } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
 } from "viem/op-stack";
-import {
-  Block,
-  TransactionWithReceipt,
-  fromViemBlock,
-  fromViemTransactionWithReceipt,
-} from "@/lib/types";
 import { TransactionEnqueued } from "@/lib/types";
-import { l1PublicClient, l2PublicClient } from "@/lib/chains";
+import { l1PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 import { loadFunctions } from "@/lib/signatures";
@@ -20,6 +13,7 @@ import { prisma } from "./prisma";
 import getERC1155Contract from "./contracts/erc-1155/contract";
 import getERC721Contract from "./contracts/erc-721/contract";
 import { convertIpfsToHttp, NftPlaceholderImage } from "./utils";
+import { formatTimestamp } from "./utils";
 
 // export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
 //   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -30,89 +24,6 @@ import { convertIpfsToHttp, NftPlaceholderImage } from "./utils";
 //   );
 //   return blocks.map(fromViemBlock);
 // };
-
-export const fetchLatestTransactions = async (
-  start: bigint,
-  index: number,
-  latest: bigint,
-): Promise<{
-  transactions: TransactionWithReceipt[];
-  previousStart?: bigint;
-  previousIndex?: number;
-  nextStart?: bigint;
-  nextIndex?: number;
-}> => {
-  const txsPerPage = BigInt(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
-  const blocks = await Promise.all(
-    range(
-      Math.min(Number(start + txsPerPage), Number(latest)),
-      Math.max(Number(start - BigInt(2) * txsPerPage), -1),
-    ).map((i) => l2PublicClient.getBlock({ blockNumber: BigInt(i) })),
-  );
-  type TransactionPaginationItem = {
-    hash: Hash;
-    transactionIndex: number;
-    blockNumber: bigint;
-    timestamp: bigint;
-  };
-  const transactionPaginationItems = blocks.reduce<TransactionPaginationItem[]>(
-    (previousValue, block) => {
-      const items = block.transactions.map((hash, i) => ({
-        hash,
-        transactionIndex: i,
-        blockNumber: block.number,
-        timestamp: block.timestamp,
-      }));
-      return [...previousValue, ...items];
-    },
-    [],
-  );
-  const startItemIndex = transactionPaginationItems.findIndex(
-    ({ blockNumber, transactionIndex }) =>
-      blockNumber === start && transactionIndex === index,
-  );
-  const previousItem =
-    transactionPaginationItems[startItemIndex - Number(txsPerPage)];
-  const nextItem =
-    transactionPaginationItems[startItemIndex + Number(txsPerPage)];
-  const currentItems = transactionPaginationItems.slice(
-    startItemIndex,
-    startItemIndex + Number(txsPerPage),
-  );
-  const [transactionsWithTimestamp, receipts] = await Promise.all([
-    Promise.all(
-      currentItems.map(async ({ hash, timestamp }) => {
-        const transaction = await l2PublicClient.getTransaction({ hash });
-        return { ...transaction, timestamp };
-      }),
-    ),
-    Promise.all(
-      currentItems.map(({ hash }) =>
-        l2PublicClient.getTransactionReceipt({ hash }),
-      ),
-    ),
-  ]);
-  const signatures = await Promise.all(
-    transactionsWithTimestamp.map(({ input }) =>
-      loadFunctions(input.slice(0, 10)),
-    ),
-  );
-  const transactions = transactionsWithTimestamp.map((transaction, i) => {
-    return fromViemTransactionWithReceipt(
-      transaction,
-      receipts[i],
-      transaction.timestamp,
-      signatures[i],
-    );
-  });
-  return {
-    transactions,
-    previousStart: previousItem?.blockNumber,
-    previousIndex: previousItem?.transactionIndex,
-    nextStart: nextItem?.blockNumber,
-    nextIndex: nextItem?.transactionIndex,
-  };
-};
 
 export const fetchLatestTransactionsEnqueued = async (
   start: bigint,
@@ -171,6 +82,28 @@ export const fetchLatestTransactionsEnqueued = async (
   };
 };
 
+export const fetchTokenPrice = async (symbol: string): Promise<number> => {
+  try {
+    const response = await fetch(
+      `https://api.coinbase.com/v2/prices/${symbol}-USD/spot`,
+    );
+
+    if (!response.ok) {
+      return 0; // Return 0 if we can't get the price
+    }
+
+    const json = await response.json();
+    const { data } = json as GetSpotPriceResponse;
+    return Number(data.amount);
+  } catch (error) {
+    return 0; // Return 0 if there's an error
+  }
+};
+
+export type GetSpotPriceResponse = {
+  data: { amount: string; base: string; currency: string };
+};
+
 export const fetchTokensPrices = async () => {
   const date = formatISO(subDays(new Date(), 1), {
     representation: "date",
@@ -193,9 +126,7 @@ export const fetchTokensPrices = async () => {
       opResponseToday.json(),
       opResponseYesterday.json(),
     ]);
-  type GetSpotPriceResponse = {
-    data: { amount: string; base: string; currency: string };
-  };
+
   const {
     data: { amount: ethPriceToday },
   } = ethJsonToday as GetSpotPriceResponse;
@@ -399,6 +330,65 @@ export async function getLatestNftTransferEvents(
 
     return {
       transfers: sortedTransfers,
+      page,
+      limit,
+    };
+  } catch (error) {
+    console.error("Error fetching token transfers:", error);
+    throw error;
+  }
+}
+
+export async function getLatestTransferEvents(
+  contractAddress: Address,
+  page: number = 1,
+  limit: number = 100,
+) {
+  console.log(contractAddress);
+  const skip = (page - 1) * limit;
+
+  try {
+    const erc20Transfers = await prisma.erc20Transfer.findMany({
+      where: {
+        OR: [{ from: contractAddress }, { to: contractAddress }],
+      },
+      orderBy: { transactionHash: "desc" },
+      take: limit,
+      skip: skip,
+      include: {
+        receipt: {
+          include: {
+            transaction: {
+              include: {
+                block: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const allTransfers = await Promise.all(
+      erc20Transfers.map(async (t) => {
+        return {
+          transactionHash: t.transactionHash,
+          method: t.receipt.transaction.input.slice(0, 10),
+          block: Number(t.receipt.transaction.blockNumber),
+          age: formatTimestamp(t.receipt.transaction.block.timestamp).distance,
+          from: t.from,
+          to: t.to,
+          amount: formatUnits(BigInt(t.value), t.decimals),
+          token: {
+            address: t.address,
+            decimals: t.decimals,
+          },
+          type: "ERC20" as const,
+        };
+      }),
+    );
+
+    return {
+      transfers: allTransfers,
       page,
       limit,
     };

@@ -8,10 +8,10 @@ import { subDays, format } from "date-fns";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import {
   fetchTokensPrices,
-  fetchLatestBlocks,
-  fetchLatestTransactions,
   fetchLatestTransactionsEnqueued,
 } from "@/lib/fetch-data";
+import fetchLatestBlocks from "../blocks/fetch-blocks";
+import fetchLatestTransactions from "../txs/fetch-transactions";
 
 const fetchTransactionHistory = async () => {
   const dates = Array.from({ length: 15 }, (_, i) => {
@@ -31,7 +31,7 @@ const fetchTransactionHistory = async () => {
       return {
         name: dateObj.name,
         date: dateObj.formattedDate,
-        price: parseFloat(res.data.amount),
+        price: parseFloat(res.data?.amount),
         transactionsCount: Math.floor(Math.random() * 200) + 400,
       };
     }),
