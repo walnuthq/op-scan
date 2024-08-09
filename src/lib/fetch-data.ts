@@ -5,17 +5,11 @@ import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
 } from "viem/op-stack";
-import {
-  Block,
-  TransactionWithReceipt,
-  fromViemBlock,
-  fromViemTransactionWithReceipt,
-} from "@/lib/types";
+import { Block, fromViemBlock } from "@/lib/types";
 import { TransactionEnqueued } from "@/lib/types";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
-import { loadFunctions } from "@/lib/signatures";
 
 // export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
 //   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -26,89 +20,6 @@ import { loadFunctions } from "@/lib/signatures";
 //   );
 //   return blocks.map(fromViemBlock);
 // };
-
-export const fetchLatestTransactions = async (
-  start: bigint,
-  index: number,
-  latest: bigint,
-): Promise<{
-  transactions: TransactionWithReceipt[];
-  previousStart?: bigint;
-  previousIndex?: number;
-  nextStart?: bigint;
-  nextIndex?: number;
-}> => {
-  const txsPerPage = BigInt(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
-  const blocks = await Promise.all(
-    range(
-      Math.min(Number(start + txsPerPage), Number(latest)),
-      Math.max(Number(start - BigInt(2) * txsPerPage), -1),
-    ).map((i) => l2PublicClient.getBlock({ blockNumber: BigInt(i) })),
-  );
-  type TransactionPaginationItem = {
-    hash: Hash;
-    transactionIndex: number;
-    blockNumber: bigint;
-    timestamp: bigint;
-  };
-  const transactionPaginationItems = blocks.reduce<TransactionPaginationItem[]>(
-    (previousValue, block) => {
-      const items = block.transactions.map((hash, i) => ({
-        hash,
-        transactionIndex: i,
-        blockNumber: block.number,
-        timestamp: block.timestamp,
-      }));
-      return [...previousValue, ...items];
-    },
-    [],
-  );
-  const startItemIndex = transactionPaginationItems.findIndex(
-    ({ blockNumber, transactionIndex }) =>
-      blockNumber === start && transactionIndex === index,
-  );
-  const previousItem =
-    transactionPaginationItems[startItemIndex - Number(txsPerPage)];
-  const nextItem =
-    transactionPaginationItems[startItemIndex + Number(txsPerPage)];
-  const currentItems = transactionPaginationItems.slice(
-    startItemIndex,
-    startItemIndex + Number(txsPerPage),
-  );
-  const [transactionsWithTimestamp, receipts] = await Promise.all([
-    Promise.all(
-      currentItems.map(async ({ hash, timestamp }) => {
-        const transaction = await l2PublicClient.getTransaction({ hash });
-        return { ...transaction, timestamp };
-      }),
-    ),
-    Promise.all(
-      currentItems.map(({ hash }) =>
-        l2PublicClient.getTransactionReceipt({ hash }),
-      ),
-    ),
-  ]);
-  const signatures = await Promise.all(
-    transactionsWithTimestamp.map(({ input }) =>
-      loadFunctions(input.slice(0, 10)),
-    ),
-  );
-  const transactions = transactionsWithTimestamp.map((transaction, i) => {
-    return fromViemTransactionWithReceipt(
-      transaction,
-      receipts[i],
-      transaction.timestamp,
-      signatures[i],
-    );
-  });
-  return {
-    transactions,
-    previousStart: previousItem?.blockNumber,
-    previousIndex: previousItem?.transactionIndex,
-    nextStart: nextItem?.blockNumber,
-    nextIndex: nextItem?.transactionIndex,
-  };
-};
 
 export const fetchLatestTransactionsEnqueued = async (
   start: bigint,

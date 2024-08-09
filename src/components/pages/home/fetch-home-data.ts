@@ -9,9 +9,9 @@ import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import {
   fetchTokensPrices,
   fetchLatestBlocks,
-  fetchLatestTransactions,
   fetchLatestTransactionsEnqueued,
 } from "@/lib/fetch-data";
+import fetchLatestTransactions from "../txs/fetch-transactions";
 
 const fetchTransactionHistory = async () => {
   const dates = Array.from({ length: 15 }, (_, i) => {

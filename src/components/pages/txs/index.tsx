@@ -1,5 +1,5 @@
 import { formatNumber } from "@/lib/utils";
-import { fetchLatestTransactions } from "@/lib/fetch-data";
+import fetchLatestTransactions from "@/components/pages/txs/fetch-transactions";
 import {
   Card,
   CardContent,
