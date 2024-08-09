@@ -3,7 +3,7 @@ import { Block, fromViemBlock, fromPrismaBlock } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 
 const fetchBlockDetailsFromDatabase = async (
-  number: bigint
+  number: bigint,
 ): Promise<Block | null> => {
   const block = await prisma.block.findUnique({
     where: { number },
@@ -18,7 +18,7 @@ const fetchBlockDetailsFromDatabase = async (
 };
 
 const fetchBlockDetailsFromJsonRpc = async (
-  number: bigint
+  number: bigint,
 ): Promise<Block | null> => {
   const block = await l2PublicClient.getBlock({ blockNumber: number });
 

@@ -49,7 +49,6 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
 };
 
 const TransactionHistory = ({ history }: { history: DataPoint[] }) => {
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -68,7 +67,11 @@ const TransactionHistory = ({ history }: { history: DataPoint[] }) => {
                 axisLine={false}
                 ticks={
                   history.length > 0
-                    ? [history[0].name, history[Math.floor(history.length / 2)].name, history[history.length - 1].name]
+                    ? [
+                        history[0].name,
+                        history[Math.floor(history.length / 2)].name,
+                        history[history.length - 1].name,
+                      ]
                     : []
                 }
               />
