@@ -7,7 +7,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx}",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:db:push2": ". .env.local && export DATABASE_URL && prisma db push",

@@ -1,5 +1,7 @@
 import { subDays, formatISO } from "date-fns";
-import { Hash } from "viem";
+import { Address, formatUnits, Hash } from "viem";
+import { formatDistanceToNow } from 'date-fns';
+import { formatEther } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
@@ -8,6 +10,9 @@ import { TransactionEnqueued } from "@/lib/types";
 import { l1PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
+import { loadFunctions } from "@/lib/signatures";
+import { prisma } from "./prisma";
+import { formatTimestamp } from "./utils";
 
 // export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
 //   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -138,3 +143,64 @@ export const fetchTokensPrices = async () => {
     op: { today: Number(opPriceToday), yesterday: Number(opPriceYesterday) },
   };
 };
+
+
+export async function getLatestTransferEvents(
+  contractAddress: Address,
+  page: number = 1,
+  limit: number = 100
+) {
+  console.log(contractAddress);
+  const skip = (page - 1) * limit;
+
+  try {
+    const erc20Transfers = await prisma.erc20Transfer.findMany({
+      where: {
+        OR: [
+          { from: contractAddress },
+          { to: contractAddress }
+        ]
+      },
+      orderBy: { transactionHash: 'desc' },
+      take: limit,
+      skip: skip,
+      include: {
+        receipt: {
+          include: {
+            transaction: {
+              include: {
+                block: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const allTransfers = await Promise.all(erc20Transfers.map(async t => {
+      return {
+        transactionHash: t.transactionHash,
+        method: t.receipt.transaction.input.slice(0, 10),
+        block: Number(t.receipt.transaction.blockNumber),
+        age: formatTimestamp(t.receipt.transaction.block.timestamp).distance,
+        from: t.from,
+        to: t.to,
+        amount: formatUnits(BigInt(t.value), t.decimals),
+        token: {
+          address: t.address,
+          decimals: t.decimals,
+        },
+        type: 'ERC20' as const,
+      };
+    }));
+
+    return {
+      transfers: allTransfers,
+      page,
+      limit,
+    };
+  } catch (error) {
+    console.error("Error fetching token transfers:", error);
+    throw error;
+  }
+}
