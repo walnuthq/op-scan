@@ -1,13 +1,11 @@
-import { range } from "lodash";
 import { subDays, formatISO } from "date-fns";
 import { Hash } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
 } from "viem/op-stack";
-import { Block, fromViemBlock } from "@/lib/types";
 import { TransactionEnqueued } from "@/lib/types";
-import { l1PublicClient, l2PublicClient } from "@/lib/chains";
+import { l1PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 
@@ -78,6 +76,28 @@ export const fetchLatestTransactionsEnqueued = async (
   };
 };
 
+export const fetchTokenPrice = async (symbol: string): Promise<number> => {
+  try {
+    const response = await fetch(
+      `https://api.coinbase.com/v2/prices/${symbol}-USD/spot`,
+    );
+
+    if (!response.ok) {
+      return 0; // Return 0 if we can't get the price
+    }
+
+    const json = await response.json();
+    const { data } = json as GetSpotPriceResponse;
+    return Number(data.amount);
+  } catch (error) {
+    return 0; // Return 0 if there's an error
+  }
+};
+
+export type GetSpotPriceResponse = {
+  data: { amount: string; base: string; currency: string };
+};
+
 export const fetchTokensPrices = async () => {
   const date = formatISO(subDays(new Date(), 1), {
     representation: "date",
@@ -100,9 +120,7 @@ export const fetchTokensPrices = async () => {
       opResponseToday.json(),
       opResponseYesterday.json(),
     ]);
-  type GetSpotPriceResponse = {
-    data: { amount: string; base: string; currency: string };
-  };
+
   const {
     data: { amount: ethPriceToday },
   } = ethJsonToday as GetSpotPriceResponse;
