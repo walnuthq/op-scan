@@ -1,6 +1,6 @@
 import { range } from "lodash";
 import { subDays, formatISO } from "date-fns";
-import { Hash } from "viem";
+import { Address, Hash } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
@@ -16,6 +16,10 @@ import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 import { loadFunctions } from "@/lib/signatures";
+import { prisma } from "./prisma";
+import getERC1155Contract from "./contracts/erc-1155/contract";
+import getERC721Contract from "./contracts/erc-721/contract";
+import { convertIpfsToHttp, NftPlaceholderImage } from "./utils";
 
 // export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
 //   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -209,3 +213,197 @@ export const fetchTokensPrices = async () => {
     op: { today: Number(opPriceToday), yesterday: Number(opPriceYesterday) },
   };
 };
+
+const fetchNFTMetadata = async (
+  contractAddress: Address,
+  tokenId: string,
+  type: "ERC721" | "ERC1155",
+) => {
+  let name = "NFT: Event#0";
+  let symbol = "NFT: Event";
+  let image = NftPlaceholderImage;
+  let tokenURI = "";
+
+  try {
+    const tokenIdBigInt = BigInt(tokenId);
+
+    if (type === "ERC721") {
+      const contract = getERC721Contract(contractAddress);
+
+      name = await contract.read.name();
+      symbol = await contract.read.symbol();
+      tokenURI = await contract.read.tokenURI([tokenIdBigInt]);
+    } else {
+      const contract = getERC1155Contract(contractAddress);
+
+      tokenURI = await contract.read.uri([tokenIdBigInt]);
+      name = await contract.read.name();
+      symbol = await contract.read.symbol();
+    }
+
+    if (tokenURI.startsWith("https")) {
+      const response = await fetch(tokenURI);
+
+      if (response.ok) {
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.startsWith("application/json")) {
+          const result = await response.json();
+          if (result.image) image = result.image;
+          else
+            console.log(
+              `Could not find image in token uri "${tokenURI}" JSON response of address "${contractAddress}": ${result}`,
+            );
+        } else if (contentType && contentType.startsWith("image"))
+          image = response.url;
+        else
+          console.log(
+            `failed to recognise content type "${contentType}" for token uri "${tokenURI}" of address "${contractAddress}"`,
+          );
+      } else
+        console.log(
+          `failed to fetch data for token uri "${tokenURI}" of address "${contractAddress}". ${response.statusText}`,
+        );
+    } else if (tokenURI.startsWith("ipfs")) {
+      let processedUri = convertIpfsToHttp(tokenURI);
+
+      if (processedUri.includes("{id}"))
+        processedUri = processedUri.replace("{id}", tokenIdBigInt.toString());
+
+      const response = await fetch(processedUri);
+
+      if (response.ok) {
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.startsWith("application/json")) {
+          const result = await response.json();
+          if (result.image) {
+            let imageUrl = result.image;
+
+            image = imageUrl.startsWith("ipfs://")
+              ? convertIpfsToHttp(imageUrl)
+              : imageUrl;
+          } else
+            console.log(
+              `Could not find image in token uri "${tokenURI}" JSON response of address "${contractAddress}": ${result}`,
+            );
+        } else if (contentType && contentType.startsWith("image"))
+          image = processedUri;
+      } else
+        console.log(
+          `failed to fetch data for token uri "${tokenURI}" of address "${contractAddress}". ${response.statusText}`,
+        );
+    } else
+      console.log(
+        `token uri "${tokenURI}" not recognised for address "${contractAddress}"`,
+      );
+
+    return {
+      name,
+      tokenId: BigInt(tokenId).toString(),
+      contractAddress,
+      symbol,
+      image,
+    };
+  } catch (e) {
+    return {
+      name,
+      tokenId: BigInt(tokenId).toString(),
+      contractAddress,
+      symbol,
+      image,
+    };
+  }
+};
+
+export async function getLatestNftTransferEvents(
+  contractAddress: Address,
+  page: number = 1,
+  limit: number = 25,
+) {
+  const skip = (page - 1) * limit;
+
+  try {
+    const [erc721Transfers, erc1155Transfers] = await Promise.all([
+      prisma.erc721Transfer.findMany({
+        where: {
+          OR: [{ to: contractAddress }, { from: contractAddress }],
+        },
+        orderBy: { transactionHash: "desc" },
+        take: limit,
+        skip: skip,
+        include: {
+          receipt: {
+            include: {
+              transaction: {
+                include: {
+                  block: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      prisma.erc1155Transfer.findMany({
+        where: {
+          OR: [{ to: contractAddress }, { from: contractAddress }],
+        },
+        orderBy: { transactionHash: "desc" },
+        take: limit,
+        skip: skip,
+        include: {
+          receipt: {
+            include: {
+              transaction: {
+                include: {
+                  block: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const mapTransfer = async (t: any, type: "ERC721" | "ERC1155") => {
+      const transactionDate = new Date(
+        Number(t.receipt.transaction.block.timestamp) * 1000,
+      );
+
+      const metadata = await fetchNFTMetadata(
+        t.address,
+        type === "ERC721" ? t.tokenId : t.id,
+        type,
+      );
+
+      return {
+        transactionHash: t.transactionHash,
+        method: t.receipt.transaction.input.slice(0, 10),
+        block: Number(t.receipt.transaction.blockNumber),
+        age: transactionDate,
+        from: t.from,
+        to: t.to,
+        type,
+        metadata,
+      };
+    };
+
+    const allTransfers = await Promise.all([
+      ...erc721Transfers.map((t) => mapTransfer(t, "ERC721")),
+      ...erc1155Transfers.map((t) => mapTransfer(t, "ERC1155")),
+    ]);
+
+    const sortedTransfers = allTransfers
+      .sort((a, b) => b.block - a.block)
+      .slice(0, limit);
+
+    return {
+      transfers: sortedTransfers,
+      page,
+      limit,
+    };
+  } catch (error) {
+    console.error("Error fetching token transfers:", error);
+    throw error;
+  }
+}
