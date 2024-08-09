@@ -1,6 +1,6 @@
 import { range } from "lodash";
 import { subDays, formatISO } from "date-fns";
-import { Address, Hash } from "viem";
+import { Address, formatUnits, Hash } from "viem";
 import { formatDistanceToNow } from 'date-fns';
 import { formatEther } from "viem";
 import {
@@ -19,6 +19,7 @@ import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 import { loadFunctions } from "@/lib/signatures";
 import { prisma } from "./prisma";
+import { formatTimestamp } from "./utils";
 
 export const fetchLatestBlocks = async (start: bigint): Promise<Block[]> => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
@@ -225,7 +226,10 @@ export async function getLatestTransferEvents(
   try {
     const erc20Transfers = await prisma.erc20Transfer.findMany({
       where: {
-        address: contractAddress,
+        OR: [
+          { from: contractAddress },
+          { to: contractAddress }
+        ]
       },
       orderBy: { transactionHash: 'desc' },
       take: limit,
@@ -244,16 +248,14 @@ export async function getLatestTransferEvents(
     });
 
     const allTransfers = await Promise.all(erc20Transfers.map(async t => {
-      const transactionDate = new Date(Number(t.receipt.transaction.block.timestamp) * 1000);
-
       return {
         transactionHash: t.transactionHash,
         method: t.receipt.transaction.input.slice(0, 10),
         block: Number(t.receipt.transaction.blockNumber),
-        age: formatDistanceToNow(transactionDate, { addSuffix: true }),
+        age: formatTimestamp(t.receipt.transaction.block.timestamp).distance,
         from: t.from,
         to: t.to,
-        amount: formatEther(BigInt(t.value)),
+        amount: formatUnits(BigInt(t.value), t.decimals),
         token: {
           address: t.address,
           decimals: t.decimals,

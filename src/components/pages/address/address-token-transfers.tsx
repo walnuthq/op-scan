@@ -1,4 +1,4 @@
-
+"use client";
 import { Address } from "viem";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import TxMethodBadge from "@/components/lib/tx-method-badge";
 
 
 interface TokenInfo {
@@ -72,7 +73,10 @@ const AddressTokenTransfers = ({ address, erc20Transfers }: { address: Address, 
                     </Tooltip>
                   </TableCell>
                 <TableCell>
-                  {item.method}
+                <TxMethodBadge
+                  selector={item.method}
+                  signature={""}
+                />
                 </TableCell>
                 <TableCell>
                   {item.block}
