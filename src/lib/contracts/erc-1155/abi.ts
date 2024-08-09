@@ -35,6 +35,20 @@ const abi = [
   },
   {
     type: "function",
+    name: "name",
+    inputs: [],
+    outputs: [{ name: "", type: "string", internalType: "string" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "symbol",
+    inputs: [],
+    outputs: [{ name: "", type: "string", internalType: "string" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "safeBatchTransferFrom",
     inputs: [
       { name: "from", type: "address", internalType: "address" },
