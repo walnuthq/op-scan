@@ -6,7 +6,7 @@ import TxMethodBadge from "@/components/lib/tx-method-badge";
 import AddressLink from "@/components/lib/address-link";
 import CopyButton from "@/components/lib/copy-button";
 
-const LatestTxsTableRow = ({
+const TxsTableRow = ({
   transaction,
   timestampFormattedAsDate,
   txGasPriceShown,
@@ -89,4 +89,4 @@ const LatestTxsTableRow = ({
   );
 };
 
-export default LatestTxsTableRow;
+export default TxsTableRow;

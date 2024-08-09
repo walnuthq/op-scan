@@ -8,9 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useGlobalContext from "@/components/lib/context/hook";
-import LatestTxsTableRow from "@/components/pages/txs/latest-txs-table-row";
+import TxsTableRow from "./txs-table-row";
 
-const LatestTxsTable = ({
+const TxsTable = ({
   transactions,
 }: {
   transactions: TransactionWithReceipt[];
@@ -52,7 +52,7 @@ const LatestTxsTable = ({
       </TableHeader>
       <TableBody>
         {transactions.map((transaction) => (
-          <LatestTxsTableRow
+          <TxsTableRow
             key={transaction.hash}
             transaction={transaction}
             timestampFormattedAsDate={timestampFormattedAsDate}
@@ -64,4 +64,4 @@ const LatestTxsTable = ({
   );
 };
 
-export default LatestTxsTable;
+export default TxsTable;
