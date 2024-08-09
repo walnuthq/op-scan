@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import AddressDetails from "@/components/pages/address/address-details";
 import { fetchTokensPrices } from "@/lib/fetch-data";
 import CopyButton from "@/components/lib/copy-button";
+import { fetchTokenHoldings } from "./fetch-token-holdings";
 
 const AddressComponent = async ({ address }: { address: Address }) => {
   const [balance, bytecode, ethPrice] = await Promise.all([
@@ -12,6 +13,9 @@ const AddressComponent = async ({ address }: { address: Address }) => {
     l2PublicClient.getCode({ address }),
     fetchTokensPrices(),
   ]);
+
+  const tokenHoldings = await fetchTokenHoldings(address);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="flex items-center">
@@ -29,7 +33,11 @@ const AddressComponent = async ({ address }: { address: Address }) => {
         <CopyButton content="Copy Address" copy={address} />
       </div>
       <Separator />
-      <AddressDetails balance={balance} ethPriceToday={ethPrice.eth.today} />
+      <AddressDetails
+        tokenHoldings={tokenHoldings}
+        balance={balance}
+        ethPriceToday={ethPrice.eth.today}
+      />
     </main>
   );
 };

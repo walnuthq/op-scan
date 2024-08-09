@@ -14,6 +14,7 @@ import TransactionTo from "@/components/pages/tx/transaction-to";
 import TransactionERC20Transfers from "@/components/pages/tx/transaction-erc20-transfers";
 import TransactionOtherAttributes from "@/components/pages/tx/transaction-other-attributes";
 import TransactionInput from "@/components/pages/tx/transaction-input";
+import CopyButton from "@/components/lib/copy-button";
 
 const TransactionDetails = ({
   transaction,
@@ -29,6 +30,7 @@ const TransactionDetails = ({
   <dl>
     <DescriptionListItem title="Transaction Hash">
       {transaction.hash}
+      <CopyButton content="Copy TxHash to clipboard" copy={transaction.hash} />
     </DescriptionListItem>
     <DescriptionListItem title="Status">
       <TxStatusBadge success={transaction.receipt.status === "success"} />

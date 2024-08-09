@@ -7,6 +7,7 @@ import AddressDetails from "@/components/pages/address/address-details";
 import { fetchTokensPrices } from "@/lib/fetch-data";
 import CopyButton from "@/components/lib/copy-button";
 import AddressTabs from "@/components/pages/address/address-tabs";
+import { fetchTokenHoldings } from "@/components/pages/address/fetch-token-holdings";
 
 const AddressLayout = async ({
   params,
@@ -21,6 +22,9 @@ const AddressLayout = async ({
     l2PublicClient.getCode({ address }),
     fetchTokensPrices(),
   ]);
+
+  const tokenHoldings = await fetchTokenHoldings(address);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="flex items-center">
@@ -38,7 +42,11 @@ const AddressLayout = async ({
         <CopyButton content="Copy Address" copy={address} />
       </div>
       <Separator />
-      <AddressDetails balance={balance} ethPriceToday={ethPrice.eth.today} />
+      <AddressDetails
+        tokenHoldings={tokenHoldings}
+        balance={balance}
+        ethPriceToday={ethPrice.eth.today}
+      />
       <AddressTabs address={address}>{children}</AddressTabs>
     </main>
   );

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { solarizedlight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import React, { useState, useEffect, ChangeEvent } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { solarizedlight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 type ContractFile = {
   name: string;
@@ -27,9 +27,13 @@ const ContractValidator = ({ hash, initialStatus }: ContractValidatorProps) => {
     const fetchFiles = async () => {
       if (status === "perfect") {
         try {
-          const response = await fetch(`https://sourcify.dev/server/files/${chainId}/${hash}`);
+          const response = await fetch(
+            `https://sourcify.dev/server/files/${chainId}/${hash}`,
+          );
           if (!response.ok) {
-            throw new Error(`Failed to fetch files for contract: ${response.statusText}`);
+            throw new Error(
+              `Failed to fetch files for contract: ${response.statusText}`,
+            );
           }
           const filesData: ContractFile[] = await response.json();
           setFiles(filesData);
@@ -59,15 +63,15 @@ const ContractValidator = ({ hash, initialStatus }: ContractValidatorProps) => {
         address: hash,
         chain: chainId,
         files: {
-          "metadata.json": metadataContent
-        }
-      };
-      const response = await fetch('https://sourcify.dev/server/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+          "metadata.json": metadataContent,
         },
-        body: JSON.stringify(payload)
+      };
+      const response = await fetch("https://sourcify.dev/server/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -78,7 +82,9 @@ const ContractValidator = ({ hash, initialStatus }: ContractValidatorProps) => {
       const validationResult = result.result[0]; // Extract the first result item
       setStatus(validationResult.status);
       if (validationResult.status === "perfect") {
-        const filesResponse = await fetch(`https://sourcify.dev/server/files/${chainId}/${hash}`);
+        const filesResponse = await fetch(
+          `https://sourcify.dev/server/files/${chainId}/${hash}`,
+        );
         const filesData: ContractFile[] = await filesResponse.json();
         setFiles(filesData);
       }
@@ -93,26 +99,31 @@ const ContractValidator = ({ hash, initialStatus }: ContractValidatorProps) => {
     <div>
       {status !== "perfect" && (
         <div className="mt-4">
-          <h3 className="text-xl font-bold">Upload metadata.json to validate contract</h3>
+          <h3 className="text-xl font-bold">
+            Upload metadata.json to validate contract
+          </h3>
           <input type="file" accept=".json" onChange={handleFileChange} />
-          <button onClick={handleSubmit} className="btn btn-primary mt-2">Submit</button>
+          <button onClick={handleSubmit} className="btn btn-primary mt-2">
+            Submit
+          </button>
         </div>
       )}
 
       {isLoading && (
-        <div className="flex justify-center items-center mt-4">
+        <div className="mt-4 flex items-center justify-center">
           <p>Validating contract, please wait...</p>
         </div>
       )}
 
-      {status === "perfect" && files.map((file, index) => (
-        <div key={index} className="mt-4">
-          <h3 className="text-xl font-bold">{file.name}</h3>
-          <SyntaxHighlighter language="solidity" style={solarizedlight}>
-            {file.content}
-          </SyntaxHighlighter>
-        </div>
-      ))}
+      {status === "perfect" &&
+        files.map((file, index) => (
+          <div key={index} className="mt-4">
+            <h3 className="text-xl font-bold">{file.name}</h3>
+            <SyntaxHighlighter language="solidity" style={solarizedlight}>
+              {file.content}
+            </SyntaxHighlighter>
+          </div>
+        ))}
 
       {error && (
         <div className="mt-4 text-red-500">
