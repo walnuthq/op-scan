@@ -9,7 +9,7 @@ export const defaultState = (): State => ({
   timestampFormattedAsDate: false,
   txGasPriceShown: false,
   hoveredSelector: "",
-  hoveredAddress: ""
+  hoveredAddress: "",
 });
 
 export type Action =
@@ -17,7 +17,8 @@ export type Action =
       type: "TOGGLE_TIMESTAMP_FORMATTED_AS_DATE";
     }
   | { type: "TOGGLE_TX_GAS_PRICE_SHOWN" }
-  | { type: "SET_HOVERED_SELECTOR"; payload: { selector: string } } |  { type: "SET_HOVERED_ADDRESS"; payload: { address: string } };
+  | { type: "SET_HOVERED_SELECTOR"; payload: { selector: string } }
+  | { type: "SET_HOVERED_ADDRESS"; payload: { address: string } };
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {

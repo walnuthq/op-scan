@@ -277,3 +277,16 @@ export const formatEventLog = async (
     args: decodedLog,
   };
 };
+
+/**
+ * using a 3rd party gateway to fetch content from IPFS
+ * can use ipfs.io
+ * the gateway was not working for me so using gateway.pinata.cloud
+ */
+export const convertIpfsToHttp = (ipfsUri: string): string => {
+  const ipfsHash = ipfsUri.replace("ipfs://", "");
+  return `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+};
+
+export const NftPlaceholderImage =
+  "https://optimistic.etherscan.io/images/main/nft-placeholder.svg";
