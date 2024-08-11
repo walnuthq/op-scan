@@ -24,6 +24,7 @@ import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
 import { l2PublicClient } from "./chains";
 import { loadEvents } from "./signatures";
+import getERC721Contract from "./contracts/erc-721/contract";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -101,6 +102,8 @@ export const parseERC20Transfers = (logs: Log[]): Promise<ERC20Transfer[]> =>
     }).map(async ({ transactionHash, logIndex, args, address }) => {
       const contract = getERC20Contract(address);
       const decimals = await contract.read.decimals();
+      const name = await contract.read.name();
+      const symbol = await contract.read.symbol();
       return {
         transactionHash,
         logIndex,
@@ -109,23 +112,35 @@ export const parseERC20Transfers = (logs: Log[]): Promise<ERC20Transfer[]> =>
         to: args.to,
         value: args.value,
         decimals,
+        name,
+        symbol,
       };
     }),
   );
 
-export const parseERC721Transfers = (logs: Log[]): ERC721Transfer[] =>
-  parseEventLogs({
-    abi: erc721Abi,
-    eventName: "Transfer",
-    logs,
-  }).map(({ transactionHash, logIndex, args, address }) => ({
-    transactionHash,
-    logIndex,
-    address: getAddress(address),
-    from: args.from,
-    to: args.to,
-    tokenId: args.tokenId,
-  }));
+export const parseERC721Transfers = (logs: Log[]): Promise<ERC721Transfer[]> =>
+  Promise.all(
+    parseEventLogs({
+      abi: erc721Abi,
+      eventName: "Transfer",
+      logs,
+    }).map(async ({ transactionHash, logIndex, args, address }) => {
+      const contract = getERC721Contract(address);
+      const name = await contract.read.name();
+      const symbol = await contract.read.symbol();
+
+      return {
+        transactionHash,
+        logIndex,
+        address: getAddress(address),
+        from: args.from,
+        to: args.to,
+        tokenId: args.tokenId,
+        name,
+        symbol,
+      };
+    }),
+  );
 
 export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
   const transfersSingle = parseEventLogs({
@@ -262,3 +277,16 @@ export const formatEventLog = async (
     args: decodedLog,
   };
 };
+
+/**
+ * using a 3rd party gateway to fetch content from IPFS
+ * can use ipfs.io
+ * the gateway was not working for me so using gateway.pinata.cloud
+ */
+export const convertIpfsToHttp = (ipfsUri: string): string => {
+  const ipfsHash = ipfsUri.replace("ipfs://", "");
+  return `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+};
+
+export const NftPlaceholderImage =
+  "https://optimistic.etherscan.io/images/main/nft-placeholder.svg";
