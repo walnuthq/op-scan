@@ -14,8 +14,8 @@ export const defaultState = (): State => ({
 
 export type Action =
   | {
-      type: "TOGGLE_TIMESTAMP_FORMATTED_AS_DATE";
-    }
+    type: "TOGGLE_TIMESTAMP_FORMATTED_AS_DATE";
+  }
   | { type: "TOGGLE_TX_GAS_PRICE_SHOWN" }
   | { type: "SET_HOVERED_SELECTOR"; payload: { selector: string } }
   | { type: "SET_HOVERED_ADDRESS"; payload: { address: string } };

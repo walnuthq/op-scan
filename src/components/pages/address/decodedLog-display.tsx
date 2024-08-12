@@ -20,7 +20,6 @@ export const DecodedLogDisplay = ({ args }: Props) => {
   const handleChange = (value: string) => {
     setSelectedFormat(value);
   };
-
   const getSelectedValue = () => {
     switch (selectedFormat) {
       case "number":

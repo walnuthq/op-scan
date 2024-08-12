@@ -9,11 +9,9 @@ const fetchBlockDetailsFromDatabase = async (
     where: { number },
     include: { transactions: true },
   });
-
   if (!block) {
     return fetchBlockDetailsFromJsonRpc(number);
   }
-
   return fromPrismaBlock(block, block.transactions);
 };
 
@@ -24,7 +22,6 @@ const fetchBlockDetailsFromJsonRpc = async (
 
   return block ? fromViemBlock(block) : null;
 };
-
 const fetchBlockDetails = process.env.DATABASE_URL
   ? fetchBlockDetailsFromDatabase
   : fetchBlockDetailsFromJsonRpc;
