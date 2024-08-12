@@ -1,13 +1,10 @@
 import { Address, Block } from "viem";
 import { abiFromBytecode } from "@shazow/whatsabi";
-
 import { l2PublicClient } from "@/lib/chains";
 import { formatEventLog } from "@/lib/utils";
-
 import { ABIEventExtended, FormattedLog } from "@/interfaces";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ContractEventsTable } from "./address-contract-events-table";
-
 const AddressEvents = async ({ address }: { address: Address }) => {
   try {
     const latestBlockNumber: bigint = await l2PublicClient.getBlockNumber();

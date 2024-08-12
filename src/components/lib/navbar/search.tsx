@@ -1,40 +1,24 @@
 "use client";
-import { Search as SearchIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { useSearch } from "@/hooks";
-import { SearchResultDropDown } from "./search-result-dropdown";
+import { CommandDemo } from "./CommandDemo";
 
 const Search = () => {
   const {
     searchResult,
-    showResult,
     selectedCategory,
+    loading,
     handleCategorySelect,
     onQueryChanged,
-    handleShowResult,
   } = useSearch();
 
   return (
-    <form className="relative ml-auto flex-1 sm:flex-initial">
-      <div className="relative">
-        <div className="relative flex items-center">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            onChange={onQueryChanged}
-            placeholder="Search by Address / Txn Hash / Block / Token"
-            className="w-full pl-8 sm:w-[400px] md:w-[360px] lg:w-[480px]"
-          />
-        </div>
-        <SearchResultDropDown
-          showResult={showResult}
-          searchResult={searchResult}
-          selectedCategory={selectedCategory}
-          handleCategorySelect={handleCategorySelect}
-          handleShowResult={handleShowResult}
-        />
-      </div>
-    </form>
+    <CommandDemo
+      searchResult={searchResult}
+      selectedCategory={selectedCategory}
+      loading={loading}
+      handleCategorySelect={handleCategorySelect}
+      onQueryChanged={onQueryChanged}
+    />
   );
 };
 
