@@ -1,14 +1,6 @@
-import {
-  Hash,
-  Address,
-  Hex,
-  TransactionType,
-  getAddress,
-  transactionType,
-} from "viem";
+import { Hash, Address, Hex, TransactionType, getAddress } from "viem";
 import {
   Prisma,
-  Block as PrismaBlock,
   erc1155Transfer as PrismaERC1155Transfer,
   erc20Transfer as PrismaERC20Transfer,
   erc721Transfer as PrismaERC721Transfer,
@@ -17,7 +9,6 @@ import {
   TransactionEnqueued as PrismaTransactionEnqueued,
   TransactionReceipt as PrismaTransactionReceipt,
 } from "@/prisma/generated/client";
-import { Address, Hash, Hex, TransactionType, getAddress } from "viem";
 
 export type Block = {
   number: bigint;
