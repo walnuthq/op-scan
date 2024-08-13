@@ -1,5 +1,5 @@
 import { formatNumber } from "@/lib/utils";
-import fetchLatestBlocks from "./fetch-blocks";
+import fetchBlocks from "@/components/pages/blocks/fetch-blocks";
 import {
   Card,
   CardContent,
@@ -11,10 +11,9 @@ import LatestBlocksPagination from "@/components/pages/blocks/latest-blocks-pagi
 import LatestBlocksTable from "@/components/pages/blocks/latest-blocks-table";
 
 const Blocks = async ({ start, latest }: { start: bigint; latest: bigint }) => {
-  const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
+  const blocks = await fetchBlocks(start);
   const totalBlocks = latest + BigInt(1);
-  const end = Math.max(Number(start - blocksPerPage + BigInt(1)), 0);
-  const blocks = await fetchLatestBlocks(start);
+  const end = blocks[blocks.length - 1].number;
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h2 className="text-2xl font-bold tracking-tight">Blocks</h2>
@@ -27,7 +26,7 @@ const Blocks = async ({ start, latest }: { start: bigint; latest: bigint }) => {
               {totalBlocks === BigInt(1) ? "" : "s"}
             </p>
             <p className="text-sm">
-              (Showing blocks between #{start.toString()} to #{end})
+              (Showing blocks between #{start.toString()} to #{end.toString()})
             </p>
           </div>
           <LatestBlocksPagination start={start} latest={latest} />
@@ -42,7 +41,7 @@ const Blocks = async ({ start, latest }: { start: bigint; latest: bigint }) => {
               {totalBlocks === BigInt(1) ? "" : "s"}
             </p>
             <p className="text-sm">
-              (Showing blocks between #{start.toString()} to #{end})
+              (Showing blocks between #{start.toString()} to #{end.toString()})
             </p>
           </div>
           <LatestBlocksPagination start={start} latest={latest} />

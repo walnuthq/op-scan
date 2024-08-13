@@ -1,7 +1,10 @@
 import { Address, getAddress } from "viem";
 import { prisma } from "@/lib/prisma";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { fromPrismaTransactionWithReceipt, TransactionWithReceipt } from "@/lib/types";
+import {
+  fromPrismaTransactionWithReceipt,
+  TransactionWithReceipt,
+} from "@/lib/types";
 import { loadFunctions } from "@/lib/signatures";
 import TxsTable from "@/components/lib/txs-table";
 
@@ -11,27 +14,23 @@ interface TransactionQueryResult {
   totalCount: number;
 }
 
-const fetchTransactionsData = async (address: Address): Promise<TransactionQueryResult> => {
+const fetchTransactionsData = async (
+  address: Address,
+): Promise<TransactionQueryResult> => {
   const checksumAddress = getAddress(address);
   const [associatedTransactions, totalCount] = await Promise.all([
     prisma.transaction.findMany({
       where: {
-        OR: [
-          { from: checksumAddress },
-          { to: checksumAddress },
-        ],
+        OR: [{ from: checksumAddress }, { to: checksumAddress }],
         receipt: { isNot: null },
       },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       include: { receipt: true },
       take: TXS_PER_PAGE,
     }),
     prisma.transaction.count({
       where: {
-        OR: [
-          { from: checksumAddress },
-          { to: checksumAddress },
-        ],
+        OR: [{ from: checksumAddress }, { to: checksumAddress }],
         receipt: { isNot: null },
       },
     }),
@@ -46,22 +45,27 @@ const fetchTransactionsData = async (address: Address): Promise<TransactionQuery
         console.error(`Error processing transaction ${tx.hash}:`, error);
         return null;
       }
-    })
+    }),
   );
 
-  const filteredValidTransactions = validTransactions.filter((tx): tx is TransactionWithReceipt => tx !== null);
+  const filteredValidTransactions = validTransactions.filter(
+    (tx): tx is TransactionWithReceipt => tx !== null,
+  );
   return {
     transactions: filteredValidTransactions,
     totalCount,
   };
 };
 
-const AddressTransactions: React.FC<{ address: Address }> = async ({ address }) => {
+const AddressTransactions: React.FC<{ address: Address }> = async ({
+  address,
+}) => {
   const { transactions, totalCount } = await fetchTransactionsData(address);
   return (
     <Card>
       <CardHeader>
-        Latest {transactions.length} from a total of {totalCount} valid transactions
+        Latest {transactions.length} from a total of {totalCount} valid
+        transactions
       </CardHeader>
       <CardContent>
         <h1>TRANSACTIONS</h1>

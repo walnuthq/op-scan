@@ -1,5 +1,6 @@
+import { Hash, Address, Hex, TransactionType, getAddress } from "viem";
 import {
-  Block as PrismaBlock,
+  Prisma,
   erc1155Transfer as PrismaERC1155Transfer,
   erc20Transfer as PrismaERC20Transfer,
   erc721Transfer as PrismaERC721Transfer,
@@ -8,7 +9,6 @@ import {
   TransactionEnqueued as PrismaTransactionEnqueued,
   TransactionReceipt as PrismaTransactionReceipt,
 } from "@/prisma/generated/client";
-import { Address, Hash, Hex, TransactionType, getAddress } from "viem";
 
 export type Block = {
   number: bigint;
@@ -59,6 +59,10 @@ export type TransactionReceipt = {
 
 export type TransactionWithReceipt = Transaction & {
   receipt: TransactionReceipt;
+};
+
+export type BlockWithTransactionsAndReceipts = Omit<Block, "transactions"> & {
+  transactions: TransactionWithReceipt[];
 };
 
 export type Log = {
@@ -184,10 +188,11 @@ export const fromViemBlock = (block: ViemBlock): Block => ({
   transactions: block.transactions,
 });
 
-export const fromViemBlockWithTransactions = (
+export const fromViemBlockWithTransactionsAndReceipts = (
   block: ViemBlockWithTransactions,
+  receipts: ViemTransactionReceipt[],
   signatures: string[] = [],
-): BlockWithTransactions => ({
+): BlockWithTransactionsAndReceipts => ({
   number: block.number,
   hash: block.hash,
   timestamp: block.timestamp,
@@ -195,24 +200,14 @@ export const fromViemBlockWithTransactions = (
   gasLimit: block.gasLimit,
   extraData: block.extraData,
   parentHash: block.parentHash,
-  transactions: block.transactions.map((transaction, i) => ({
-    blockNumber: transaction.blockNumber,
-    hash: transaction.hash,
-    from: getAddress(transaction.from),
-    to: transaction.to ? getAddress(transaction.to) : null,
-    value: transaction.value,
-    gas: transaction.gas,
-    gasPrice: transaction.gasPrice ?? null,
-    maxFeePerGas: transaction.maxFeePerGas ?? null,
-    maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
-    transactionIndex: transaction.transactionIndex,
-    type: transaction.type || "legacy",
-    typeHex: transaction.typeHex || "0x1",
-    nonce: transaction.nonce,
-    input: transaction.input,
-    signature: signatures.length > 0 ? signatures[i] : "",
-    timestamp: block.timestamp,
-  })),
+  transactions: block.transactions.map((transaction, i) =>
+    fromViemTransactionWithReceipt(
+      transaction,
+      receipts[i],
+      block.timestamp,
+      signatures[i],
+    ),
+  ),
 });
 
 export const fromViemTransaction = (
@@ -275,9 +270,17 @@ export const fromViemTransactionWithReceipt = (
   },
 });
 
+const prismaBlockWithTransactionsHashes =
+  Prisma.validator<Prisma.BlockDefaultArgs>()({
+    include: { transactions: { select: { hash: true } } },
+  });
+
+type PrismaBlockWithTransactionsHashes = Prisma.BlockGetPayload<
+  typeof prismaBlockWithTransactionsHashes
+>;
+
 export const fromPrismaBlock = (
-  block: PrismaBlock,
-  transactions: PrismaTransaction[],
+  block: PrismaBlockWithTransactionsHashes,
 ): Block => ({
   number: block.number,
   hash: block.hash as Hash,
@@ -286,14 +289,22 @@ export const fromPrismaBlock = (
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
-  transactions: transactions.map(({ hash }) => hash as Hash),
+  transactions: block.transactions.map(({ hash }) => hash as Hash),
 });
 
-export const fromPrismaBlockWithTransactions = (
-  block: PrismaBlock,
-  transactions: PrismaTransaction[],
+const prismaBlockWithTransactionsAndReceipts =
+  Prisma.validator<Prisma.BlockDefaultArgs>()({
+    include: { transactions: { include: { receipt: true } } },
+  });
+
+type PrismaBlockWithTransactionsAndReceipts = Prisma.BlockGetPayload<
+  typeof prismaBlockWithTransactionsAndReceipts
+>;
+
+export const fromPrismaBlockWithTransactionsAndReceipts = (
+  block: PrismaBlockWithTransactionsAndReceipts,
   signatures: string[] = [],
-): BlockWithTransactions => ({
+): BlockWithTransactionsAndReceipts => ({
   number: block.number,
   hash: block.hash as Hash,
   timestamp: block.timestamp,
@@ -301,9 +312,18 @@ export const fromPrismaBlockWithTransactions = (
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
-  transactions: transactions.map((transaction, i) =>
-    fromPrismaTransaction(transaction, signatures[i]),
-  ),
+  transactions: block.transactions
+    .map((transaction, i) => {
+      if (!transaction.receipt) {
+        return null;
+      }
+      return fromPrismaTransactionWithReceipt(
+        transaction,
+        transaction.receipt,
+        signatures[i],
+      );
+    })
+    .filter((transaction) => transaction !== null),
 });
 
 export const fromPrismaTransaction = (

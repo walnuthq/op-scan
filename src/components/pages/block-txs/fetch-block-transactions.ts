@@ -1,55 +1,37 @@
 import { l2PublicClient } from "@/lib/chains";
 import {
-  fromViemTransactionWithReceipt,
-  TransactionWithReceipt,
-  fromPrismaTransactionWithReceipt,
+  fromViemBlockWithTransactionsAndReceipts,
+  fromPrismaBlockWithTransactionsAndReceipts,
+  BlockWithTransactionsAndReceipts,
 } from "@/lib/types";
 import { loadFunctions } from "@/lib/signatures";
 import { prisma } from "@/lib/prisma";
 
-type FetchBlockTransactionsReturnType = {
-  transactions: TransactionWithReceipt[];
-};
-
 const fetchBlockTransactionsFromDatabase = async (
-  blockNumber: bigint,
-): Promise<FetchBlockTransactionsReturnType> => {
-  const transactions = await prisma.transaction.findMany({
-    where: { blockNumber },
-    include: { receipt: true },
+  number: bigint,
+): Promise<BlockWithTransactionsAndReceipts | null> => {
+  const block = await prisma.block.findUnique({
+    where: { number },
+    include: { transactions: { include: { receipt: true } } },
   });
-  if (!transactions || transactions.length === 0) {
-    return fetchBlockTransactionsFromJsonRpc(blockNumber);
+  if (!block) {
+    return fetchBlockTransactionsFromJsonRpc(number);
   }
-  const detailedTransactions = await Promise.all(
-    transactions.map(async (transaction) => {
-      if (!transaction.receipt) {
-        return null;
-      }
-      const signature = await loadFunctions(transaction.input.slice(0, 10));
-      return fromPrismaTransactionWithReceipt(
-        transaction,
-        transaction.receipt,
-        signature,
-      );
-    }),
-  ).then((results) => results.filter((tx) => tx !== null));
-  return {
-    transactions: detailedTransactions,
-  };
+  const signatures = await Promise.all(
+    block.transactions.map(({ input }) => loadFunctions(input.slice(0, 10))),
+  );
+  return fromPrismaBlockWithTransactionsAndReceipts(block, signatures);
 };
 
 const fetchBlockTransactionsFromJsonRpc = async (
-  blockNumber: bigint,
-): Promise<FetchBlockTransactionsReturnType> => {
+  number: bigint,
+): Promise<BlockWithTransactionsAndReceipts | null> => {
   const block = await l2PublicClient.getBlock({
-    blockNumber,
+    blockNumber: number,
     includeTransactions: true,
   });
   if (!block) {
-    return {
-      transactions: [],
-    };
+    return null;
   }
   const [receipts, signatures] = await Promise.all([
     Promise.all(
@@ -61,17 +43,7 @@ const fetchBlockTransactionsFromJsonRpc = async (
       block.transactions.map(({ input }) => loadFunctions(input.slice(0, 10))),
     ),
   ]);
-  const detailedTransactions = block.transactions.map((transaction, i) =>
-    fromViemTransactionWithReceipt(
-      transaction,
-      receipts[i],
-      block.timestamp,
-      signatures[i],
-    ),
-  );
-  return {
-    transactions: detailedTransactions,
-  };
+  return fromViemBlockWithTransactionsAndReceipts(block, receipts, signatures);
 };
 
 const fetchBlockTransactions = process.env.DATABASE_URL

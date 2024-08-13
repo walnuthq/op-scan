@@ -1,6 +1,6 @@
 "use client";
-
 import Link from "next/link";
+import { zeroAddress } from "viem";
 import { Transaction } from "@/lib/types";
 import {
   Card,
@@ -22,7 +22,7 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
     </div>
     <div className="flex grow flex-col gap-1">
       <div className="flex items-center gap-1 text-sm">
-        Tx#{" "}
+        Tx#
         <Link
           className="max-w-60 truncate text-primary hover:brightness-150 md:max-w-96 xl:max-w-60"
           href={`/tx/${transaction.hash}`}
@@ -31,21 +31,13 @@ const LatestTransaction = ({ transaction }: { transaction: Transaction }) => (
         </Link>
       </div>
       <div className="flex items-center gap-1 text-sm">
-        <div className="flex items-center gap-1">
-          From{" "}
-          <AddressLink
-            className="max-w-36 truncate md:max-w-48 xl:max-w-36"
-            address={transaction.from}
-            href={`/address/${transaction.from}`}
-          />
+        <div className="flex max-w-44 items-center gap-1 md:max-w-60 xl:max-w-44">
+          From
+          <AddressLink address={transaction.from} formatted />
         </div>
-        <div className="flex items-center gap-1">
-          To{" "}
-          <AddressLink
-            className="max-w-36 truncate md:max-w-48 xl:max-w-36"
-            address={transaction.to}
-            href={`/address/${transaction.to}`}
-          />
+        <div className="flex max-w-44 items-center gap-1 md:max-w-60 xl:max-w-44">
+          To
+          <AddressLink address={transaction.to ?? zeroAddress} formatted />
         </div>
       </div>
       <div className="flex items-center gap-1 text-sm">

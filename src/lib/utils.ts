@@ -22,11 +22,14 @@ import erc20Abi from "@/lib/contracts/erc-20/abi";
 import getERC20Contract from "@/lib/contracts/erc-20/contract";
 import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
-import { l2PublicClient } from "./chains";
-import { loadEvents } from "./signatures";
-import getERC721Contract from "./contracts/erc-721/contract";
+import getERC721Contract from "@/lib/contracts/erc-721/contract";
+import { l2PublicClient } from "@/lib/chains";
+import { loadEvents } from "@/lib/signatures";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 export const formatEther = (wei: bigint, precision = 5) =>
   new Intl.NumberFormat("en-US", {
@@ -75,7 +78,7 @@ export const formatTimestamp = (timestamp: bigint) => {
 };
 
 export const formatAddress = (address: Address) =>
-  `${address.slice(0, 10)}...${address.slice(-8)}`;
+  `${address.slice(0, 10)}…${address.slice(-8)}`;
 
 export const formatNumber = (value: bigint) =>
   new Intl.NumberFormat("en-US").format(value);

@@ -3,19 +3,17 @@ import { l2PublicClient } from "@/lib/chains";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import AddressDetails from "@/components/pages/address/address-details";
-import { fetchTokensPrices } from "@/lib/fetch-data";
+import { fetchSpotPrices } from "@/lib/fetch-data";
 import CopyButton from "@/components/lib/copy-button";
 import { fetchTokenHoldings } from "./fetch-token-holdings";
 
 const AddressComponent = async ({ address }: { address: Address }) => {
-  const [balance, bytecode, ethPrice] = await Promise.all([
+  const [balance, bytecode, tokenHoldings, prices] = await Promise.all([
     l2PublicClient.getBalance({ address }),
     l2PublicClient.getCode({ address }),
-    fetchTokensPrices(),
+    fetchTokenHoldings(address),
+    fetchSpotPrices(),
   ]);
-
-  const tokenHoldings = await fetchTokenHoldings(address);
-
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="flex items-center">
@@ -36,7 +34,7 @@ const AddressComponent = async ({ address }: { address: Address }) => {
       <AddressDetails
         tokenHoldings={tokenHoldings}
         balance={balance}
-        ethPriceToday={ethPrice.eth.today}
+        ethPriceToday={prices.ETH}
       />
     </main>
   );

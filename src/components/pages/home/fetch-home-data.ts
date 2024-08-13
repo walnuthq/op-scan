@@ -1,44 +1,33 @@
 import { prisma } from "@/lib/prisma";
+import { range } from "lodash";
 import {
   fromPrismaBlock,
   fromPrismaTransaction,
   fromPrismaTransactionEnqueued,
 } from "@/lib/types";
-import { subDays, format } from "date-fns";
+import { subDays, format, formatISO } from "date-fns";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import {
-  fetchTokensPrices,
+  fetchSpotPrices,
   fetchLatestTransactionsEnqueued,
 } from "@/lib/fetch-data";
-import fetchLatestBlocks from "../blocks/fetch-blocks";
-import fetchLatestTransactions from "../txs/fetch-transactions";
+import fetchBlocks from "@/components/pages/blocks/fetch-blocks";
+import fetchTransactions from "@/components/pages/txs/fetch-transactions";
 
-const fetchTransactionHistory = async () => {
-  const dates = Array.from({ length: 15 }, (_, i) => {
-    const date = subDays(new Date(), 14 - i);
-    return {
-      name: format(date, "MMM d"),
-      formattedDate: format(date, "yyyy-MM-dd"),
-    };
-  });
-
-  const responses = await Promise.all(
-    dates.map(async (dateObj) => {
-      const response = await fetch(
-        `https://api.coinbase.com/v2/prices/OP-USD/spot?date=${dateObj.formattedDate}`,
-      );
-      const res = await response.json();
+const fetchTransactionsHistory = () =>
+  Promise.all(
+    range(14, -1).map(async (i) => {
+      const rawDate = subDays(new Date(), i);
+      const date = formatISO(rawDate, { representation: "date" });
+      const prices = await fetchSpotPrices(date);
       return {
-        name: dateObj.name,
-        date: dateObj.formattedDate,
-        price: parseFloat(res.data?.amount),
-        transactionsCount: Math.floor(Math.random() * 200) + 400,
+        name: format(rawDate, "MMM d"),
+        date,
+        price: prices.OP,
+        transactions: Math.floor(Math.random() * 200) + 400,
       };
     }),
   );
-
-  return responses;
-};
 
 const fetchHomeDataFromJsonRpc = async () => {
   const [latestL1BlockNumber, latestL2BlockNumber] = await Promise.all([
@@ -46,40 +35,53 @@ const fetchHomeDataFromJsonRpc = async () => {
     l2PublicClient.getBlockNumber(),
   ]);
   const [
-    tokensPrices,
-    latestBlocks,
-    { transactions: latestTransactions },
-    { transactionsEnqueued: latestTransactionsEnqueued },
-    transactionHistory,
+    pricesToday,
+    pricesYesterday,
+    blocks,
+    { transactions },
+    { transactionsEnqueued },
+    transactionsHistory,
   ] = await Promise.all([
-    fetchTokensPrices(),
-    fetchLatestBlocks(latestL2BlockNumber),
-    fetchLatestTransactions(latestL2BlockNumber, 0, latestL2BlockNumber),
+    fetchSpotPrices(),
+    fetchSpotPrices(
+      formatISO(subDays(new Date(), 1), {
+        representation: "date",
+      }),
+    ),
+    fetchBlocks(latestL2BlockNumber),
+    fetchTransactions(latestL2BlockNumber, 0, latestL2BlockNumber),
     fetchLatestTransactionsEnqueued(
       latestL1BlockNumber,
       "0x",
       latestL1BlockNumber,
     ),
-    fetchTransactionHistory(),
+    fetchTransactionsHistory(),
   ]);
   return {
-    tokensPrices,
-    latestBlocks: latestBlocks.slice(0, 6),
-    latestTransactions: latestTransactions.slice(0, 6),
-    latestTransactionsEnqueued: latestTransactionsEnqueued.slice(0, 10),
-    transactionHistory,
+    pricesToday,
+    pricesYesterday,
+    blocks: blocks.slice(0, 6),
+    transactions: transactions.slice(0, 6),
+    transactionsEnqueued: transactionsEnqueued.slice(0, 10),
+    transactionsHistory,
   };
 };
 
 const fetchHomeDataFromDatabase = async () => {
   const [
-    tokensPrices,
-    latestBlocks,
-    latestTransactions,
-    latestTransactionsEnqueued,
-    transactionHistory,
+    pricesToday,
+    pricesYesterday,
+    blocks,
+    transactions,
+    transactionsEnqueued,
+    transactionsHistory,
   ] = await Promise.all([
-    fetchTokensPrices(),
+    fetchSpotPrices(),
+    fetchSpotPrices(
+      formatISO(subDays(new Date(), 1), {
+        representation: "date",
+      }),
+    ),
     prisma.block.findMany({
       include: { transactions: true },
       orderBy: { number: "desc" },
@@ -93,23 +95,24 @@ const fetchHomeDataFromDatabase = async () => {
       orderBy: { timestamp: "desc" },
       take: 10,
     }),
-    fetchTransactionHistory(),
+    fetchTransactionsHistory(),
   ]);
   return {
-    tokensPrices,
-    latestBlocks: latestBlocks.map((block) =>
-      fromPrismaBlock(block, block.transactions),
-    ),
-    latestTransactions: latestTransactions.map((transaction) =>
+    pricesToday,
+    pricesYesterday,
+    blocks: blocks.map((block) => fromPrismaBlock(block)),
+    transactions: transactions.map((transaction) =>
       fromPrismaTransaction(transaction),
     ),
-    latestTransactionsEnqueued: latestTransactionsEnqueued.map(
+    transactionsEnqueued: transactionsEnqueued.map(
       fromPrismaTransactionEnqueued,
     ),
-    transactionHistory,
+    transactionsHistory,
   };
 };
 
-export const fetchHomeData = process.env.DATABASE_URL
+const fetchHomeData = process.env.DATABASE_URL
   ? fetchHomeDataFromDatabase
   : fetchHomeDataFromJsonRpc;
+
+export default fetchHomeData;

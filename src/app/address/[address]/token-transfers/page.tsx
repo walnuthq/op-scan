@@ -2,7 +2,6 @@ import { Address } from "viem";
 import AddressTokenTransfers from "@/components/pages/address/address-token-transfers";
 import { getLatestTransferEvents } from "@/lib/fetch-data";
 
-
 const AddressTokenTransfersPage = async ({
   params: { address },
 }: {
@@ -15,10 +14,12 @@ const AddressTokenTransfersPage = async ({
   } catch (error) {
     console.error("Error Transfer:", error);
   }
-  return(
-  <AddressTokenTransfers address={address as Address} erc20Transfers={transferEvents}
-  />
-  )
+  return (
+    <AddressTokenTransfers
+      address={address as Address}
+      erc20Transfers={transferEvents}
+    />
+  );
 };
 
 export default AddressTokenTransfersPage;

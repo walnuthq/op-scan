@@ -3,7 +3,13 @@ import { cn, formatPrice, formatPercent } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ethereumImg from "@/img/ethereum.png";
 
-const EthPrice = ({ eth }: { eth: { today: number; yesterday: number } }) => (
+const EthPrice = ({
+  today,
+  yesterday,
+}: {
+  today: number;
+  yesterday: number;
+}) => (
   <Card className="relative pl-8">
     <Image
       src={ethereumImg}
@@ -15,16 +21,14 @@ const EthPrice = ({ eth }: { eth: { today: number; yesterday: number } }) => (
     </CardHeader>
     <CardContent>
       <div className="text-sm font-bold">
-        {formatPrice(eth.today)}{" "}
+        {formatPrice(today)}{" "}
         <span
           className={cn("text-xs text-muted-foreground", {
-            "text-red-500": eth.today - eth.yesterday < 0,
-            "text-green-500": eth.today - eth.yesterday > 0,
+            "text-red-500": today - yesterday < 0,
+            "text-green-500": today - yesterday > 0,
           })}
         >
-          (
-          {formatPercent((eth.today - eth.yesterday) / eth.yesterday, "always")}
-          )
+          ({formatPercent((today - yesterday) / yesterday, "always")})
         </span>
       </div>
     </CardContent>
