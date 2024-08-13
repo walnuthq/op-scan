@@ -67,6 +67,7 @@ export function CommandDemo({
                       ?.values.map((value, index) => (
                         <Item
                           key={index}
+                          index={index}
                           selectedCategory={selectedCategory}
                           setOpen={setOpen}
                           value={value}
