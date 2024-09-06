@@ -1,11 +1,11 @@
 import { l2PublicClient } from "@/lib/chains";
-import {
-  fromViemBlockWithTransactionsAndReceipts,
-  fromPrismaBlockWithTransactionsAndReceipts,
-  BlockWithTransactionsAndReceipts,
-} from "@/lib/types";
+import { BlockWithTransactionsAndReceipts } from "@/lib/types";
+import { fromViemBlockWithTransactionsAndReceipts } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
-import { prisma } from "@/lib/prisma";
+import {
+  prisma,
+  fromPrismaBlockWithTransactionsAndReceipts,
+} from "@/lib/prisma";
 
 const fetchBlockTransactionsFromDatabase = async (
   number: bigint,

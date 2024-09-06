@@ -120,8 +120,8 @@ const loadEventsFromOpenChain = async (hash: string) => {
   return name;
 };
 
-export const loadEvents = async (hash: string) => {
-  if (hash === "0x") {
+export const loadEvents = async (hash?: string) => {
+  if (!hash) {
     return "";
   }
   const fallback = () => {

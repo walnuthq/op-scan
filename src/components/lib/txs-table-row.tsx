@@ -1,20 +1,32 @@
 import Link from "next/link";
-import { zeroAddress } from "viem";
+import { Address, zeroAddress, formatEther as viemFormatEther } from "viem";
 import { TransactionWithReceipt } from "@/lib/types";
-import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
+import {
+  formatTimestamp,
+  formatEther,
+  formatGwei,
+  formatPrice,
+} from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 import AddressLink from "@/components/lib/address-link";
 import CopyButton from "@/components/lib/copy-button";
+import TxTypeBadge from "@/components/lib/tx-type-badge";
 
 const TxsTableRow = ({
   transaction,
   timestampFormattedAsDate,
+  usdValueShown,
   txGasPriceShown,
+  ethPrice,
+  address,
 }: {
   transaction: TransactionWithReceipt;
   timestampFormattedAsDate: boolean;
+  usdValueShown: boolean;
   txGasPriceShown: boolean;
+  ethPrice: number;
+  address?: Address;
 }) => {
   const { distance, utc } = formatTimestamp(transaction.timestamp);
   return (
@@ -53,13 +65,30 @@ const TxsTableRow = ({
           <CopyButton content="Copy From" copy={transaction.from} />
         </div>
       </TableCell>
+      {address && (
+        <TableCell>
+          <TxTypeBadge
+            type={
+              transaction.from === transaction.to
+                ? "self"
+                : transaction.from === address
+                  ? "out"
+                  : "in"
+            }
+          />
+        </TableCell>
+      )}
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
           <AddressLink address={transaction.to ?? zeroAddress} formatted />
           <CopyButton content="Copy To" copy={transaction.to ?? ""} />
         </div>
       </TableCell>
-      <TableCell>{formatEther(transaction.value, 15)} ETH</TableCell>
+      <TableCell>
+        {usdValueShown
+          ? formatPrice(Number(viemFormatEther(transaction.value)) * ethPrice)
+          : `${formatEther(transaction.value, 15)} ETH`}
+      </TableCell>
       <TableCell>
         {txGasPriceShown
           ? formatGwei(transaction.receipt.effectiveGasPrice)

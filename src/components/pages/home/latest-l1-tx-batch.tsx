@@ -1,6 +1,7 @@
-import Link from "next/link";
+// import Link from "next/link";
 import { Gauge } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatNumber } from "@/lib/utils";
 
 const LatestL1TxBatch = () => (
   <Card className="relative pl-8">
@@ -13,17 +14,22 @@ const LatestL1TxBatch = () => (
     </CardHeader>
     <CardContent className="flex flex-row items-center justify-between">
       <div className="text-sm">
-        <Link href="/batches" className="text-primary hover:brightness-150">
-          1.08 M
-        </Link>
+        <a
+          //href="/batches"
+          href="#"
+          className="text-primary hover:brightness-150"
+        >
+          {formatNumber(1078412, { notation: "compact" })}
+        </a>
       </div>
       <div className="text-sm">
-        <Link
-          href="/state-batches"
+        <a
+          //href="/state-batches"
+          href="#"
           className="text-primary hover:brightness-150"
         >
           8878
-        </Link>
+        </a>
       </div>
     </CardContent>
   </Card>

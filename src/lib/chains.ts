@@ -105,6 +105,11 @@ if (process.env.NEXT_PUBLIC_L1_FALLBACK2_RPC_URL) {
     http(process.env.NEXT_PUBLIC_L1_FALLBACK2_RPC_URL, transportOptions),
   );
 }
+if (process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL) {
+  l1Transport.push(
+    http(process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL, transportOptions),
+  );
+}
 
 export const l1PublicClient = createPublicClient({
   chain: l1Chain,
@@ -122,6 +127,11 @@ if (process.env.NEXT_PUBLIC_L2_FALLBACK1_RPC_URL) {
 if (process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL) {
   l2Transport.push(
     http(process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL, transportOptions),
+  );
+}
+if (process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL) {
+  l2Transport.push(
+    http(process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL, transportOptions),
   );
 }
 

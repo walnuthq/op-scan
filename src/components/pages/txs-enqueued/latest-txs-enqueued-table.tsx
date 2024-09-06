@@ -42,7 +42,7 @@ const LatestTxsEnqueuedTable = ({
       <TableBody>
         {transactionsEnqueued.map((transactionEnqueued) => (
           <LatestTxsEnqueuedTableRow
-            key={transactionEnqueued.l1TxHash}
+            key={transactionEnqueued.l2TxHash}
             transactionEnqueued={transactionEnqueued}
             timestampFormattedAsDate={timestampFormattedAsDate}
           />

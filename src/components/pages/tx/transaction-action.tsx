@@ -1,6 +1,5 @@
 import { formatEther } from "viem";
 import { ChevronRight } from "lucide-react";
-import { formatAddress } from "@/lib/utils";
 import { TransactionWithReceipt } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TxMethodBadge from "@/components/lib/tx-method-badge";

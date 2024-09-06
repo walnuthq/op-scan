@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { Server } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatNumber } from "@/lib/utils";
 
 const LatestBlockAndTxs = ({
-  blockNumber = BigInt(0),
+  blockNumber,
+  transactionsCount,
+  tps,
 }: {
-  blockNumber?: bigint;
+  blockNumber: bigint;
+  transactionsCount: number;
+  tps: number;
 }) => (
   <Card className="relative pl-8">
     <Server className="absolute left-4 top-6 size-6" />
@@ -16,22 +21,24 @@ const LatestBlockAndTxs = ({
       </CardTitle>
     </CardHeader>
     <CardContent className="flex flex-row items-center justify-between">
-      <div className="text-sm">
+      <div className="flex items-center gap-1 text-sm">
         <Link
           href={`/block/${blockNumber}`}
           className="text-primary hover:brightness-150"
         >
           {blockNumber.toString()}
-        </Link>{" "}
+        </Link>
         <span className="text-xs text-muted-foreground">
           ({process.env.NEXT_PUBLIC_L2_BLOCK_TIME}.0s)
         </span>
       </div>
-      <div className="text-sm">
+      <div className="flex items-center gap-1 text-sm">
         <Link href="/txs" className="text-primary hover:brightness-150">
-          300.00 M
-        </Link>{" "}
-        <span className="text-xs text-muted-foreground">(6.8 TPS)</span>
+          {formatNumber(transactionsCount, { notation: "compact" })}
+        </Link>
+        <span className="text-xs text-muted-foreground">
+          ({tps.toFixed(1)} TPS)
+        </span>
       </div>
     </CardContent>
   </Card>

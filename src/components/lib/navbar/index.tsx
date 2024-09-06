@@ -3,10 +3,10 @@ import Image from "next/image";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import Search from "@/components/lib/navbar/search";
+import Search from "@/components/lib/search";
 import ModeToggle from "@/components/lib/navbar/mode-toggle";
-import UserMenu from "@/components/lib/navbar/user-menu";
 import logoImg from "@/img/logo.png";
+
 const Navbar = () => (
   <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
     <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
@@ -47,9 +47,8 @@ const Navbar = () => (
       </SheetContent>
     </Sheet>
     <div className="flex w-full items-start justify-end gap-4 md:ml-auto md:gap-2 lg:gap-4">
-      <Search />
+      <Search className="fixed mr-14 w-5/12 sm:w-3/5 md:w-3/6 lg:w-1/3" />
       <ModeToggle />
-      <UserMenu />
     </div>
   </header>
 );

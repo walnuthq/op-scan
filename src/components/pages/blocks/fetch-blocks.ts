@@ -1,9 +1,9 @@
 import { l2PublicClient } from "@/lib/chains";
-import { prisma } from "@/lib/prisma";
-import { fromViemBlock, Block, fromPrismaBlock } from "@/lib/types";
+import { prisma, fromPrismaBlock } from "@/lib/prisma";
+import { fromViemBlock } from "@/lib/viem";
 import { range } from "lodash";
 
-const fetchBlocksFromJsonRpc = async (start: bigint): Promise<Block[]> => {
+const fetchBlocksFromJsonRpc = async (start: bigint) => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
   const blocks = await Promise.all(
     range(Number(start), Math.max(Number(start - blocksPerPage), -1)).map((i) =>
@@ -13,11 +13,11 @@ const fetchBlocksFromJsonRpc = async (start: bigint): Promise<Block[]> => {
   return blocks.map(fromViemBlock);
 };
 
-const fetchBlocksFromDatabase = async (start: bigint): Promise<Block[]> => {
+const fetchBlocksFromDatabase = async (start: bigint) => {
   const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
   const blocks = await prisma.block.findMany({
     where: {
-      number: { lte: start, gt: start - blocksPerPage },
+      number: { lte: start, gt: Math.max(Number(start - blocksPerPage), -1) },
     },
     orderBy: { number: "desc" },
     take: Number(blocksPerPage),

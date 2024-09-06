@@ -6,8 +6,8 @@ generator client {
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
-// provider = "postgres"
-// url      = env("DATABASE_URL")
+  // provider = "postgres"
+  // url      = env("DATABASE_URL")
 }
 
 model DeployConfig {
@@ -46,10 +46,14 @@ model Transaction {
   timestamp            BigInt
   block                Block               @relation(fields: [blockNumber], references: [number])
   receipt              TransactionReceipt?
+  logs                 Log[]
+  erc20Transfers       Erc20Transfer[]
+  nftTransfers         NftTransfer[]
+  Account              Account[]
 }
 
 model TransactionReceipt {
-  transactionHash   String            @id
+  transactionHash   String          @id
   status            Boolean
   from              String
   to                String?
@@ -59,74 +63,100 @@ model TransactionReceipt {
   l1GasPrice        String?
   l1GasUsed         String?
   l1FeeScalar       Int?
+  transaction       Transaction     @relation(fields: [transactionHash], references: [hash])
   logs              Log[]
-  erc20Transfers    erc20Transfer[]
-  transaction       Transaction       @relation(fields: [transactionHash], references: [hash])
-  erc721Transfer    erc721Transfer[]
-  erc1155Transfer   erc1155Transfer[]
+  erc20Transfers    Erc20Transfer[]
+  nftTransfers      NftTransfer[]
 }
 
 model Log {
-  address          String
   blockNumber      BigInt
+  transactionIndex Int
+  logIndex         Int
+  address          String
   blockHash        String
   data             String
-  logIndex         Int
   transactionHash  String
-  transactionIndex Int
   removed          Boolean
   topics           String
+  transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
   receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+  erc20Transfer    Erc20Transfer?
+  nftTransfer      NftTransfer?
 
-  @@id([transactionHash, logIndex])
+  @@id([blockNumber, transactionIndex, logIndex])
 }
 
-model Address {
-  address    String  @id
-  isContract Boolean
+model Account {
+  address         String        @id
+  bytecode        String?
+  transactionHash String?
+  transaction     Transaction?  @relation(fields: [transactionHash], references: [hash])
+  erc20Token      Erc20Token?
+  erc721Token     Erc721Token?
+  erc1155Token    Erc1155Token?
 }
 
-model erc20Transfer {
-  transactionHash String
-  logIndex        Int
-  address         String
-  from            String
-  to              String
-  value           String
-  decimals        Int
-  name            String
-  symbol          String
-  receipt         TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
-
-  @@id([transactionHash, logIndex])
+model Erc20Token {
+  address   String          @id
+  name      String
+  symbol    String
+  decimals  Int
+  account   Account         @relation(fields: [address], references: [address])
+  transfers Erc20Transfer[]
 }
 
-model erc721Transfer {
-  transactionHash String
-  logIndex        Int
-  address         String
-  from            String
-  to              String
-  tokenId         String
-  name            String
-  symbol          String
-  receipt         TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+model Erc20Transfer {
+  blockNumber      BigInt
+  transactionIndex Int
+  logIndex         Int
+  transactionHash  String
+  address          String
+  from             String
+  to               String
+  value            String
+  token            Erc20Token         @relation(fields: [address], references: [address])
+  transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
+  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+  log              Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex])
 
-  @@id([transactionHash, logIndex])
+  @@id([blockNumber, transactionIndex, logIndex])
 }
 
-model erc1155Transfer {
-  transactionHash String
-  logIndex        Int
-  address         String
-  operator        String
-  from            String
-  to              String
-  id              String
-  value           String
-  receipt         TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+model Erc721Token {
+  address   String        @id
+  name      String
+  symbol    String
+  account   Account       @relation(fields: [address], references: [address])
+  transfers NftTransfer[]
+}
 
-  @@id([transactionHash, logIndex])
+model Erc1155Token {
+  address   String        @id
+  account   Account       @relation(fields: [address], references: [address])
+  transfers NftTransfer[]
+}
+
+model NftTransfer {
+  blockNumber         BigInt
+  transactionIndex    Int
+  logIndex            Int
+  transactionHash     String
+  address             String
+  operator            String?
+  from                String
+  to                  String
+  tokenId             String
+  value               String
+  erc721TokenAddress  String?
+  erc1155TokenAddress String?
+  erc721Token         Erc721Token?       @relation(fields: [erc721TokenAddress], references: [address])
+  erc1155Token        Erc1155Token?      @relation(fields: [erc1155TokenAddress], references: [address])
+  transaction         Transaction        @relation(fields: [transactionHash], references: [hash])
+  receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+  log                 Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex])
+
+  @@id([blockNumber, transactionIndex, logIndex])
 }
 
 model TransactionEnqueued {

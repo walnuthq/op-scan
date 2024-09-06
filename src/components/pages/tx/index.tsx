@@ -21,7 +21,7 @@ const Tx = async ({ hash }: { hash: Hash }) => {
           <TransactionDetails
             transaction={transaction}
             confirmations={confirmations}
-            ethPriceToday={prices.ETH}
+            ethPrice={prices.ETH}
             erc20Transfers={erc20Transfers}
           />
         </CardContent>

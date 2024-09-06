@@ -1,27 +1,16 @@
-import { l2PublicClient } from "@/lib/chains";
 import Txs from "@/components/pages/txs";
+import { fetchL2BlockNumber } from "@/lib/fetch-data";
 
 const TxsPage = async ({
-  searchParams,
+  searchParams: { start, page },
 }: {
-  searchParams: {
-    start?: string;
-    index?: string;
-    page?: string;
-    latest?: string;
-  };
+  searchParams: { start?: string; page?: string };
 }) => {
-  const latestBlockNumber = await l2PublicClient.getBlockNumber();
+  const latestBlockNumber = await fetchL2BlockNumber();
   return (
     <Txs
-      start={
-        searchParams.start ? BigInt(searchParams.start) : latestBlockNumber
-      }
-      index={searchParams.index ? Number(searchParams.index) : 0}
-      page={searchParams.page ? Number(searchParams.page) : 1}
-      latest={
-        searchParams.latest ? BigInt(searchParams.latest) : latestBlockNumber
-      }
+      start={start ? BigInt(start) : latestBlockNumber}
+      page={page ? Number(page) : 1}
     />
   );
 };

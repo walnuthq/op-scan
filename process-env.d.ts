@@ -7,6 +7,8 @@ declare global {
       readonly DATABASE_URL: string;
       readonly L1_RPC_WSS: string;
       readonly L2_RPC_WSS: string;
+      readonly ETHERSCAN_BASE_URL: string;
+      readonly ETHERSCAN_API_KEY: string;
       // public
       // L1 chain config
       readonly NEXT_PUBLIC_L1_CHAIN_ID: string;
@@ -28,11 +30,14 @@ declare global {
       readonly NEXT_PUBLIC_BLOCKS_PER_PAGE: string;
       readonly NEXT_PUBLIC_TXS_PER_PAGE: string;
       readonly NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE: string;
+      readonly NEXT_PUBLIC_EVENTS_PER_PAGE: string;
       // fallback rpc urls
       readonly NEXT_PUBLIC_L1_FALLBACK1_RPC_URL: string;
       readonly NEXT_PUBLIC_L2_FALLBACK1_RPC_URL: string;
       readonly NEXT_PUBLIC_L1_FALLBACK2_RPC_URL: string;
       readonly NEXT_PUBLIC_L2_FALLBACK2_RPC_URL: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK3_RPC_URL: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK3_RPC_URL: string;
     }
   }
 }

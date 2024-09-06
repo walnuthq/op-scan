@@ -28,14 +28,14 @@ const LatestBlock = ({ block }: { block: Block }) => (
             {formatTimestamp(block.timestamp).distance}
           </p>
         </div>
-        <div className="ml-auto text-sm font-medium">
+        <div className="ml-auto flex items-center gap-1 text-sm font-medium">
           <Link
             href={`/block/${block.number}/txs`}
             className="text-primary hover:brightness-150"
           >
             {block.transactions.length} txn
             {block.transactions.length === 1 ? "" : "s"}
-          </Link>{" "}
+          </Link>
           <span className="text-muted-foreground">
             in {process.env.NEXT_PUBLIC_L2_BLOCK_TIME} secs
           </span>

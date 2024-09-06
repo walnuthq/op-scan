@@ -2,7 +2,7 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, formatNumber } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 
 const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
@@ -13,7 +13,9 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
         <p className="text-xs">
           {format(parseISO(date), "EEEE, MMMM d, yyyy")}
         </p>
-        <p>Transactions: {transactions}k</p>
+        <p>
+          Transactions: {formatNumber(transactions, { notation: "compact" })}
+        </p>
         <p>Price: {formatPrice(price)}</p>
       </div>
     );
@@ -67,7 +69,9 @@ const TransactionHistory = ({
             }
           />
           <YAxis
-            tickFormatter={(value) => `${value}k`}
+            tickFormatter={(value) =>
+              formatNumber(value, { notation: "compact" })
+            }
             tickLine={false}
             axisLine={false}
             domain={["dataMin", "dataMax"]}
