@@ -1,12 +1,11 @@
 import { decodeAbiParameters, Hex, Abi } from "viem";
 import { Network } from "lucide-react";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { Contract } from "@/lib/types";
 import {
-  Contract,
   getContractMetadata,
   findAbiConstructor,
 } from "@/components/pages/address/address-contract/fetch-contract";
-import PreCard from "@/components/pages/address/address-contract/pre-card";
+import PreCard from "@/components/lib/pre-card";
 import DecodedParameterValue from "@/components/lib/decoded-parameter-value";
 
 const decodeDeployData = ({
@@ -32,10 +31,12 @@ const decodeDeployData = ({
 };
 
 const AddressContractConstructorArguments = ({
-  account,
+  bytecode,
+  creationCode,
   contract,
 }: {
-  account: AccountWithTransactionAndToken;
+  bytecode: Hex;
+  creationCode: Hex;
   contract: Contract;
 }) => {
   const abiConstructor = findAbiConstructor(contract.abi);
@@ -44,8 +45,8 @@ const AddressContractConstructorArguments = ({
   }
   const { args } = decodeDeployData({
     abi: contract.abi,
-    bytecode: account.bytecode ?? "0x",
-    data: account.transaction ? account.transaction.input : "0x",
+    bytecode,
+    data: creationCode,
   });
   return (
     <div className="space-y-4">

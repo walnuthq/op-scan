@@ -1,6 +1,6 @@
 "use client";
 import { Address } from "viem";
-import { TransactionWithReceipt } from "@/lib/types";
+import { TransactionWithReceiptAndAccounts } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -17,7 +17,7 @@ const TxsTable = ({
   ethPrice,
   address,
 }: {
-  transactions: TransactionWithReceipt[];
+  transactions: TransactionWithReceiptAndAccounts[];
   ethPrice: number;
   address?: Address;
 }) => {

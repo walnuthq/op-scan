@@ -1,26 +1,9 @@
-import { Abi, Address, Hex } from "viem";
+import { Abi, Hex, Address } from "viem";
 import { AbiConstructor } from "abitype";
+import { ContractSources, Contract } from "@/lib/types";
 import { getContract } from "@/lib/whatsabi";
 import { whatsabi } from "@shazow/whatsabi";
-
-export type ContractInfo = {
-  name: string | null;
-  evmVersion: string;
-  compilerVersion: string;
-  optimizer: { enabled: boolean; runs: number };
-  license: string;
-  language: string;
-};
-
-export type ContractSource = { path: string; content: string };
-
-export type ContractSources = ContractSource[];
-
-export type Contract = {
-  info: ContractInfo;
-  sources: ContractSources;
-  abi: Abi;
-};
+import { Metadata } from "@ethereum-sourcify/lib-sourcify";
 
 export const getContractMetadata = (bytecode: Hex) => {
   const last2Bytes = bytecode.slice(-4);
@@ -31,6 +14,17 @@ export const getContractMetadata = (bytecode: Hex) => {
 export const findAbiConstructor = (abi: Abi) => {
   const abiConstructor = abi.find(({ type }) => type === "constructor");
   return abiConstructor ? (abiConstructor as AbiConstructor) : null;
+};
+
+const extractMatch = (sources: whatsabi.loaders.ContractSources) => {
+  if (sources.length === 0) {
+    return null;
+  }
+  const [source] = sources;
+  if (!source.path) {
+    return null;
+  }
+  return source.path.includes("full_match") ? "perfect" : "partial";
 };
 
 const cleanSources = (
@@ -44,43 +38,29 @@ const cleanSources = (
     content: source.content,
   }));
 
-const getMetadata = (sources: ContractSources) => {
+const getMetadata = (sources: ContractSources): Metadata | null => {
   const metadata = sources.find(({ path }) => path.endsWith("metadata.json"));
-  if (!metadata) {
-    return {
-      name: "",
-      optimizer: { enabled: false, runs: -1 },
-      license: "",
-      language: "Solidity",
-    };
-  }
-  const { language, settings } = JSON.parse(metadata.content) as {
-    language: string;
-    settings: {
-      compilationTarget: Record<string, string>;
-      optimizer: { enabled: boolean; runs: number };
-    };
-  };
-  const [name] = Object.values(settings.compilationTarget);
-  return { name, optimizer: settings.optimizer, license: "", language };
+  return metadata ? JSON.parse(metadata.content) : null;
 };
 
 export const fetchContract = async (address: Address): Promise<Contract> => {
   const contract = await getContract(address);
   const rawSources = contract.getSources ? await contract.getSources() : [];
+  const match = extractMatch(rawSources);
   const sources = cleanSources(rawSources, contract.name ?? "");
-  const { name, optimizer, license, language } = getMetadata(sources);
+  const metadata = getMetadata(sources);
   return {
     info: {
-      name: contract.name || name,
+      name: contract.name ?? "",
+      match,
       evmVersion: contract.evmVersion,
       compilerVersion: contract.compilerVersion,
       optimizer:
-        optimizer.runs === -1
-          ? { enabled: true, runs: contract.runs }
-          : optimizer,
-      license,
-      language,
+        metadata && metadata.settings.optimizer
+          ? metadata.settings.optimizer
+          : { enabled: true, runs: contract.runs },
+      license: "",
+      language: metadata ? metadata.language : "Solidity",
     },
     sources,
     abi: contract.abi,

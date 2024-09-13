@@ -13,7 +13,7 @@ const SECONDS_IN_DAY = 24 * 60 * 60;
 const fetchTransactionsHistory = () =>
   Promise.all(
     range(14, -1).map(async (i) => {
-      const rawDate = subDays(new Date(), i);
+      const rawDate = subDays(new Date().setUTCHours(0, 0, 0, 0), i);
       const timestamp = getUnixTime(rawDate);
       const date = formatISO(rawDate, { representation: "date" });
       const [transactions, prices] = await Promise.all([

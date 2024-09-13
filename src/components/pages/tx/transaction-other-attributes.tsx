@@ -1,25 +1,31 @@
+import { TransactionType, Hex } from "viem";
 import { formatTransactionType } from "@/lib/utils";
-import { TransactionWithReceipt } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
 const TransactionOtherAttributes = ({
-  transaction,
+  type,
+  typeHex,
+  nonce,
+  transactionIndex,
 }: {
-  transaction: TransactionWithReceipt;
+  type: TransactionType;
+  typeHex: Hex;
+  nonce: number;
+  transactionIndex: number;
 }) => (
   <DescriptionListItem title="Other Attributes">
     <Badge variant="outline">
       <span className="mr-1 text-muted-foreground">Txn Type:</span>
-      {formatTransactionType(transaction.type, transaction.typeHex)}
+      {formatTransactionType(type, typeHex)}
     </Badge>
     <Badge variant="outline">
       <span className="mr-1 text-muted-foreground">Nonce:</span>
-      {transaction.nonce}
+      {nonce}
     </Badge>
     <Badge variant="outline">
       <span className="mr-1 text-muted-foreground">Position In Block:</span>
-      {transaction.transactionIndex}
+      {transactionIndex}
     </Badge>
   </DescriptionListItem>
 );

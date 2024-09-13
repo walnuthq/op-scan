@@ -12,7 +12,7 @@ const fetchBlockTransactionsFromDatabase = async (
 ): Promise<BlockWithTransactionsAndReceipts | null> => {
   const block = await prisma.block.findUnique({
     where: { number },
-    include: { transactions: { include: { receipt: true } } },
+    include: { transactions: { include: { receipt: true, accounts: true } } },
   });
   if (!block) {
     return fetchBlockTransactionsFromJsonRpc(number);

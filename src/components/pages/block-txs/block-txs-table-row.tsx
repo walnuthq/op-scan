@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { TransactionWithReceipt } from "@/lib/types";
+import { TransactionWithReceiptAndAccounts } from "@/lib/types";
 import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
@@ -12,11 +12,15 @@ const BlockTxsTableRow = ({
   timestampFormattedAsDate,
   txGasPriceShown,
 }: {
-  transaction: TransactionWithReceipt;
+  transaction: TransactionWithReceiptAndAccounts;
   timestampFormattedAsDate: boolean;
   txGasPriceShown: boolean;
 }) => {
+  const account =
+    transaction.accounts.length === 1 ? transaction.accounts[0] : undefined;
   const { distance, utc } = formatTimestamp(transaction.timestamp);
+  const actualTo =
+    transaction.to ?? (account ? account.address : null) ?? zeroAddress;
   return (
     <TableRow>
       <TableCell className="max-w-40">
@@ -34,6 +38,7 @@ const BlockTxsTableRow = ({
         <TxMethodBadge
           selector={transaction.input.slice(0, 10)}
           signature={transaction.signature}
+          account={account}
         />
       </TableCell>
       <TableCell>{timestampFormattedAsDate ? utc : distance}</TableCell>
@@ -45,8 +50,8 @@ const BlockTxsTableRow = ({
       </TableCell>
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
-          <AddressLink address={transaction.to ?? zeroAddress} formatted />
-          <CopyButton content="Copy To" copy={transaction.to ?? zeroAddress} />
+          <AddressLink address={actualTo} formatted />
+          <CopyButton content="Copy To" copy={actualTo} />
         </div>
       </TableCell>
       <TableCell>{formatEther(transaction.value, 15)} ETH</TableCell>

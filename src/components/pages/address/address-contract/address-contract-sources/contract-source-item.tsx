@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ContractSource } from "@/components/pages/address/address-contract/fetch-contract";
+import { ContractSource } from "@/lib/types";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import virtualizedRenderer from "react-syntax-highlighter-virtualized-renderer";
 import solidity from "react-syntax-highlighter/dist/esm/languages/prism/solidity";
@@ -19,8 +19,19 @@ import {
 SyntaxHighlighter.registerLanguage("solidity", solidity);
 SyntaxHighlighter.registerLanguage("json", json);
 
+const getLanguage = (path: string) => {
+  if (path.endsWith(".sol")) {
+    return "solidity";
+  }
+  if (path.endsWith(".json")) {
+    return "json";
+  }
+  return "text";
+};
+
 const ContractSourceItem = ({ source }: { source: ContractSource }) => {
   const { resolvedTheme } = useTheme();
+
   return (
     <Accordion type="multiple">
       <AccordionItem value={source.path}>
@@ -30,13 +41,13 @@ const ContractSourceItem = ({ source }: { source: ContractSource }) => {
             className="h-96 overflow-y-scroll rounded-md"
             showLineNumbers
             showInlineLineNumbers
-            language={source.path.endsWith(".sol") ? "solidity" : "json"}
+            language={getLanguage(source.path)}
             style={resolvedTheme === "light" ? vs : vscDarkPlus}
             renderer={virtualizedRenderer()}
           >
-            {source.path.endsWith(".sol")
-              ? source.content
-              : JSON.stringify(JSON.parse(source.content), null, 2)}
+            {source.path.endsWith(".json")
+              ? JSON.stringify(JSON.parse(source.content), null, 2)
+              : source.content}
           </SyntaxHighlighter>
         </AccordionContent>
       </AccordionItem>

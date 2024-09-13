@@ -5,10 +5,10 @@ import fetchAccount from "@/components/pages/address/fetch-account";
 import { fetchContract } from "@/components/pages/address/address-contract/fetch-contract";
 
 const AddressContract = async ({ address }: { address: Address }) => {
-  const [account, contract] = await Promise.all([
-    fetchAccount(address),
-    fetchContract(address),
-  ]);
+  const account = await fetchAccount(address);
+  const contract = account.contract
+    ? account.contract
+    : await fetchContract(address);
   return (
     <Card>
       <CardContent className="py-4">

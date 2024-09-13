@@ -9,7 +9,7 @@ const PreCard = ({
   className?: string;
   children: ReactNode;
 }) => (
-  <Card>
+  <Card className="w-full bg-background">
     <CardContent className="p-4">
       <pre className={cn("font-mono text-sm", className)}>{children}</pre>
     </CardContent>

@@ -12,7 +12,12 @@ const VerifyContractWizard = ({
 }) => (
   <div className="flex items-center gap-4">
     <div className="flex items-center gap-2">
-      <div className="flex size-8 items-center justify-center rounded-full bg-destructive">
+      <div
+        className={cn("flex size-8 items-center justify-center rounded-full", {
+          "bg-muted": step === 2,
+          "bg-destructive": step === 1,
+        })}
+      >
         <span className="text-sm font-semibold">1</span>
       </div>
       <Link

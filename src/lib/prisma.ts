@@ -17,6 +17,7 @@ import {
   Transaction,
   BlockWithTransactionsAndReceipts,
   TransactionWithReceipt,
+  TransactionWithReceiptAndAccounts,
   Log,
   Erc20Token,
   Erc721Token,
@@ -60,7 +61,7 @@ export const fromPrismaBlock = (
 
 const prismaBlockWithTransactionsAndReceipts =
   Prisma.validator<Prisma.BlockDefaultArgs>()({
-    include: { transactions: { include: { receipt: true } } },
+    include: { transactions: { include: { receipt: true, accounts: true } } },
   });
 
 type PrismaBlockWithTransactionsAndReceipts = Prisma.BlockGetPayload<
@@ -79,7 +80,7 @@ export const fromPrismaBlockWithTransactionsAndReceipts = (
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
   transactions: block.transactions.map((transaction, i) =>
-    fromPrismaTransactionWithReceipt(transaction, signatures[i]),
+    fromPrismaTransactionWithReceiptAndAccounts(transaction, signatures[i]),
   ),
 });
 
@@ -122,26 +123,7 @@ export const fromPrismaTransactionWithReceipt = (
   transaction: PrismaTransactionWithReceipt,
   signature: string = "",
 ): TransactionWithReceipt => ({
-  hash: transaction.hash as Hash,
-  blockNumber: transaction.blockNumber,
-  from: transaction.from as Address,
-  to: transaction.to ? (transaction.to as Address) : null,
-  value: BigInt(transaction.value),
-  gas: BigInt(transaction.gas),
-  gasPrice: transaction.gasPrice ? BigInt(transaction.gasPrice) : null,
-  maxFeePerGas: transaction.maxFeePerGas
-    ? BigInt(transaction.maxFeePerGas)
-    : null,
-  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas
-    ? BigInt(transaction.maxPriorityFeePerGas)
-    : null,
-  type: transaction.type as TransactionType,
-  typeHex: transaction.typeHex as Hex,
-  nonce: transaction.nonce,
-  transactionIndex: transaction.transactionIndex,
-  input: transaction.input as Hex,
-  signature,
-  timestamp: transaction.timestamp,
+  ...fromPrismaTransaction(transaction, signature),
   receipt: {
     transactionHash: transaction.receipt!.transactionHash as Hash,
     status: transaction.receipt!.status ? "success" : "reverted",
@@ -164,6 +146,23 @@ export const fromPrismaTransactionWithReceipt = (
       : null,
     l1FeeScalar: transaction.receipt!.l1FeeScalar,
   },
+});
+
+const prismaTransactionWithReceiptAndAccounts =
+  Prisma.validator<Prisma.TransactionDefaultArgs>()({
+    include: { receipt: true, accounts: true },
+  });
+
+type PrismaTransactionWithReceiptAndAccounts = Prisma.TransactionGetPayload<
+  typeof prismaTransactionWithReceiptAndAccounts
+>;
+
+export const fromPrismaTransactionWithReceiptAndAccounts = (
+  transaction: PrismaTransactionWithReceiptAndAccounts,
+  signature: string = "",
+): TransactionWithReceiptAndAccounts => ({
+  ...fromPrismaTransactionWithReceipt(transaction, signature),
+  accounts: transaction.accounts.map(fromPrismaAccount),
 });
 
 export const fromPrismaLog = (log: PrismaLog): Log => ({
@@ -288,6 +287,7 @@ export const fromPrismaAccount = (account: PrismaAccount): Account => ({
   address: account.address as Address,
   bytecode: account.bytecode ? (account.bytecode as Hex) : null,
   transactionHash: account.transactionHash as Hash,
+  contract: account.contract ? JSON.parse(account.contract) : null,
 });
 
 const prismaAccountWithTransactionAndToken =

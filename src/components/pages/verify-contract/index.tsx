@@ -1,5 +1,4 @@
 import { Address } from "viem";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import VerifyContractInfo from "@/components/pages/verify-contract/info";
 import VerifyContractWizard from "@/components/pages/verify-contract/wizard";
@@ -26,15 +25,19 @@ const VerifyContract = async ({
       <div className="my-8 flex flex-col items-center gap-8">
         <VerifyContractInfo step={step} type={type} />
         <VerifyContractWizard step={step} address={address} />
-        <Card className="w-full lg:w-2/3">
-          <CardContent className="p-4">
-            {step === 1 ? (
-              <VerifyContractDetailsForm address={address} />
-            ) : (
-              <VerifyContractVerifyForm />
-            )}
-          </CardContent>
-        </Card>
+        {step === 1 ? (
+          <VerifyContractDetailsForm address={address} />
+        ) : (
+          address &&
+          type &&
+          version && (
+            <VerifyContractVerifyForm
+              address={address}
+              type={type}
+              version={version}
+            />
+          )
+        )}
       </div>
     </main>
   );

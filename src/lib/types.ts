@@ -1,4 +1,4 @@
-import { Hash, Address, Hex, TransactionType } from "viem";
+import { Hash, Address, Hex, TransactionType, Abi } from "viem";
 
 export type Block = {
   number: bigint;
@@ -51,8 +51,12 @@ export type TransactionWithReceipt = Transaction & {
   receipt: TransactionReceipt;
 };
 
+export type TransactionWithReceiptAndAccounts = TransactionWithReceipt & {
+  accounts: Account[];
+};
+
 export type BlockWithTransactionsAndReceipts = Omit<Block, "transactions"> & {
-  transactions: TransactionWithReceipt[];
+  transactions: TransactionWithReceiptAndAccounts[];
 };
 
 export type Log = {
@@ -117,10 +121,31 @@ export type NftTransferWithToken = NftTransfer & {
   erc1155Token: Erc1155Token | null;
 };
 
+export type ContractInfo = {
+  name: string;
+  match: "partial" | "perfect" | null;
+  evmVersion: string;
+  compilerVersion: string;
+  optimizer: { enabled: boolean; runs: number };
+  license: string;
+  language: string;
+};
+
+export type ContractSource = { path: string; content: string };
+
+export type ContractSources = ContractSource[];
+
+export type Contract = {
+  info: ContractInfo;
+  sources: ContractSources;
+  abi: Abi;
+};
+
 export type Account = {
   address: Address;
   bytecode: Hex | null;
   transactionHash: Hash | null;
+  contract: Contract | null;
 };
 
 export type AccountWithTransaction = Account & {
@@ -151,44 +176,34 @@ export type NFTMetadata = {
 };
 
 export const compilerTypes = {
-  "solidity-single-file": "Solidity (Single file)",
-  "solidity-multiple-files": "Solidity (Multi-Part files)",
   "solidity-standard-json-input": "Solidity (Standard Json Input)",
+  "solidity-single-file": "Solidity (Single file)",
+  // "solidity-multiple-files": "Solidity (Multi-Part files)",
 } as const;
-
-export const compilerTypeKeys = Object.keys(compilerTypes) as CompilerType[];
 
 export type CompilerType = keyof typeof compilerTypes;
 
+export const compilerTypeKeys = Object.keys(compilerTypes) as CompilerType[];
+
 export const compilerVersions = [
-  "v0.8.27+commit.40a35a09",
-  "v0.8.26+commit.8a97fa7a",
-  "v0.8.25+commit.b61c2a91",
-  "v0.8.24+commit.e11b9ed9",
-  "v0.8.23+commit.f704f362",
-  "v0.8.22+commit.4fc1097e",
-  "v0.8.21+commit.d9974bed",
-  "v0.8.20+commit.a1b79de6",
-  "v0.8.19+commit.7dd6d404",
-  "v0.8.18+commit.87f61d96",
-  "v0.8.17+commit.8df45f5f",
-  "v0.8.16+commit.07a7930e",
-  "v0.8.15+commit.e14f2714",
-  "v0.8.14+commit.80d49f37",
-  "v0.8.13+commit.abaa5c0e",
-  "v0.8.12+commit.f00d7308",
-  "v0.8.11+commit.d7f03943",
-  "v0.8.10+commit.fc410830",
-  "v0.8.9+commit.e5eed63a",
-  "v0.8.8+commit.dddeac2f",
-  "v0.8.7+commit.e28d00a7",
-  "v0.8.6+commit.11564f7e",
-  "v0.8.5+commit.a4f2e591",
-  "v0.8.4+commit.c7e474f2",
-  "v0.8.3+commit.8d00100c",
-  "v0.8.2+commit.661d1103",
-  "v0.8.1+commit.df193b15",
-  "v0.8.0+commit.c7dfd78e",
+  "0.8.24+commit.e11b9ed9",
+  "0.8.20+commit.a1b79de6",
+  "0.8.18+commit.87f61d96",
+  "0.8.7+commit.e28d00a7",
+  "0.8.5+commit.a4f2e591",
 ] as const;
 
 export type CompilerVersion = (typeof compilerVersions)[number];
+
+export const evmVersions = {
+  default: "default (compiler defaults)",
+  berlin: "berlin (default for >= v0.8.5)",
+  london: "london (default for >= v0.8.7)",
+  paris: "paris (default for >= v0.8.18)",
+  shanghai: "shanghai (default for >= v0.8.20)",
+  cancun: "cancun (default for >= v0.8.24)",
+} as const;
+
+export type EvmVersion = keyof typeof evmVersions;
+
+export const evmVersionKeys = Object.keys(evmVersions) as EvmVersion[];

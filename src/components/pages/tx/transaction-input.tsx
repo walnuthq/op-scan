@@ -1,10 +1,15 @@
 import { Hex } from "viem";
-import { Textarea } from "@/components/ui/textarea";
+import { Account } from "@/lib/types";
+import PreCard from "@/components/lib/pre-card";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
-const getPlaceholder = (signature: string, input: string) => {
-  if (input === "0x") {
-    return "0x";
+const getPlaceholder = (
+  signature: string,
+  input: string,
+  account?: Account,
+) => {
+  if (input === "0x" || account) {
+    return input;
   }
   let result = "";
   if (signature) {
@@ -22,21 +27,17 @@ const getPlaceholder = (signature: string, input: string) => {
 const TransactionInput = ({
   signature,
   input,
+  account,
 }: {
   signature: string;
   input: Hex;
-}) => {
-  const placeholder = getPlaceholder(signature, input);
-  return (
-    <DescriptionListItem title="Input Data">
-      <Textarea
-        placeholder={placeholder}
-        className="font-mono"
-        disabled
-        rows={Math.min(placeholder.split("\n").length, 8)}
-      />
-    </DescriptionListItem>
-  );
-};
+  account?: Account;
+}) => (
+  <DescriptionListItem title="Input Data">
+    <PreCard className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
+      {getPlaceholder(signature, input, account)}
+    </PreCard>
+  </DescriptionListItem>
+);
 
 export default TransactionInput;

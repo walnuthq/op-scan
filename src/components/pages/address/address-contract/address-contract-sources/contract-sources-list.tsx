@@ -1,4 +1,4 @@
-import { ContractSources } from "@/components/pages/address/address-contract/fetch-contract";
+import { ContractSources } from "@/lib/types";
 import ContractSourceItem from "@/components/pages/address/address-contract/address-contract-sources/contract-source-item";
 
 const ContractSourcesList = ({ sources }: { sources: ContractSources }) =>

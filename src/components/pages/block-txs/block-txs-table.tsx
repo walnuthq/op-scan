@@ -1,5 +1,5 @@
 "use client";
-import { TransactionWithReceipt } from "@/lib/types";
+import { TransactionWithReceiptAndAccounts } from "@/lib/types";
 import {
   Table,
   TableHeader,
@@ -13,7 +13,7 @@ import useGlobalContext from "@/components/lib/context/hook";
 const BlockTxsTable = ({
   transactions,
 }: {
-  transactions: TransactionWithReceipt[];
+  transactions: TransactionWithReceiptAndAccounts[];
 }) => {
   const {
     state: { timestampFormattedAsDate, txGasPriceShown },

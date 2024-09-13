@@ -12,7 +12,7 @@ import CopyButton from "@/components/lib/copy-button";
 
 SyntaxHighlighter.registerLanguage("json", json);
 
-const AddressContractInfo = ({ abi }: { abi: Abi }) => {
+const AddressContractAbi = ({ abi }: { abi: Abi }) => {
   const { resolvedTheme } = useTheme();
   const abiString = JSON.stringify(abi, null, 2);
   return (
@@ -36,4 +36,4 @@ const AddressContractInfo = ({ abi }: { abi: Abi }) => {
   );
 };
 
-export default AddressContractInfo;
+export default AddressContractAbi;

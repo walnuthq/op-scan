@@ -86,14 +86,15 @@ export const fromViemBlockWithTransactionsAndReceipts = (
   gasLimit: block.gasLimit,
   extraData: block.extraData,
   parentHash: block.parentHash,
-  transactions: block.transactions.map((transaction, i) =>
-    fromViemTransactionWithReceipt(
+  transactions: block.transactions.map((transaction, i) => ({
+    ...fromViemTransactionWithReceipt(
       transaction,
       receipts[i],
       block.timestamp,
       signatures[i],
     ),
-  ),
+    accounts: [],
+  })),
 });
 
 export const fromViemTransaction = (
@@ -125,22 +126,7 @@ export const fromViemTransactionWithReceipt = (
   timestamp: bigint,
   signature: string = "",
 ): TransactionWithReceipt => ({
-  blockNumber: transaction.blockNumber,
-  hash: transaction.hash,
-  from: getAddress(transaction.from),
-  to: transaction.to ? getAddress(transaction.to) : null,
-  value: transaction.value,
-  gas: transaction.gas,
-  gasPrice: transaction.gasPrice ?? null,
-  maxFeePerGas: transaction.maxFeePerGas ?? null,
-  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
-  transactionIndex: transaction.transactionIndex,
-  type: transaction.type || "legacy",
-  typeHex: transaction.typeHex || "0x1",
-  nonce: transaction.nonce,
-  input: transaction.input,
-  signature,
-  timestamp,
+  ...fromViemTransaction(transaction, timestamp, signature),
   receipt: {
     transactionHash: receipt.transactionHash,
     status: receipt.status,

@@ -5,7 +5,7 @@ import { Erc20TransferWithToken } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Separator } from "@/components/ui/separator";
-import { TransactionWithReceipt } from "@/lib/types";
+import { TransactionWithReceiptAndAccounts } from "@/lib/types";
 import TxStatusBadge from "@/components/lib/tx-status-badge";
 import TimestampListItem from "@/components/lib/timestamp-list-item";
 import TransactionAction from "@/components/pages/tx/transaction-action";
@@ -22,7 +22,7 @@ const TransactionDetails = ({
   ethPrice,
   erc20Transfers,
 }: {
-  transaction: TransactionWithReceipt;
+  transaction: TransactionWithReceiptAndAccounts;
   confirmations: bigint;
   ethPrice: number;
   erc20Transfers: Erc20TransferWithToken[];
@@ -35,6 +35,8 @@ const TransactionDetails = ({
     transaction.receipt.gasUsed,
     transaction.gas,
   );
+  const account =
+    transaction.accounts.length === 1 ? transaction.accounts[0] : undefined;
   return (
     <dl>
       <DescriptionListItem title="Transaction Hash">
@@ -60,10 +62,22 @@ const TransactionDetails = ({
       </DescriptionListItem>
       <TimestampListItem timestamp={transaction.timestamp} />
       <Separator />
-      <TransactionAction transaction={transaction} />
+      <TransactionAction
+        from={transaction.from}
+        to={transaction.to}
+        input={transaction.input}
+        signature={transaction.signature}
+        value={transaction.value}
+        account={account}
+      />
       <Separator />
       <TransactionFrom from={transaction.from} />
-      <TransactionTo transaction={transaction} />
+      <TransactionTo
+        to={transaction.to}
+        input={transaction.input}
+        receipt={transaction.receipt}
+        account={account}
+      />
       {erc20Transfers.length > 0 && (
         <>
           <Separator />
@@ -148,10 +162,16 @@ const TransactionDetails = ({
         {transaction.receipt.l1FeeScalar ?? 0}
       </DescriptionListItem>
       <Separator />
-      <TransactionOtherAttributes transaction={transaction} />
+      <TransactionOtherAttributes
+        type={transaction.type}
+        typeHex={transaction.typeHex}
+        nonce={transaction.nonce}
+        transactionIndex={transaction.transactionIndex}
+      />
       <TransactionInput
         signature={transaction.signature}
         input={transaction.input}
+        account={account}
       />
     </dl>
   );

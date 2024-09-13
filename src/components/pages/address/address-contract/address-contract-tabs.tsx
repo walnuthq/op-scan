@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddressContractCode from "@/components/pages/address/address-contract/address-contract-code";
-import { Contract } from "@/components/pages/address/address-contract/fetch-contract";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { AccountWithTransactionAndToken, Contract } from "@/lib/types";
 
 const AddressContractTabs = ({
   account,

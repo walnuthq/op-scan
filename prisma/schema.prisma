@@ -49,7 +49,7 @@ model Transaction {
   logs                 Log[]
   erc20Transfers       Erc20Transfer[]
   nftTransfers         NftTransfer[]
-  Account              Account[]
+  accounts             Account[]
 }
 
 model TransactionReceipt {
@@ -91,6 +91,7 @@ model Account {
   address         String        @id
   bytecode        String?
   transactionHash String?
+  contract        String?
   transaction     Transaction?  @relation(fields: [transactionHash], references: [hash])
   erc20Token      Erc20Token?
   erc721Token     Erc721Token?

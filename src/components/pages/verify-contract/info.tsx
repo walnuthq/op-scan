@@ -21,13 +21,13 @@ const VerifyContractInfo = ({
             fit in a single file.
           </p>
         )}
-        {type === "solidity-multiple-files" && (
+        {/*type === "solidity-multiple-files" && (
           <p className="text-sm">
             This is an <strong>experimental</strong> source code verifier which
             supports verification of <strong>multi-part solidity files</strong>{" "}
             (imports).
           </p>
-        )}
+        )*/}
         {type === "solidity-standard-json-input" && (
           <p className="text-sm">
             <strong>Standard Json-Input</strong> is the recommended way to

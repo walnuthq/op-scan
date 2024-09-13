@@ -1,47 +1,60 @@
-import { formatEther } from "viem";
+import { Address, Hex, formatEther } from "viem";
 import { ChevronRight } from "lucide-react";
-import { TransactionWithReceipt } from "@/lib/types";
+import { Account } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 import AddressLink from "@/components/lib/address-link";
 
 const TransactionAction = ({
-  transaction,
+  from,
+  to,
+  input,
+  signature,
+  value,
+  account,
 }: {
-  transaction: TransactionWithReceipt;
+  from: Address;
+  to: Address | null;
+  input: Hex;
+  signature: string;
+  value: bigint;
+  account?: Account;
 }) => {
-  if (!transaction.to) {
+  const actualTo = to ?? (account ? account.address : null);
+  if (!actualTo) {
     return null;
   }
-  const selector = transaction.input.slice(0, 10);
   return (
     <DescriptionListItem title="Transaction Action">
       <div className="flex items-center gap-2">
-        {selector === "0x" ? (
+        <ChevronRight className="size-4" />
+        {input === "0x" ? (
           <>
-            <ChevronRight className="size-4" />
             <span className="text-muted-foreground">Native Transfer</span>
-            <span>{formatEther(transaction.value)} ETH</span>
+            <span>{formatEther(value)} ETH</span>
             <span className="text-muted-foreground">To</span>
-            <AddressLink address={transaction.to} formatted />
+            <AddressLink address={actualTo} formatted />
+          </>
+        ) : account ? (
+          <>
+            <span className="text-muted-foreground">Deployed</span>
+            <AddressLink address={actualTo} formatted />
           </>
         ) : (
           <>
-            <ChevronRight className="size-4" />
             Call
             <TxMethodBadge
-              selector={selector}
-              signature={transaction.signature}
+              selector={input.slice(0, 10)}
+              signature={signature}
             />
             Method by
-            <AddressLink address={transaction.from} formatted />
+            <AddressLink address={from} formatted />
             on
-            <AddressLink address={transaction.to} formatted />
+            <AddressLink address={actualTo} formatted />
           </>
         )}
       </div>
     </DescriptionListItem>
   );
 };
-
 export default TransactionAction;

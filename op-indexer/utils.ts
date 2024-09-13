@@ -26,6 +26,7 @@ import {
   Erc20Transfer as PrismaErc20Transfer,
   NftTransfer as PrismaNftTransfer,
   TransactionEnqueued as PrismaTransactionEnqueued,
+  Account as PrismaAccount,
 } from "@/prisma/generated/client";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { prisma } from "@/lib/prisma";
@@ -211,6 +212,18 @@ const toPrismaTransactionEnqueued = ({
   gasLimit: `0x${gasLimit.toString(16)}`,
 });
 
+const toPrismaAccount = ({
+  address,
+  bytecode,
+  transactionHash,
+  contract,
+}: Account): PrismaAccount => ({
+  address,
+  bytecode,
+  transactionHash,
+  contract: contract ? JSON.stringify(contract) : null,
+});
+
 const indexAccount = async (
   address: Address,
   accounts: Map<Address, Hex | null>,
@@ -322,6 +335,7 @@ export const indexL2Block = async (blockNumber: bigint) => {
         address: getAddress(transactionReceipt.contractAddress),
         bytecode: bytecode ?? null,
         transactionHash: transactionReceipt.transactionHash,
+        contract: null,
       });
     }
   }
@@ -402,8 +416,8 @@ export const indexL2Block = async (blockNumber: bigint) => {
     ...Array.from(contractDeployments).map(([, account]) =>
       prisma.account.upsert({
         where: { address: account.address },
-        create: account,
-        update: account,
+        create: toPrismaAccount(account),
+        update: toPrismaAccount(account),
       }),
     ),
     ...Array.from(accounts).map(([address, bytecode]) =>

@@ -1,18 +1,21 @@
 import { Hash } from "viem";
 import { l2PublicClient } from "@/lib/chains";
-import { Erc20TransferWithToken, TransactionWithReceipt } from "@/lib/types";
+import {
+  Erc20TransferWithToken,
+  TransactionWithReceiptAndAccounts,
+} from "@/lib/types";
 import { fromViemTransactionWithReceipt } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
 import {
   prisma,
-  fromPrismaTransactionWithReceipt,
+  fromPrismaTransactionWithReceiptAndAccounts,
   fromPrismaErc20TransferWithToken,
 } from "@/lib/prisma";
 import { parseErc20Transfers } from "@/lib/utils";
 import getErc20Contract from "@/lib/contracts/erc-20/contract";
 
 type FetchTransactionDetailsReturnType = {
-  transaction: TransactionWithReceipt | null;
+  transaction: TransactionWithReceiptAndAccounts | null;
   confirmations: bigint;
   erc20Transfers: Erc20TransferWithToken[];
 };
@@ -25,6 +28,7 @@ const fetchTransactionDetailsFromDatabase = async (
       where: { hash },
       include: {
         receipt: { include: { erc20Transfers: { include: { token: true } } } },
+        accounts: true,
       },
     }),
     l2PublicClient.getTransactionConfirmations({ hash }),
@@ -34,7 +38,10 @@ const fetchTransactionDetailsFromDatabase = async (
   }
   const signature = await loadFunctions(transaction.input.slice(0, 10));
   return {
-    transaction: fromPrismaTransactionWithReceipt(transaction, signature),
+    transaction: fromPrismaTransactionWithReceiptAndAccounts(
+      transaction,
+      signature,
+    ),
     confirmations,
     erc20Transfers: transaction.receipt.erc20Transfers.map(
       fromPrismaErc20TransferWithToken,
@@ -78,12 +85,15 @@ const fetchTransactionDetailsFromJsonRpc = async (
     }),
   );
   return {
-    transaction: fromViemTransactionWithReceipt(
-      transaction,
-      transactionReceipt,
-      block.timestamp,
-      signature,
-    ),
+    transaction: {
+      ...fromViemTransactionWithReceipt(
+        transaction,
+        transactionReceipt,
+        block.timestamp,
+        signature,
+      ),
+      accounts: [],
+    },
     confirmations,
     erc20Transfers: erc20TransfersWithToken,
   };

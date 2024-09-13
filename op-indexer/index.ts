@@ -7,12 +7,12 @@ import { indexL1Block, indexL2Block } from "./utils";
 
 const l1PublicClientWs = createPublicClient({
   chain: l1Chain,
-  transport: webSocket(process.env.L1_RPC_WSS),
+  transport: webSocket(process.env.L1_RPC_WS),
 });
 
 const l2PublicClientWs = createPublicClient({
   chain: l2Chain,
-  transport: webSocket(process.env.L2_RPC_WSS),
+  transport: webSocket(process.env.L2_RPC_WS),
 });
 
 const deployConfig = { l1ChainId: l1Chain.id, l2ChainId: l2Chain.id };
@@ -83,7 +83,7 @@ l2PublicClientWs.watchBlockNumber({
   onBlockNumber: (blockNumber) => l2BlocksToIndex.add(blockNumber),
 });
 
-const indexDelay = Number(values["index-delay"] ?? "1000");
+const indexDelay = Number(values["index-delay"] ?? "400");
 
 setInterval(async () => {
   const [blockNumber] = l1BlocksToIndex;

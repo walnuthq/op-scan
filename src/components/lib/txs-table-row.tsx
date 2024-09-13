@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Address, zeroAddress, formatEther as viemFormatEther } from "viem";
-import { TransactionWithReceipt } from "@/lib/types";
+import { TransactionWithReceiptAndAccounts } from "@/lib/types";
 import {
   formatTimestamp,
   formatEther,
@@ -21,14 +21,18 @@ const TxsTableRow = ({
   ethPrice,
   address,
 }: {
-  transaction: TransactionWithReceipt;
+  transaction: TransactionWithReceiptAndAccounts;
   timestampFormattedAsDate: boolean;
   usdValueShown: boolean;
   txGasPriceShown: boolean;
   ethPrice: number;
   address?: Address;
 }) => {
+  const account =
+    transaction.accounts.length === 1 ? transaction.accounts[0] : undefined;
   const { distance, utc } = formatTimestamp(transaction.timestamp);
+  const actualTo =
+    transaction.to ?? (account ? account.address : null) ?? zeroAddress;
   return (
     <TableRow>
       <TableCell className="max-w-40">
@@ -46,6 +50,7 @@ const TxsTableRow = ({
         <TxMethodBadge
           selector={transaction.input.slice(0, 10)}
           signature={transaction.signature}
+          account={account}
         />
       </TableCell>
       <TableCell>
@@ -80,8 +85,8 @@ const TxsTableRow = ({
       )}
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
-          <AddressLink address={transaction.to ?? zeroAddress} formatted />
-          <CopyButton content="Copy To" copy={transaction.to ?? ""} />
+          <AddressLink address={actualTo} formatted />
+          <CopyButton content="Copy To" copy={actualTo} />
         </div>
       </TableCell>
       <TableCell>

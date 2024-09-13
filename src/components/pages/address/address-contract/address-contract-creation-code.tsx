@@ -1,6 +1,6 @@
 import { Hex } from "viem";
 import { SquareCode } from "lucide-react";
-import PreCard from "@/components/pages/address/address-contract/pre-card";
+import PreCard from "@/components/lib/pre-card";
 import CopyButton from "@/components/lib/copy-button";
 
 const AddressContractCreationCode = ({

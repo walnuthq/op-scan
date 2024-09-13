@@ -1,5 +1,8 @@
 import { Address } from "viem";
-import { prisma, fromPrismaTransactionWithReceipt } from "@/lib/prisma";
+import {
+  prisma,
+  fromPrismaTransactionWithReceiptAndAccounts,
+} from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
 
 const fetchTransactions = async (address: Address, page: number) => {
@@ -11,7 +14,7 @@ const fetchTransactions = async (address: Address, page: number) => {
     prisma.transaction.findMany({
       where,
       orderBy: [{ blockNumber: "desc" }, { transactionIndex: "desc" }],
-      include: { receipt: true },
+      include: { receipt: true, accounts: true },
       take: txsPerPage,
       skip: (page - 1) * txsPerPage,
     }),
@@ -22,7 +25,10 @@ const fetchTransactions = async (address: Address, page: number) => {
   );
   return {
     transactions: prismaTransactions.map((prismaTransaction, i) =>
-      fromPrismaTransactionWithReceipt(prismaTransaction, signatures[i]),
+      fromPrismaTransactionWithReceiptAndAccounts(
+        prismaTransaction,
+        signatures[i],
+      ),
     ),
     totalCount,
   };
