@@ -22,7 +22,7 @@ const SignatureParameter = ({
     <div className="inline-flex gap-1">
       {input.indexed && <span>index_topic_{index + 1}</span>}
       <span className="text-green-500">{input.type}</span>
-      <span className="text-red-500">{input.name}</span>
+      {input.name && <span className="text-red-500">{input.name}</span>}
     </div>
     {index !== inputsCount - 1 && <span className="mr-1">,</span>}
   </Fragment>
