@@ -1,6 +1,7 @@
 import { l2PublicClient } from "@/lib/chains";
-import { Block, fromViemBlock, fromPrismaBlock } from "@/lib/types";
-import { prisma } from "@/lib/prisma";
+import { Block } from "@/lib/types";
+import { fromViemBlock } from "@/lib/viem";
+import { prisma, fromPrismaBlock } from "@/lib/prisma";
 
 const fetchBlockDetailsFromDatabase = async (
   number: bigint,
@@ -9,10 +10,7 @@ const fetchBlockDetailsFromDatabase = async (
     where: { number },
     include: { transactions: { select: { hash: true } } },
   });
-  if (!block) {
-    return fetchBlockDetailsFromJsonRpc(number);
-  }
-  return fromPrismaBlock(block);
+  return block ? fromPrismaBlock(block) : fetchBlockDetailsFromJsonRpc(number);
 };
 
 const fetchBlockDetailsFromJsonRpc = async (
@@ -21,6 +19,7 @@ const fetchBlockDetailsFromJsonRpc = async (
   const block = await l2PublicClient.getBlock({ blockNumber: number });
   return block ? fromViemBlock(block) : null;
 };
+
 const fetchBlockDetails = process.env.DATABASE_URL
   ? fetchBlockDetailsFromDatabase
   : fetchBlockDetailsFromJsonRpc;

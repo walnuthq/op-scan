@@ -1,23 +1,24 @@
-import { Address } from "viem";
+import { notFound, permanentRedirect } from "next/navigation";
+import { isAddress, getAddress } from "viem";
 import AddressNftTransfers from "@/components/pages/address/address-nft-transfers";
-import { getLatestNftTransferEvents } from "@/lib/fetch-data";
 
-const AddressNftTransfersPage = async ({
-  params: { address },
+const AddressNftTransfersPage = ({
+  params: { address: rawAddress },
+  searchParams: { page },
 }: {
-  params: { address: Address };
+  params: { address: string };
+  searchParams: { page?: string };
 }) => {
-  let nftTransferEvents;
-  try {
-    nftTransferEvents = await getLatestNftTransferEvents(address);
-  } catch (error) {
-    console.error("Error Transfer:", error);
+  if (!isAddress(rawAddress)) {
+    notFound();
+  }
+  const address = getAddress(rawAddress);
+  if (rawAddress !== address) {
+    permanentRedirect(`/address/${address}/nft-transfers`);
   }
   return (
-    <AddressNftTransfers
-      address={address as Address}
-      nftTokenTransfers={nftTransferEvents}
-    />
+    <AddressNftTransfers address={address} page={page ? Number(page) : 1} />
   );
 };
+
 export default AddressNftTransfersPage;

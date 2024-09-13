@@ -1,20 +1,23 @@
 import { Hash } from "viem";
 import { l2PublicClient } from "@/lib/chains";
 import {
-  ERC20Transfer,
-  fromViemTransactionWithReceipt,
-  TransactionWithReceipt,
-  fromPrismaTransactionWithReceipt,
-  fromPrismaERC20Transfer,
+  Erc20TransferWithToken,
+  TransactionWithReceiptAndAccounts,
 } from "@/lib/types";
+import { fromViemTransactionWithReceipt } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
-import { prisma } from "@/lib/prisma";
-import { parseERC20Transfers } from "@/lib/utils";
+import {
+  prisma,
+  fromPrismaTransactionWithReceiptAndAccounts,
+  fromPrismaErc20TransferWithToken,
+} from "@/lib/prisma";
+import { parseErc20Transfers } from "@/lib/utils";
+import getErc20Contract from "@/lib/contracts/erc-20/contract";
 
 type FetchTransactionDetailsReturnType = {
-  transaction: TransactionWithReceipt | null;
+  transaction: TransactionWithReceiptAndAccounts | null;
   confirmations: bigint;
-  erc20Transfers: ERC20Transfer[];
+  erc20Transfers: Erc20TransferWithToken[];
 };
 
 const fetchTransactionDetailsFromDatabase = async (
@@ -23,7 +26,10 @@ const fetchTransactionDetailsFromDatabase = async (
   const [transaction, confirmations] = await Promise.all([
     prisma.transaction.findUnique({
       where: { hash },
-      include: { receipt: { include: { erc20Transfers: true } } },
+      include: {
+        receipt: { include: { erc20Transfers: { include: { token: true } } } },
+        accounts: true,
+      },
     }),
     l2PublicClient.getTransactionConfirmations({ hash }),
   ]);
@@ -32,14 +38,13 @@ const fetchTransactionDetailsFromDatabase = async (
   }
   const signature = await loadFunctions(transaction.input.slice(0, 10));
   return {
-    transaction: fromPrismaTransactionWithReceipt(
+    transaction: fromPrismaTransactionWithReceiptAndAccounts(
       transaction,
-      transaction.receipt,
       signature,
     ),
     confirmations,
     erc20Transfers: transaction.receipt.erc20Transfers.map(
-      fromPrismaERC20Transfer,
+      fromPrismaErc20TransferWithToken,
     ),
   };
 };
@@ -61,18 +66,36 @@ const fetchTransactionDetailsFromJsonRpc = async (
   const [block, confirmations, erc20Transfers, signature] = await Promise.all([
     l2PublicClient.getBlock({ blockNumber: transaction.blockNumber }),
     l2PublicClient.getTransactionConfirmations({ transactionReceipt }),
-    parseERC20Transfers(transactionReceipt.logs),
+    parseErc20Transfers(transactionReceipt.logs),
     loadFunctions(transaction.input.slice(0, 10)),
   ]);
+  const erc20TransfersWithToken = await Promise.all(
+    erc20Transfers.map(async (erc20Transfer) => {
+      const contract = getErc20Contract(erc20Transfer.address);
+      const decimals = await contract.read.decimals();
+      return {
+        ...erc20Transfer,
+        token: {
+          address: erc20Transfer.address,
+          name: "",
+          symbol: "",
+          decimals,
+        },
+      };
+    }),
+  );
   return {
-    transaction: fromViemTransactionWithReceipt(
-      transaction,
-      transactionReceipt,
-      block.timestamp,
-      signature,
-    ),
+    transaction: {
+      ...fromViemTransactionWithReceipt(
+        transaction,
+        transactionReceipt,
+        block.timestamp,
+        signature,
+      ),
+      accounts: [],
+    },
     confirmations,
-    erc20Transfers,
+    erc20Transfers: erc20TransfersWithToken,
   };
 };
 

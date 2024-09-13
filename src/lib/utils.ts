@@ -1,5 +1,4 @@
 import { type ClassValue, clsx } from "clsx";
-import { ABIEventExtended, DecodedArgs } from "@/interfaces";
 import { twMerge } from "tailwind-merge";
 import { fromUnixTime, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
@@ -12,19 +11,12 @@ import {
   Log,
   getAddress,
   parseEventLogs,
-  toHex,
-  isHex,
-  toBytes,
 } from "viem";
 import { capitalize } from "lodash";
-import { ERC20Transfer, ERC721Transfer, ERC1155Transfer } from "@/lib/types";
+import { Erc20Transfer, NftTransfer } from "@/lib/types";
 import erc20Abi from "@/lib/contracts/erc-20/abi";
-import getERC20Contract from "@/lib/contracts/erc-20/contract";
 import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
-import getERC721Contract from "@/lib/contracts/erc-721/contract";
-import { l2PublicClient } from "@/lib/chains";
-import { loadEvents } from "@/lib/signatures";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -80,8 +72,10 @@ export const formatTimestamp = (timestamp: bigint) => {
 export const formatAddress = (address: Address) =>
   `${address.slice(0, 10)}…${address.slice(-8)}`;
 
-export const formatNumber = (value: bigint) =>
-  new Intl.NumberFormat("en-US").format(value);
+export const formatNumber = (
+  value: number | bigint,
+  options?: Intl.NumberFormatOptions,
+) => new Intl.NumberFormat("en-US", options).format(value);
 
 export const formatGas = (value: bigint, total: bigint = BigInt(1)) => ({
   value: formatNumber(value),
@@ -96,200 +90,121 @@ export const formatTransactionType = (type: TransactionType, typeHex: Hex) => {
   return `${Number(typeHex)} (${typeString})`;
 };
 
-export const parseERC20Transfers = (logs: Log[]): Promise<ERC20Transfer[]> =>
-  Promise.all(
-    parseEventLogs({
-      abi: erc20Abi,
-      eventName: "Transfer",
-      logs,
-    }).map(async ({ transactionHash, logIndex, args, address }) => {
-      const contract = getERC20Contract(address);
-      const decimals = await contract.read.decimals();
-      const name = await contract.read.name();
-      const symbol = await contract.read.symbol();
-      return {
-        transactionHash,
-        logIndex,
-        address: getAddress(address),
-        from: args.from,
-        to: args.to,
-        value: args.value,
-        decimals,
-        name,
-        symbol,
-      };
+export const parseErc20Transfers = (logs: Log[]): Erc20Transfer[] =>
+  parseEventLogs({
+    abi: erc20Abi,
+    eventName: "Transfer",
+    logs,
+  }).map(
+    ({
+      blockNumber,
+      transactionIndex,
+      logIndex,
+      transactionHash,
+      args,
+      address,
+    }) => ({
+      blockNumber,
+      transactionIndex,
+      logIndex,
+      transactionHash,
+      address: getAddress(address),
+      from: getAddress(args.from),
+      to: getAddress(args.to),
+      value: args.value,
     }),
   );
 
-export const parseERC721Transfers = (logs: Log[]): Promise<ERC721Transfer[]> =>
-  Promise.all(
-    parseEventLogs({
-      abi: erc721Abi,
-      eventName: "Transfer",
-      logs,
-    }).map(async ({ transactionHash, logIndex, args, address }) => {
-      const contract = getERC721Contract(address);
-      const name = await contract.read.name();
-      const symbol = await contract.read.symbol();
-
-      return {
-        transactionHash,
-        logIndex,
-        address: getAddress(address),
-        from: args.from,
-        to: args.to,
-        tokenId: args.tokenId,
-        name,
-        symbol,
-      };
+export const parseErc721Transfers = (logs: Log[]): NftTransfer[] =>
+  parseEventLogs({
+    abi: erc721Abi,
+    eventName: "Transfer",
+    logs,
+  }).map(
+    ({
+      blockNumber,
+      transactionIndex,
+      logIndex,
+      transactionHash,
+      args,
+      address,
+    }) => ({
+      blockNumber,
+      transactionIndex,
+      logIndex,
+      transactionHash,
+      address: getAddress(address),
+      operator: null,
+      from: getAddress(args.from),
+      to: getAddress(args.to),
+      tokenId: args.tokenId,
+      value: BigInt(1),
+      erc721TokenAddress: getAddress(address),
+      erc1155TokenAddress: null,
     }),
   );
 
-export const parseERC1155Transfers = (logs: Log[]): ERC1155Transfer[] => {
+export const parseErc1155Transfers = (logs: Log[]): NftTransfer[] => {
   const transfersSingle = parseEventLogs({
     abi: erc1155Abi,
     eventName: "TransferSingle",
     logs,
-  }).map(({ transactionHash, logIndex, args, address }) => ({
-    transactionHash,
-    logIndex,
-    address: getAddress(address),
-    operator: args.operator,
-    from: args.from,
-    to: args.to,
-    id: args.id,
-    value: args.value,
-  }));
+  }).map(
+    ({
+      blockNumber,
+      transactionIndex,
+      logIndex,
+      transactionHash,
+      args,
+      address,
+    }) => ({
+      blockNumber,
+      transactionIndex,
+      logIndex,
+      transactionHash,
+      address: getAddress(address),
+      operator: getAddress(args.operator),
+      from: getAddress(args.from),
+      to: getAddress(args.to),
+      tokenId: args.id,
+      value: args.value,
+      erc721TokenAddress: null,
+      erc1155TokenAddress: getAddress(address),
+    }),
+  );
   const transfersBatch = parseEventLogs({
     abi: erc1155Abi,
     eventName: "TransferBatch",
     logs,
-  }).reduce<ERC1155Transfer[]>(
-    (previousValue, { transactionHash, logIndex, args, address }) => [
-      ...previousValue,
-      ...args.ids.map((id, i) => ({
-        transactionHash,
+  }).reduce<NftTransfer[]>(
+    (
+      previousValue,
+      {
+        blockNumber,
+        transactionIndex,
         logIndex,
+        transactionHash,
+        args,
+        address,
+      },
+    ) => [
+      ...previousValue,
+      ...args.ids.map((tokenId, i) => ({
+        blockNumber,
+        transactionIndex,
+        logIndex,
+        transactionHash,
         address: getAddress(address),
-        operator: args.operator,
-        from: args.from,
-        to: args.to,
-        id,
+        operator: getAddress(args.operator),
+        from: getAddress(args.from),
+        to: getAddress(args.to),
+        tokenId,
         value: args.values[i],
+        erc721TokenAddress: null,
+        erc1155TokenAddress: getAddress(address),
       })),
     ],
     [],
   );
   return [...transfersSingle, ...transfersBatch];
 };
-
-const decodeData = (
-  data: string,
-): { hex: string; number: string; address: string }[] => {
-  const decoded: { hex: string; number: string; address: string }[] = [];
-
-  if (!isHex(data)) {
-    return [];
-  }
-
-  const dataBytes = toBytes(data);
-
-  for (let i = 0; i < dataBytes.length; i += 32) {
-    const value = dataBytes.slice(i, i + 32);
-    const hexValue = toHex(value);
-
-    let formattedValue: { hex: string; number: string; address: string } = {
-      hex: hexValue,
-      number: "N/A",
-      address: "N/A",
-    };
-
-    try {
-      const numberValue = BigInt(hexValue);
-      formattedValue.number = numberValue.toString();
-    } catch (error) {
-      console.error(`Error converting hex to number at index ${i}:`, error);
-    }
-
-    try {
-      if (value.length === 20) {
-        const addressValue = getAddress(hexValue);
-        formattedValue.address = addressValue;
-      } else if (value.length === 32) {
-        const addressValue = getAddress(toHex(value.slice(12)));
-        formattedValue.address = addressValue;
-      }
-    } catch (error) {
-      console.error(`Error converting hex to address at index ${i}:`, error);
-    }
-
-    decoded.push(formattedValue);
-  }
-
-  return decoded;
-};
-
-export const formatEventLog = async (
-  log: Log,
-  abi: ABIEventExtended[],
-): Promise<{ eventName: string; method: string; args: DecodedArgs }> => {
-  const eventFragment = abi.find(
-    (item) => item.type === "event" && item.hash === log.topics[0],
-  );
-  if (!eventFragment) {
-    return {
-      eventName: "Unknown",
-      method: log.topics?.[0]?.slice(0, 10) || "Unknown",
-      args: {
-        function: "Unknown function",
-        topics: log.topics,
-        data: log.data,
-        decoded: decodeData(log.data),
-      },
-    };
-  }
-
-  const eventSignatures = await loadEvents(log.topics[0] as Address);
-  const eventName = eventSignatures.length > 0 ? eventSignatures : "Unknown";
-
-  let methodID = "Unknown";
-  if (log.transactionHash) {
-    try {
-      const transaction = await l2PublicClient.getTransaction({
-        hash: log.transactionHash as Address,
-      });
-      methodID = transaction.input.slice(0, 10);
-    } catch (error) {
-      console.error(
-        `Error fetching transaction for log: ${log.transactionHash}`,
-        error,
-      );
-    }
-  }
-
-  const decodedLog: DecodedArgs = {
-    function: `${eventName}`,
-    topics: log.topics,
-    data: log.data,
-    decoded: decodeData(log.data),
-  };
-
-  return {
-    eventName,
-    method: methodID,
-    args: decodedLog,
-  };
-};
-
-/**
- * using a 3rd party gateway to fetch content from IPFS
- * can use ipfs.io
- * the gateway was not working for me so using gateway.pinata.cloud
- */
-export const convertIpfsToHttp = (ipfsUri: string): string => {
-  const ipfsHash = ipfsUri.replace("ipfs://", "");
-  return `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
-};
-
-export const NftPlaceholderImage =
-  "https://optimistic.etherscan.io/images/main/nft-placeholder.svg";

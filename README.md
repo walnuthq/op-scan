@@ -3,7 +3,7 @@
 >
 > - [x] Milestone 1: Homepage and basic nav (current stage)
 > - [x] Milestone 2: Tx detail page
-> - [ ] Milestone 3: Contract detail page
+> - [x] Milestone 3: Contract detail page
 > - [ ] Milestone 4: Feedback incorporation and polish
 
 # 🔎 OP Scan
@@ -28,11 +28,11 @@ OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/bu
 The app requires the following dependencies:
 
 ```
-NodeJS >= 20
+NodeJS >= 22
 pnpm >= 9
 ```
 
-### Run the Explorer Locally
+### Explorer Configuration
 
 Clone this repository:
 
@@ -64,38 +64,23 @@ You can get free node rpcs url by signing up to services such as [Alchemy](https
 You will also need to provide your L1 contracts addresses:
 
 ```
-NEXT_PUBLIC_DISPUTE_GAME_FACTORY_ADDRESS="..."
-NEXT_PUBLIC_L2_OUTPUT_ORACLE_ADDRESS="..."
 NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS="..."
-NEXT_PUBLIC_L1_STANDARD_BRIDGE_ADDRESS="..."
 NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS="..."
 ```
 
 You will find theses addresses in your rollup deployment artifacts in `contracts-bedrock/deployments/your-deployment/L1Contract.json`.
 Note that you always need to provide the proxy address, not the underlying contract.
 
-If you don't want to run the explorer with your local chain setup, you will find all the necessary environment variables commented in `.env.local.example` to configure the explorer with OP Mainnet.
+If you don't want to run the explorer with your local chain setup, you will find all the necessary environment variables commented in `.env.local.example` to configure the explorer with OP Sepolia or OP Mainnet.
 
-When you're done configuring your environment variables you can build the app:
-
-```
-pnpm build
-```
-
-Make sure your local chain is started and launch the explorer to see it running at `http://localhost:3000`
-
-```
-pnpm start
-```
-
-### Run the Indexer
+### Indexer Configuration
 
 To run the indexer, you first need to setup your `DATABASE_URL` in `.env.local` as well as websocket connections to your L1/L2 chains (once again you can get them from a 3rd-party provider):
 
 ```
 DATABASE_URL="file:dev.db"
-L1_RPC_WSS="wss://eth-mainnet.g.alchemy.com/v2/API_KEY"
-L2_RPC_WSS="wss://opt-mainnet.g.alchemy.com/v2/API_KEY"
+L1_RPC_WS="wss://eth-mainnet.g.alchemy.com/v2/API_KEY"
+L2_RPC_WS="wss://opt-mainnet.g.alchemy.com/v2/API_KEY"
 ```
 
 Then you can sync your local database with the Prisma schema:
@@ -125,13 +110,15 @@ pnpm prisma:db:push
 ```
 
 Indexing a blockchain is putting a heavy load on the RPC as you need to perform a large number of JSON-RPC requests to fully index a block (along with transactions and logs).
-You will probably meet 429 errors related to rate-limiting, you may provide up to 2 fallback RPC URLs in case this happens:
+When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 3 fallback RPC URLs in case this happens:
 
 ```
 NEXT_PUBLIC_L1_FALLBACK1_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK1_API_KEY"
 NEXT_PUBLIC_L2_FALLBACK1_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK1_API_KEY"
 NEXT_PUBLIC_L1_FALLBACK2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK2_API_KEY"
 NEXT_PUBLIC_L2_FALLBACK2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK2_API_KEY"
+NEXT_PUBLIC_L1_FALLBACK3_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK3_API_KEY"
+NEXT_PUBLIC_L2_FALLBACK3_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK3_API_KEY"
 ```
 
 You can pass several parameters to the indexer to control the indexing range and execution:
@@ -146,6 +133,26 @@ Example of running the indexer:
 
 ```
 pnpm op-indexer -f 123416717 --l1-index-block 20426733 --l1-index-block 20426726 -d 500
+```
+
+### Running the Explorer
+
+When you're done configuring your environment variables you can build the app:
+
+```
+pnpm build
+```
+
+Make sure your local chain is started and the indexer is running, then launch the explorer to see it live at `http://localhost:3000`
+
+```
+pnpm start
+```
+
+Alternatively you can launch the explorer in dev mode if you want to customize it
+
+```
+pnpm dev
 ```
 
 # 🚀 Deploying

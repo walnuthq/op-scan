@@ -1,35 +1,42 @@
-import { Log, getAddress } from "viem";
+import { Log, getAddress, Address, Hex } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
 } from "viem/op-stack";
 import {
+  Account,
+  Erc20Token,
+  Erc20Transfer,
+  Erc721Token,
+  Erc1155Token,
+  NftTransfer,
+  TransactionEnqueued,
+} from "@/lib/types";
+import {
   ViemBlockWithTransactions,
   ViemLog,
   ViemTransaction,
   ViemTransactionReceipt,
-  ERC20Transfer,
-  ERC721Transfer,
-  ERC1155Transfer,
-  TransactionEnqueued,
-} from "@/lib/types";
+} from "@/lib/viem";
 import {
   Block as PrismaBlock,
   Transaction as PrismaTransaction,
   TransactionReceipt as PrismaTransactionReceipt,
   Log as PrismaLog,
-  erc20Transfer as PrismaERC20Transfer,
-  erc721Transfer as PrismaERC721Transfer,
-  erc1155Transfer as PrismaERC1155Transfer,
+  Erc20Transfer as PrismaErc20Transfer,
+  NftTransfer as PrismaNftTransfer,
   TransactionEnqueued as PrismaTransactionEnqueued,
+  Account as PrismaAccount,
 } from "@/prisma/generated/client";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { prisma } from "@/lib/prisma";
 import {
-  parseERC20Transfers,
-  parseERC721Transfers,
-  parseERC1155Transfers,
+  parseErc20Transfers,
+  parseErc721Transfers,
+  parseErc1155Transfers,
 } from "@/lib/utils";
+import getErc20Contract from "@/lib/contracts/erc-20/contract";
+import getErc721Contract from "@/lib/contracts/erc-721/contract";
 import portal from "@/lib/contracts/portal/contract";
 import l1CrossDomainMessenger from "@/lib/contracts/l1-cross-domain-messenger/contract";
 
@@ -137,66 +144,56 @@ const toPrismaLog = ({
   topics: topics.join(","),
 });
 
-const toPrismaERC20Transfer = ({
-  transactionHash,
+const toPrismaErc20Transfer = ({
+  blockNumber,
+  transactionIndex,
   logIndex,
+  transactionHash,
   address,
   from,
   to,
   value,
-  decimals,
-  name,
-  symbol,
-}: ERC20Transfer): PrismaERC20Transfer => ({
-  transactionHash,
+}: Erc20Transfer): PrismaErc20Transfer => ({
+  blockNumber,
+  transactionIndex,
   logIndex,
-  address,
-  from,
-  to,
+  transactionHash,
+  address: getAddress(address),
+  from: getAddress(from),
+  to: getAddress(to),
   value: `0x${value.toString(16)}`,
-  decimals,
-  name,
-  symbol,
 });
 
-const toPrismaERC721Transfer = ({
-  transactionHash,
+const toPrismaNftTransfer = ({
+  blockNumber,
+  transactionIndex,
   logIndex,
+  transactionHash,
   address,
+  operator,
   from,
   to,
   tokenId,
-  name,
-  symbol,
-}: ERC721Transfer): PrismaERC721Transfer => ({
-  transactionHash,
-  logIndex,
-  address,
-  from,
-  to,
-  tokenId: `0x${tokenId.toString(16)}`,
-  name,
-  symbol,
-});
-
-const toPrismaERC1155Transfer = ({
-  transactionHash,
-  logIndex,
-  address,
-  operator,
-  from,
-  to,
-  id,
   value,
-}: ERC1155Transfer): PrismaERC1155Transfer => ({
-  transactionHash,
+  erc721TokenAddress,
+  erc1155TokenAddress,
+}: NftTransfer): PrismaNftTransfer => ({
+  blockNumber,
+  transactionIndex,
   logIndex,
-  address,
-  operator,
-  from,
-  to,
-  id: `0x${id.toString(16)}`,
+  transactionHash,
+  address: getAddress(address),
+  operator: operator ? getAddress(operator) : null,
+  from: getAddress(from),
+  to: getAddress(to),
+  tokenId: `0x${tokenId.toString(16)}`,
   value: `0x${value.toString(16)}`,
+  erc721TokenAddress: erc721TokenAddress
+    ? getAddress(erc721TokenAddress)
+    : null,
+  erc1155TokenAddress: erc1155TokenAddress
+    ? getAddress(erc1155TokenAddress)
+    : null,
 });
 
 const toPrismaTransactionEnqueued = ({
@@ -211,9 +208,96 @@ const toPrismaTransactionEnqueued = ({
   l2TxHash,
   timestamp,
   l1TxHash,
-  l1TxOrigin,
+  l1TxOrigin: getAddress(l1TxOrigin),
   gasLimit: `0x${gasLimit.toString(16)}`,
 });
+
+const toPrismaAccount = ({
+  address,
+  bytecode,
+  transactionHash,
+  contract,
+}: Account): PrismaAccount => ({
+  address,
+  bytecode,
+  transactionHash,
+  contract: contract ? JSON.stringify(contract) : null,
+});
+
+const indexAccount = async (
+  address: Address,
+  accounts: Map<Address, Hex | null>,
+) => {
+  const account = await prisma.account.findUnique({
+    where: { address },
+  });
+  if (account || accounts.get(address)) {
+    return;
+  }
+  const bytecode = await l2PublicClient.getCode({ address });
+  accounts.set(address, bytecode ?? null);
+};
+
+const indexErc20Token = async (
+  address: Address,
+  erc20Tokens: Map<Address, Erc20Token>,
+) => {
+  const erc20Token = await prisma.erc20Token.findUnique({
+    where: { address },
+  });
+  if (erc20Token || erc20Tokens.get(address)) {
+    return;
+  }
+  const contract = getErc20Contract(address);
+  const [name, symbol, decimals] = await Promise.all([
+    contract.read.name(),
+    contract.read.symbol(),
+    contract.read.decimals(),
+  ]);
+  erc20Tokens.set(address, {
+    address,
+    name,
+    symbol,
+    decimals,
+  });
+};
+
+const indexErc721Token = async (
+  address: Address,
+  erc721Tokens: Map<Address, Erc721Token>,
+) => {
+  const erc721Token = await prisma.erc721Token.findUnique({
+    where: { address },
+  });
+  if (erc721Token || erc721Tokens.get(address)) {
+    return;
+  }
+  const contract = getErc721Contract(address);
+  const [name, symbol] = await Promise.all([
+    contract.read.name(),
+    contract.read.symbol(),
+  ]);
+  erc721Tokens.set(address, {
+    address,
+    name,
+    symbol,
+  });
+};
+
+const indexErc1155Token = async (
+  address: Address,
+  erc1155Tokens: Map<Address, Erc1155Token>,
+) => {
+  const erc1155Token = await prisma.erc1155Token.findUnique({
+    where: { address },
+  });
+  if (erc1155Token || erc1155Tokens.get(address)) {
+    return;
+  }
+  erc1155Tokens.set(address, {
+    address,
+  });
+};
 
 export const indexL2Block = async (blockNumber: bigint) => {
   const block = await l2PublicClient.getBlock({
@@ -221,109 +305,187 @@ export const indexL2Block = async (blockNumber: bigint) => {
     includeTransactions: true,
   });
   const prismaBlock = toPrismaBlock(block);
-  await prisma.block.upsert({
-    where: { number: prismaBlock.number },
-    create: prismaBlock,
-    update: prismaBlock,
-  });
-  const [receipts] = await Promise.all([
-    Promise.all(
-      block.transactions.map(({ hash }) =>
-        l2PublicClient.getTransactionReceipt({ hash }),
-      ),
-    ),
-    Promise.all(
-      block.transactions
-        .map((transaction) => toPrismaTransaction(transaction, block.timestamp))
-        .map((prismaTransaction) =>
-          prisma.transaction.upsert({
-            where: { hash: prismaTransaction.hash },
-            create: prismaTransaction,
-            update: prismaTransaction,
-          }),
-        ),
-    ),
-  ]);
+  const prismaTransactions = block.transactions.map((transaction) =>
+    toPrismaTransaction(transaction, block.timestamp),
+  );
+  const accounts = new Map<Address, Hex | null>();
   await Promise.all(
-    receipts.map(toPrismaTransactionReceipt).map((prismaTransactionReceipt) =>
+    block.transactions.map(({ from, to }) =>
+      Promise.all([
+        indexAccount(getAddress(from), accounts),
+        to ? indexAccount(getAddress(to), accounts) : null,
+      ]),
+    ),
+  );
+  const transactionReceipts = await Promise.all(
+    block.transactions.map(({ hash }) =>
+      l2PublicClient.getTransactionReceipt({ hash }),
+    ),
+  );
+  const prismaTransactionReceipts = transactionReceipts.map(
+    toPrismaTransactionReceipt,
+  );
+  const contractDeployments = new Map<Address, Account>();
+  for (let transactionReceipt of transactionReceipts) {
+    if (transactionReceipt.contractAddress) {
+      const bytecode = await l2PublicClient.getCode({
+        address: transactionReceipt.contractAddress,
+      });
+      contractDeployments.set(transactionReceipt.contractAddress, {
+        address: getAddress(transactionReceipt.contractAddress),
+        bytecode: bytecode ?? null,
+        transactionHash: transactionReceipt.transactionHash,
+        contract: null,
+      });
+    }
+  }
+  const logs = transactionReceipts.reduce<Log[]>(
+    (logs, receipt) => [...logs, ...receipt.logs],
+    [],
+  );
+  await Promise.all(
+    logs.map(({ address }) => indexAccount(getAddress(address), accounts)),
+  );
+  const prismaLogs = logs.map((log) => toPrismaLog(log as ViemLog));
+  const erc20Tokens = new Map<Address, Erc20Token>();
+  const erc20Transfers = parseErc20Transfers(logs);
+  await Promise.all(
+    erc20Transfers.map(({ from, to, address }) =>
+      Promise.all([
+        indexAccount(getAddress(from), accounts),
+        indexAccount(getAddress(to), accounts),
+        indexErc20Token(getAddress(address), erc20Tokens),
+      ]),
+    ),
+  );
+  const erc721Tokens = new Map<Address, Erc721Token>();
+  const erc721Transfers = parseErc721Transfers(logs);
+  await Promise.all(
+    erc721Transfers.map(({ from, to, address }) =>
+      Promise.all([
+        indexAccount(getAddress(from), accounts),
+        indexAccount(getAddress(to), accounts),
+        indexErc721Token(getAddress(address), erc721Tokens),
+      ]),
+    ),
+  );
+  const erc1155Tokens = new Map<Address, Erc1155Token>();
+  const erc1155Transfers = parseErc1155Transfers(logs);
+  await Promise.all(
+    erc1155Transfers.map(({ from, to, address }) =>
+      Promise.all([
+        indexAccount(getAddress(from), accounts),
+        indexAccount(getAddress(to), accounts),
+        indexErc1155Token(getAddress(address), erc1155Tokens),
+      ]),
+    ),
+  );
+  await prisma.$transaction([
+    prisma.block.upsert({
+      where: { number: prismaBlock.number },
+      create: prismaBlock,
+      update: prismaBlock,
+    }),
+    ...prismaTransactions.map((prismaTransaction) =>
+      prisma.transaction.upsert({
+        where: { hash: prismaTransaction.hash },
+        create: prismaTransaction,
+        update: prismaTransaction,
+      }),
+    ),
+    ...prismaTransactionReceipts.map((prismaTransactionReceipt) =>
       prisma.transactionReceipt.upsert({
         where: { transactionHash: prismaTransactionReceipt.transactionHash },
         create: prismaTransactionReceipt,
         update: prismaTransactionReceipt,
       }),
     ),
-  );
-  const logs = receipts.reduce<Log[]>(
-    (logs, receipt) => [...logs, ...receipt.logs],
-    [],
-  );
-  await Promise.all(
-    logs
-      .map((log) => toPrismaLog(log as ViemLog))
-      .map((prismaLog) =>
-        prisma.log.upsert({
-          where: {
-            transactionHash_logIndex: {
-              transactionHash: prismaLog.transactionHash,
-              logIndex: prismaLog.logIndex,
-            },
+    ...prismaLogs.map((prismaLog) =>
+      prisma.log.upsert({
+        where: {
+          blockNumber_transactionIndex_logIndex: {
+            blockNumber: prismaLog.blockNumber,
+            transactionIndex: prismaLog.transactionIndex,
+            logIndex: prismaLog.logIndex,
           },
-          create: prismaLog,
-          update: prismaLog,
-        }),
-      ),
-  );
-  const [erc20Transfers, erc721Transfers, erc1155Transfers] = await Promise.all(
-    [
-      parseERC20Transfers(logs),
-      parseERC721Transfers(logs),
-      parseERC1155Transfers(logs),
-    ],
-  );
-  await Promise.all([
-    Promise.all(
-      erc20Transfers.map(toPrismaERC20Transfer).map((prismaERC20Transfer) =>
-        prisma.erc20Transfer.upsert({
-          where: {
-            transactionHash_logIndex: {
-              transactionHash: prismaERC20Transfer.transactionHash,
-              logIndex: prismaERC20Transfer.logIndex,
-            },
-          },
-          create: prismaERC20Transfer,
-          update: prismaERC20Transfer,
-        }),
-      ),
+        },
+        create: prismaLog,
+        update: prismaLog,
+      }),
     ),
-    Promise.all(
-      erc721Transfers.map(toPrismaERC721Transfer).map((prismaERC721Transfer) =>
-        prisma.erc721Transfer.upsert({
-          where: {
-            transactionHash_logIndex: {
-              transactionHash: prismaERC721Transfer.transactionHash,
-              logIndex: prismaERC721Transfer.logIndex,
-            },
-          },
-          create: prismaERC721Transfer,
-          update: prismaERC721Transfer,
-        }),
-      ),
+    ...Array.from(contractDeployments).map(([, account]) =>
+      prisma.account.upsert({
+        where: { address: account.address },
+        create: toPrismaAccount(account),
+        update: toPrismaAccount(account),
+      }),
     ),
-    Promise.all(
-      erc1155Transfers
-        .map(toPrismaERC1155Transfer)
-        .map((prismaERC1155Transfer) =>
-          prisma.erc1155Transfer.upsert({
-            where: {
-              transactionHash_logIndex: {
-                transactionHash: prismaERC1155Transfer.transactionHash,
-                logIndex: prismaERC1155Transfer.logIndex,
-              },
-            },
-            create: prismaERC1155Transfer,
-            update: prismaERC1155Transfer,
-          }),
-        ),
+    ...Array.from(accounts).map(([address, bytecode]) =>
+      prisma.account.upsert({
+        where: { address },
+        create: { address, bytecode },
+        update: { address, bytecode },
+      }),
+    ),
+    ...Array.from(erc20Tokens).map(([, erc20Token]) =>
+      prisma.erc20Token.upsert({
+        where: { address: erc20Token.address },
+        create: erc20Token,
+        update: erc20Token,
+      }),
+    ),
+    ...erc20Transfers.map(toPrismaErc20Transfer).map((prismaErc20Transfer) =>
+      prisma.erc20Transfer.upsert({
+        where: {
+          blockNumber_transactionIndex_logIndex: {
+            blockNumber: prismaErc20Transfer.blockNumber,
+            transactionIndex: prismaErc20Transfer.transactionIndex,
+            logIndex: prismaErc20Transfer.logIndex,
+          },
+        },
+        create: prismaErc20Transfer,
+        update: prismaErc20Transfer,
+      }),
+    ),
+    ...Array.from(erc721Tokens).map(([, erc721Token]) =>
+      prisma.erc721Token.upsert({
+        where: { address: erc721Token.address },
+        create: erc721Token,
+        update: erc721Token,
+      }),
+    ),
+    ...erc721Transfers.map(toPrismaNftTransfer).map((prismaNftTransfer) =>
+      prisma.nftTransfer.upsert({
+        where: {
+          blockNumber_transactionIndex_logIndex: {
+            blockNumber: prismaNftTransfer.blockNumber,
+            transactionIndex: prismaNftTransfer.transactionIndex,
+            logIndex: prismaNftTransfer.logIndex,
+          },
+        },
+        create: prismaNftTransfer,
+        update: prismaNftTransfer,
+      }),
+    ),
+    ...Array.from(erc1155Tokens).map(([, erc1155Token]) =>
+      prisma.erc1155Token.upsert({
+        where: { address: erc1155Token.address },
+        create: erc1155Token,
+        update: erc1155Token,
+      }),
+    ),
+    ...erc1155Transfers.map(toPrismaNftTransfer).map((prismaNftTransfer) =>
+      prisma.nftTransfer.upsert({
+        where: {
+          blockNumber_transactionIndex_logIndex: {
+            blockNumber: prismaNftTransfer.blockNumber,
+            transactionIndex: prismaNftTransfer.transactionIndex,
+            logIndex: prismaNftTransfer.logIndex,
+          },
+        },
+        create: prismaNftTransfer,
+        update: prismaNftTransfer,
+      }),
     ),
   ]);
 };
@@ -354,26 +516,25 @@ export const indexL1Block = async (blockNumber: bigint) => {
         l2TxHash: getL2TransactionHash({ log: transactionDepositedLog }),
         l1TxHash: transactionDepositedLog.transactionHash,
         timestamp,
-        l1TxOrigin: transactionDepositedLog.args.from,
+        l1TxOrigin: getAddress(transactionDepositedLog.args.from),
         gasLimit: sentMessageLog.args.gasLimit,
       };
     })
     .filter((transactionEnqueued) => transactionEnqueued !== null);
-  const prismaTransactionsEnqueued = transactionsEnqueued.map(
-    toPrismaTransactionEnqueued,
-  );
-  await Promise.all(
-    prismaTransactionsEnqueued.map((prismaTransactionEnqueued) =>
-      prisma.transactionEnqueued.upsert({
-        where: {
-          l1BlockNumber_l2TxHash: {
-            l1BlockNumber: prismaTransactionEnqueued.l1BlockNumber,
-            l2TxHash: prismaTransactionEnqueued.l2TxHash,
+  await prisma.$transaction(
+    transactionsEnqueued
+      .map(toPrismaTransactionEnqueued)
+      .map((prismaTransactionEnqueued) =>
+        prisma.transactionEnqueued.upsert({
+          where: {
+            l1BlockNumber_l2TxHash: {
+              l1BlockNumber: prismaTransactionEnqueued.l1BlockNumber,
+              l2TxHash: prismaTransactionEnqueued.l2TxHash,
+            },
           },
-        },
-        create: prismaTransactionEnqueued,
-        update: prismaTransactionEnqueued,
-      }),
-    ),
+          create: prismaTransactionEnqueued,
+          update: prismaTransactionEnqueued,
+        }),
+      ),
   );
 };

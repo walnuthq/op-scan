@@ -1,24 +1,23 @@
-import { Address } from "viem";
+import { notFound, permanentRedirect } from "next/navigation";
+import { isAddress, getAddress } from "viem";
 import AddressTokenTransfers from "@/components/pages/address/address-token-transfers";
-import { getLatestTransferEvents } from "@/lib/fetch-data";
 
-const AddressTokenTransfersPage = async ({
-  params: { address },
+const AddressTokenTransfersPage = ({
+  params: { address: rawAddress },
+  searchParams: { page },
 }: {
-  params: { address: Address };
+  params: { address: string };
+  searchParams: { page?: string };
 }) => {
-  let transferEvents;
-  try {
-    transferEvents = await getLatestTransferEvents(address);
-    console.log("Transfer:", transferEvents);
-  } catch (error) {
-    console.error("Error Transfer:", error);
+  if (!isAddress(rawAddress)) {
+    notFound();
+  }
+  const address = getAddress(rawAddress);
+  if (rawAddress !== address) {
+    permanentRedirect(`/address/${address}/token-transfers`);
   }
   return (
-    <AddressTokenTransfers
-      address={address as Address}
-      erc20Transfers={transferEvents}
-    />
+    <AddressTokenTransfers address={address} page={page ? Number(page) : 1} />
   );
 };
 

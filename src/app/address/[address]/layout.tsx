@@ -1,51 +1,47 @@
 import { ReactNode } from "react";
-import { Address } from "viem";
+import { getAddress } from "viem";
 import { l2PublicClient } from "@/lib/chains";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import AddressDetails from "@/components/pages/address/address-details";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import CopyButton from "@/components/lib/copy-button";
 import AddressTabs from "@/components/pages/address/address-tabs";
-import { fetchTokenHoldings } from "@/components/pages/address/fetch-token-holdings";
+import fetchAccount from "@/components/pages/address/fetch-account";
+import { fetchTokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
+import AddressAvatar from "@/components/lib/address-avatar";
 
 const AddressLayout = async ({
-  params,
+  params: { address: rawAddress },
   children,
 }: {
   params: { address: string };
   children: ReactNode;
 }) => {
-  const address = params.address as Address;
-  const [balance, bytecode, tokenHoldings, prices] = await Promise.all([
+  const address = getAddress(rawAddress);
+  const [account, balance, tokenHoldings, prices] = await Promise.all([
+    fetchAccount(address),
     l2PublicClient.getBalance({ address }),
-    l2PublicClient.getCode({ address }),
     fetchTokenHoldings(address),
     fetchSpotPrices(),
   ]);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="flex items-center gap-2">
-        <Avatar className="size-8">
-          <AvatarImage
-            src={`https://effigy.im/a/${address}.png`}
-            alt="Ethereum avatar"
-          />
-          <AvatarFallback>0x</AvatarFallback>
-        </Avatar>
+        <AddressAvatar address={address} className="size-8" />
         <h2 className="inline-flex items-baseline gap-2 text-2xl font-bold tracking-tight">
-          {bytecode ? "Contract" : "Address"}
+          {account.bytecode ? "Contract" : "Address"}
           <span className="text-base font-normal">{address}</span>
         </h2>
         <CopyButton content="Copy Address" copy={address} />
       </div>
       <Separator />
       <AddressDetails
-        tokenHoldings={tokenHoldings}
         balance={balance}
-        ethPriceToday={prices.ETH}
+        ethPrice={prices.ETH}
+        tokenHoldings={tokenHoldings}
+        account={account}
       />
-      <AddressTabs address={address}>{children}</AddressTabs>
+      <AddressTabs account={account}>{children}</AddressTabs>
     </main>
   );
 };

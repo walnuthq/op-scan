@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import {
   Pagination,
   PaginationContent,
@@ -10,72 +9,65 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { RotateCw } from "lucide-react";
-import { l2PublicClient } from "@/lib/chains";
+import { refresh } from "@/components/pages/txs/actions";
 
 const LatestTxsPagination = ({
+  start,
   page,
-  previousStart,
-  previousIndex,
-  nextStart,
-  nextIndex,
-  latest,
+  totalPages,
 }: {
+  start: bigint;
   page: number;
-  previousStart?: bigint;
-  previousIndex?: number;
-  nextStart?: bigint;
-  nextIndex?: number;
-  latest: bigint;
-}) => {
-  const router = useRouter();
-  const txsPerPage = BigInt(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
-  const totalPages = BigInt(Math.ceil(500000 / Number(txsPerPage)));
-  return (
-    <Pagination className="mx-0 w-auto">
-      <PaginationContent>
-        <PaginationItem>
-          <Button
-            variant="ghost"
-            className="text-primary hover:bg-primary"
-            onClick={async () => {
-              const latestBlockNumber = await l2PublicClient.getBlockNumber();
-              router.push(
-                `/txs?start=${latestBlockNumber}&index=0&latest=${latestBlockNumber}`,
-              );
-            }}
-          >
-            <RotateCw className="size-4" />
-          </Button>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink
-            className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/txs?start=${latest}&index=0&latest=${latest}`}
-            aria-disabled={!previousStart}
-          >
-            First
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationPrevious
-            className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/txs?start=${previousStart}&index=${previousIndex}&latest=${latest}`}
-            aria-disabled={!previousStart}
-          />
-        </PaginationItem>
-        <PaginationItem className="text-sm">
-          Page {page} of {totalPages.toString()}
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationNext
-            className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/txs?start=${nextStart}&index=${nextIndex}&latest=${latest}`}
-            aria-disabled={!nextStart}
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
-  );
-};
+  totalPages: number;
+}) => (
+  <Pagination className="mx-0 w-auto">
+    <PaginationContent>
+      <PaginationItem>
+        <Button
+          variant="ghost"
+          className="text-primary hover:bg-primary"
+          onClick={() => refresh()}
+        >
+          <RotateCw className="size-4" />
+        </Button>
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationLink
+          className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
+          href={`/txs?start=${start}`}
+          aria-disabled={page === 1}
+        >
+          First
+        </PaginationLink>
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationPrevious
+          className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
+          href={`/txs?start=${start}&page=${page - 1}`}
+          aria-disabled={page === 1}
+        />
+      </PaginationItem>
+      <PaginationItem className="text-sm">
+        Page {page} of {totalPages}
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationNext
+          className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
+          href={`/txs?start=${start}&page=${page + 1}`}
+          aria-disabled={page === totalPages}
+        />
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationLink
+          className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
+          href={`/txs?start=${start}&page=${totalPages}`}
+          aria-disabled={page === totalPages}
+        >
+          Last
+        </PaginationLink>
+      </PaginationItem>
+    </PaginationContent>
+  </Pagination>
+);
 
 export default LatestTxsPagination;

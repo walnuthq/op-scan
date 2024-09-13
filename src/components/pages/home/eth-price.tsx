@@ -20,8 +20,8 @@ const EthPrice = ({
       <CardTitle className="text-sm font-medium">ETH Price</CardTitle>
     </CardHeader>
     <CardContent>
-      <div className="text-sm font-bold">
-        {formatPrice(today)}{" "}
+      <div className="flex items-center gap-1 text-sm font-bold">
+        {formatPrice(today)}
         <span
           className={cn("text-xs text-muted-foreground", {
             "text-red-500": today - yesterday < 0,

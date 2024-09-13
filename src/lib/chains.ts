@@ -5,7 +5,7 @@ import {
   fallback,
   HttpTransportConfig,
 } from "viem";
-import { mainnet, sepolia, optimism } from "viem/chains";
+import { mainnet, sepolia, optimism, optimismSepolia } from "viem/chains";
 import { chainConfig } from "viem/op-stack";
 
 const l1KnownChains = { [mainnet.id]: mainnet, [sepolia.id]: sepolia } as const;
@@ -37,7 +37,10 @@ export const l1Chain = Object.keys(l1KnownChains).includes(
   ? l1KnownChains[l1ChainId as L1KnownChainId]
   : l1CustomChain;
 
-const l2KnownChains = { [optimism.id]: optimism } as const;
+const l2KnownChains = {
+  [optimism.id]: optimism,
+  [optimismSepolia.id]: optimismSepolia,
+} as const;
 type L2KnownChainId = keyof typeof l2KnownChains;
 
 const l2CustomChain = defineChain({
@@ -48,33 +51,6 @@ const l2CustomChain = defineChain({
   rpcUrls: {
     default: {
       http: [process.env.NEXT_PUBLIC_L2_RPC_URL],
-    },
-  },
-  contracts: {
-    ...chainConfig.contracts,
-    disputeGameFactory: {
-      [l1Chain.id]: {
-        address: process.env.NEXT_PUBLIC_DISPUTE_GAME_FACTORY_ADDRESS,
-      },
-    },
-    l2OutputOracle: {
-      [l1Chain.id]: {
-        address: process.env.NEXT_PUBLIC_L2_OUTPUT_ORACLE_ADDRESS,
-      },
-    },
-    multicall3: {
-      address: "0xca11bde05977b3631167028862be2a173976ca11",
-      blockCreated: 1620204,
-    },
-    portal: {
-      [l1Chain.id]: {
-        address: process.env.NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS,
-      },
-    },
-    l1StandardBridge: {
-      [l1Chain.id]: {
-        address: process.env.NEXT_PUBLIC_L1_STANDARD_BRIDGE_ADDRESS,
-      },
     },
   },
 });
@@ -105,6 +81,11 @@ if (process.env.NEXT_PUBLIC_L1_FALLBACK2_RPC_URL) {
     http(process.env.NEXT_PUBLIC_L1_FALLBACK2_RPC_URL, transportOptions),
   );
 }
+if (process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL) {
+  l1Transport.push(
+    http(process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL, transportOptions),
+  );
+}
 
 export const l1PublicClient = createPublicClient({
   chain: l1Chain,
@@ -122,6 +103,11 @@ if (process.env.NEXT_PUBLIC_L2_FALLBACK1_RPC_URL) {
 if (process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL) {
   l2Transport.push(
     http(process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL, transportOptions),
+  );
+}
+if (process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL) {
+  l2Transport.push(
+    http(process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL, transportOptions),
   );
 }
 

@@ -12,6 +12,10 @@ const useGlobalContext = () => {
     dispatch({
       type: "TOGGLE_TX_GAS_PRICE_SHOWN",
     });
+  const toggleUSDValueShown = (): void =>
+    dispatch({
+      type: "TOGGLE_USD_VALUE_SHOWN",
+    });
   const setHoveredSelector = (selector: string): void =>
     dispatch({
       type: "SET_HOVERED_SELECTOR",
@@ -25,6 +29,7 @@ const useGlobalContext = () => {
   return {
     state,
     toggleTimestampFormattedAsDate,
+    toggleUSDValueShown,
     toggleTxGasPriceShown,
     setHoveredSelector,
     setHoveredAddress,

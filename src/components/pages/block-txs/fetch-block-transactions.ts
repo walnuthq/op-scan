@@ -1,18 +1,18 @@
 import { l2PublicClient } from "@/lib/chains";
-import {
-  fromViemBlockWithTransactionsAndReceipts,
-  fromPrismaBlockWithTransactionsAndReceipts,
-  BlockWithTransactionsAndReceipts,
-} from "@/lib/types";
+import { BlockWithTransactionsAndReceipts } from "@/lib/types";
+import { fromViemBlockWithTransactionsAndReceipts } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
-import { prisma } from "@/lib/prisma";
+import {
+  prisma,
+  fromPrismaBlockWithTransactionsAndReceipts,
+} from "@/lib/prisma";
 
 const fetchBlockTransactionsFromDatabase = async (
   number: bigint,
 ): Promise<BlockWithTransactionsAndReceipts | null> => {
   const block = await prisma.block.findUnique({
     where: { number },
-    include: { transactions: { include: { receipt: true } } },
+    include: { transactions: { include: { receipt: true, accounts: true } } },
   });
   if (!block) {
     return fetchBlockTransactionsFromJsonRpc(number);

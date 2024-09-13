@@ -1,13 +1,13 @@
 import { formatUnits } from "viem";
 import { ChevronRight } from "lucide-react";
 import AddressLink from "@/components/lib/address-link";
-import { ERC20Transfer } from "@/lib/types";
+import { Erc20TransferWithToken } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
-const TransactionERC20Transfers = ({
+const TransactionErc20Transfers = ({
   erc20Transfers,
 }: {
-  erc20Transfers: ERC20Transfer[];
+  erc20Transfers: Erc20TransferWithToken[];
 }) => (
   <DescriptionListItem title="ERC-20 Tokens Transferred">
     <ul className="max-h-64 list-inside overflow-y-auto pr-2">
@@ -19,7 +19,7 @@ const TransactionERC20Transfers = ({
           <span className="font-semibold">To</span>
           <AddressLink address={erc20Transfer.to} formatted />
           <span className="font-semibold">For</span>
-          {formatUnits(erc20Transfer.value, erc20Transfer.decimals)}
+          {formatUnits(erc20Transfer.value, erc20Transfer.token.decimals)}
           <span className="font-semibold">Token</span>
           <AddressLink address={erc20Transfer.address} formatted />
         </li>
@@ -28,4 +28,4 @@ const TransactionERC20Transfers = ({
   </DescriptionListItem>
 );
 
-export default TransactionERC20Transfers;
+export default TransactionErc20Transfers;

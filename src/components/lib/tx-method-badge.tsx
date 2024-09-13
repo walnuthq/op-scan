@@ -1,6 +1,7 @@
 "use client";
 import { startCase } from "lodash";
 import { cn } from "@/lib/utils";
+import { Account } from "@/lib/types";
 import {
   Tooltip,
   TooltipContent,
@@ -12,9 +13,11 @@ import useGlobalContext from "@/components/lib/context/hook";
 const TxMethodBadge = ({
   selector,
   signature,
+  account,
 }: {
   selector: string;
   signature: string;
+  account?: Account;
 }) => {
   const {
     state: { hoveredSelector },
@@ -30,26 +33,30 @@ const TxMethodBadge = ({
       >
         <TooltipTrigger
           className={cn(
-            "w-28 truncate rounded-md border px-2 py-1 text-xs transition-colors hover:border-dashed hover:border-yellow-500 hover:bg-yellow-500/15",
+            "w-32 truncate rounded-md border px-2 py-1 text-xs transition-colors hover:border-dashed hover:border-yellow-500 hover:bg-yellow-500/15",
             {
               "border-dashed border-yellow-500 bg-yellow-500/15":
                 hoveredSelector === selector,
             },
           )}
         >
-          {signature === ""
-            ? selector === "0x"
-              ? "Native Transfer"
-              : selector
-            : method}
+          {selector === "0x"
+            ? "Native Transfer"
+            : account
+              ? "Deploy Contract"
+              : signature === ""
+                ? selector
+                : method}
         </TooltipTrigger>
         <TooltipContent>
           <p>
-            {signature === ""
-              ? selector === "0x"
-                ? "Native Transfer"
-                : selector
-              : signature}
+            {selector === "0x"
+              ? "Native Transfer"
+              : account
+                ? "Deploy Contract"
+                : signature === ""
+                  ? selector
+                  : signature}
           </p>
         </TooltipContent>
       </Tooltip>

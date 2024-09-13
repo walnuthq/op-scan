@@ -1,14 +1,14 @@
 "use client";
 import { ReactNode } from "react";
-import { Address } from "viem";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
+import { AccountWithTransactionAndToken } from "@/lib/types";
 
 const AddressTabs = ({
-  address,
+  account,
   children,
 }: {
-  address: Address;
+  account: AccountWithTransactionAndToken;
   children: ReactNode;
 }) => {
   const pathname = usePathname();
@@ -16,16 +16,29 @@ const AddressTabs = ({
   return (
     <Tabs defaultValue={pathname} onValueChange={(value) => router.push(value)}>
       <TabsList>
-        <TabsTrigger value={`/address/${address}`}>Transactions</TabsTrigger>
-        <TabsTrigger value={`/address/${address}/token-transfers`}>
+        <TabsTrigger value={`/address/${account.address}`}>
+          Transactions
+        </TabsTrigger>
+        <TabsTrigger value={`/address/${account.address}/token-transfers`}>
           Token Transfers (ERC-20)
         </TabsTrigger>
-        <TabsTrigger value={`/address/${address}/nft-transfers`}>
+        <TabsTrigger value={`/address/${account.address}/nft-transfers`}>
           NFT Transfers
         </TabsTrigger>
-        <TabsTrigger value={`/address/${address}/events`}>Events</TabsTrigger>
+        {account.bytecode && (
+          <TabsTrigger value={`/address/${account.address}/events`}>
+            Events
+          </TabsTrigger>
+        )}
+        {account.bytecode && (
+          <TabsTrigger value={`/address/${account.address}/contract`}>
+            Contract
+          </TabsTrigger>
+        )}
       </TabsList>
-      <TabsContent value={pathname}>{children}</TabsContent>
+      <TabsContent value={pathname} className="pt-2">
+        {children}
+      </TabsContent>
     </Tabs>
   );
 };

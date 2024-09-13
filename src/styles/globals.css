@@ -58,11 +58,11 @@
   }
 }
 
-.card {
+/* .card {
   backdrop-filter: blur(10px) saturate(180%);
   -webkit-backdrop-filter: blur(10px) saturate(180%);
   border-radius: 8px;
-  /* border: 1px solid rgba(255, 255, 255, 0.125); */
+  border: 1px solid rgba(255, 255, 255, 0.125);
 }
 
 .custom-scroll::-webkit-scrollbar {
@@ -73,4 +73,4 @@
 .custom-scroll::-webkit-scrollbar-thumb {
   border-radius: 20px;
   background: #c71c41;
-}
+} */
