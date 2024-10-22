@@ -4,14 +4,14 @@ import {
   getAddress,
   Hash,
   Hex,
+  Abi,
   AbiEvent,
   parseAbiItem,
   toEventHash,
 } from "viem";
-import { AutoloadResult } from "@shazow/whatsabi";
-import { autoload } from "@/lib/whatsabi";
 import { prisma, fromPrismaLog } from "@/lib/prisma";
 import { loadEvents, loadFunctions } from "@/lib/signatures";
+import fetchAccount from "@/lib/fetch-account";
 
 export type DecodedData = {
   hex: Hex;
@@ -52,25 +52,18 @@ const abiEventFromSignature = (signature: string): AbiEvent => {
 };
 
 const findAbiEventFromHash = async (
-  autoloadResult: AutoloadResult,
+  abi?: Abi,
   hash?: Hash,
 ): Promise<AbiEvent | null> => {
-  // if the hash is present in the ABIEvent then it was loaded from bytecode
-  const abiEventFromBytecode = autoloadResult.abi
-    .filter(({ type }) => type === "event")
-    .find((abiItem) => (abiItem as { hash: string }).hash === hash);
-  if (abiEventFromBytecode && abiEventFromBytecode.sig) {
-    return abiEventFromSignature(abiEventFromBytecode.sig);
-  }
-  // try to find a match from ABI
-  const abiEvents = autoloadResult.abi.filter(
-    ({ type }) => type === "event",
-  ) as unknown as AbiEvent[];
-  const abiEventFromAbi = abiEvents.find(
-    (abiEvent) => hash === toEventHash(abiEvent),
-  );
-  if (abiEventFromAbi) {
-    return abiEventFromAbi;
+  if (abi) {
+    // try to find a match from ABI
+    const abiEvents = abi.filter(({ type }) => type === "event") as AbiEvent[];
+    const abiEventFromAbi = abiEvents.find(
+      (abiEvent) => hash === toEventHash(abiEvent),
+    );
+    if (abiEventFromAbi) {
+      return abiEventFromAbi;
+    }
   }
   // try to find a match from signature
   const signature = await loadEvents(hash);
@@ -78,7 +71,7 @@ const findAbiEventFromHash = async (
 };
 
 export const fetchEvents = async (address: Address): Promise<Event[]> => {
-  const [logs, autoloadResult] = await Promise.all([
+  const [logs, account] = await Promise.all([
     prisma.log.findMany({
       where: { address },
       include: { transaction: true },
@@ -89,7 +82,7 @@ export const fetchEvents = async (address: Address): Promise<Event[]> => {
       ],
       take: Number(process.env.NEXT_PUBLIC_EVENTS_PER_PAGE),
     }),
-    autoload(address),
+    fetchAccount(address),
   ]);
   return Promise.all(
     logs.map(async (prismaLog) => {
@@ -97,7 +90,7 @@ export const fetchEvents = async (address: Address): Promise<Event[]> => {
       const selector = prismaLog.transaction.input.slice(0, 10);
       const [signature, abiEvent] = await Promise.all([
         loadFunctions(selector),
-        findAbiEventFromHash(autoloadResult, log.topics[0]),
+        findAbiEventFromHash(account.contract?.abi, log.topics[0]),
       ]);
       return {
         logIndex: log.logIndex,

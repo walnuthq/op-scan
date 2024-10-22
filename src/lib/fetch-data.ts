@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { l2PublicClient } from "@/lib/chains";
+import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 
-const fetchL2BlockNumberFromJsonRpc = () => l2PublicClient.getBlockNumber();
+export const fetchL2BlockNumberFromJsonRpc = () =>
+  l2PublicClient.getBlockNumber();
 
-const fetchL2BlockNumberFromDatabase = async () => {
+export const fetchL2BlockNumberFromDatabase = async () => {
   const {
     _max: { number: latestBlockNumber },
   } = await prisma.block.aggregate({
@@ -16,7 +17,23 @@ export const fetchL2BlockNumber = process.env.DATABASE_URL
   ? fetchL2BlockNumberFromDatabase
   : fetchL2BlockNumberFromJsonRpc;
 
-type GetSpotPriceResult = Record<string, number>;
+export const fetchL1BlockNumberFromJsonRpc = () =>
+  l1PublicClient.getBlockNumber();
+
+export const fetchL1BlockNumberFromDatabase = async () => {
+  const {
+    _max: { number: latestBlockNumber },
+  } = await prisma.l1Block.aggregate({
+    _max: { number: true },
+  });
+  return latestBlockNumber ?? fetchL1BlockNumberFromJsonRpc();
+};
+
+export const fetchL1BlockNumber = process.env.DATABASE_URL
+  ? fetchL1BlockNumberFromDatabase
+  : fetchL1BlockNumberFromJsonRpc;
+
+type GetSpotPriceResult = Record<string, number> & { ETH: number; OP: number };
 
 export const fetchSpotPrices = async (date?: string) => {
   const url = date
@@ -25,19 +42,24 @@ export const fetchSpotPrices = async (date?: string) => {
   const response = await fetch(url, {
     cache: date ? "force-cache" : "no-store",
   });
-  const json = await response.json();
-  const { data } = json as {
-    data: {
-      amount: string;
-      base: string;
-      currency: "USD";
-    }[];
-  };
-  return data.reduce<GetSpotPriceResult>(
-    (previousValue, currentValue) => ({
-      ...previousValue,
-      [currentValue.base]: Number(currentValue.amount),
-    }),
-    {},
-  );
+  try {
+    const json = await response.json();
+    const { data } = json as {
+      data: {
+        amount: string;
+        base: string;
+        currency: "USD";
+      }[];
+    };
+    return data.reduce<GetSpotPriceResult>(
+      (previousValue, currentValue) => ({
+        ...previousValue,
+        [currentValue.base]: Number(currentValue.amount),
+      }),
+      { ETH: 0, OP: 0 },
+    );
+  } catch (error) {
+    console.error(error);
+    return { ETH: 0, OP: 0 };
+  }
 };

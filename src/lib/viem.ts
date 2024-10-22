@@ -86,15 +86,23 @@ export const fromViemBlockWithTransactionsAndReceipts = (
   gasLimit: block.gasLimit,
   extraData: block.extraData,
   parentHash: block.parentHash,
-  transactions: block.transactions.map((transaction, i) => ({
-    ...fromViemTransactionWithReceipt(
-      transaction,
-      receipts[i],
-      block.timestamp,
-      signatures[i],
-    ),
-    accounts: [],
-  })),
+  transactions: block.transactions
+    .map((transaction, index) => {
+      const receipt = receipts[index];
+      if (!receipt) {
+        return null;
+      }
+      return {
+        ...fromViemTransactionWithReceipt(
+          transaction,
+          receipt,
+          block.timestamp,
+          signatures[index],
+        ),
+        accounts: [],
+      };
+    })
+    .filter((transaction) => transaction !== null),
 });
 
 export const fromViemTransaction = (

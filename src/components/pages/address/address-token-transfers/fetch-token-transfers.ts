@@ -46,7 +46,7 @@ export const fetchTokenTransfers = async (address: Address, page: number) => {
     ),
   );
   return {
-    tokenTransfers: prismaErc20Transfers.map((prismaErc20Transfer, i) => {
+    tokenTransfers: prismaErc20Transfers.map((prismaErc20Transfer, index) => {
       const erc20Transfer =
         fromPrismaErc20TransferWithToken(prismaErc20Transfer);
       const amount = formatUnits(
@@ -57,7 +57,7 @@ export const fetchTokenTransfers = async (address: Address, page: number) => {
       return {
         transactionHash: erc20Transfer.transactionHash,
         selector: prismaErc20Transfer.transaction.input.slice(0, 10),
-        signature: signatures[i],
+        signature: signatures[index] ?? "",
         blockNumber: erc20Transfer.blockNumber,
         timestamp: prismaErc20Transfer.transaction.timestamp,
         from: erc20Transfer.from,

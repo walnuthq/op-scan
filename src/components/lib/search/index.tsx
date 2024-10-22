@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Address, isAddress, getAddress, Hash } from "viem";
+import { cn } from "@/lib/utils";
 import {
   Command,
   CommandEmpty,
@@ -17,18 +18,39 @@ import {
 } from "@/components/lib/search/actions";
 import AddressAvatar from "@/components/lib/address-avatar";
 
-const Search = ({ className }: { className?: string }) => {
+const Search = ({
+  className,
+  shortcut = false,
+}: {
+  className?: string;
+  shortcut?: boolean;
+}) => {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [blockResult, setBlockResult] = useState<bigint | null>(null);
   const [addressResult, setAddressResult] = useState<Address | null>(null);
   const [transactionResult, setTransactionResult] = useState<Hash | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (!shortcut) {
+      return;
+    }
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === "/") {
+        event.preventDefault();
+        inputRef?.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", keydown);
+    return () => document.removeEventListener("keydown", keydown);
+  }, [shortcut]);
   return (
     <div className={className}>
       <Command className="rounded-lg border" shouldFilter={false}>
         <CommandInput
-          className="h-10"
+          ref={inputRef}
+          className={cn("h-10", { shortcut })}
           placeholder="Search by Address / Txn Hash / Block / Token"
           value={search}
           onFocus={() => setOpen(true)}

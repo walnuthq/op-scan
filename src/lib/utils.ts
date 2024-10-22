@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { fromUnixTime, formatDistance } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
+import { fromUnixTime, formatDistance, format } from "date-fns";
+import { utc } from "@date-fns/utc";
 import {
   formatEther as viemFormatEther,
   formatGwei as viemFormatGwei,
@@ -11,11 +11,13 @@ import {
   Log,
   getAddress,
   parseEventLogs,
+  erc20Abi,
+  erc721Abi,
+  Abi,
 } from "viem";
+import { AbiConstructor } from "abitype";
 import { capitalize } from "lodash";
 import { Erc20Transfer, NftTransfer } from "@/lib/types";
-import erc20Abi from "@/lib/contracts/erc-20/abi";
-import erc721Abi from "@/lib/contracts/erc-721/abi";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
@@ -59,13 +61,7 @@ export const formatTimestamp = (timestamp: bigint) => {
       includeSeconds: true,
       addSuffix: true,
     }),
-    utc: formatInTimeZone(timestampDate, "UTC", "yyyy-dd-MM hh:mm:ss"),
-    utcWithTz: formatInTimeZone(
-      timestampDate,
-      "UTC",
-      "MMM-dd-yyyy hh:mm:ss aa +z",
-    ),
-    originalTimestamp: timestamp,
+    utc: format(utc(timestampDate), "MMM-dd-yyyy hh:mm:ss aa"),
   };
 };
 
@@ -189,7 +185,7 @@ export const parseErc1155Transfers = (logs: Log[]): NftTransfer[] => {
       },
     ) => [
       ...previousValue,
-      ...args.ids.map((tokenId, i) => ({
+      ...args.ids.map((tokenId, index) => ({
         blockNumber,
         transactionIndex,
         logIndex,
@@ -199,7 +195,7 @@ export const parseErc1155Transfers = (logs: Log[]): NftTransfer[] => {
         from: getAddress(args.from),
         to: getAddress(args.to),
         tokenId,
-        value: args.values[i],
+        value: args.values[index] ?? BigInt(0),
         erc721TokenAddress: null,
         erc1155TokenAddress: getAddress(address),
       })),
@@ -207,4 +203,15 @@ export const parseErc1155Transfers = (logs: Log[]): NftTransfer[] => {
     [],
   );
   return [...transfersSingle, ...transfersBatch];
+};
+
+export const getContractMetadata = (bytecode: Hex) => {
+  const last2Bytes = bytecode.slice(-4);
+  const cborLength = Number(`0x${last2Bytes}`);
+  return bytecode.slice(-cborLength * 2 - 4, -4);
+};
+
+export const findAbiConstructor = (abi: Abi) => {
+  const abiConstructor = abi.find(({ type }) => type === "constructor");
+  return abiConstructor ? (abiConstructor as AbiConstructor) : null;
 };

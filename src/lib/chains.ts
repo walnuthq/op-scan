@@ -22,9 +22,8 @@ const l1CustomChain = defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Etherscan",
-      url: "https://etherscan.io",
-      apiUrl: "https://api.etherscan.io/api",
+      name: process.env.NEXT_PUBLIC_L1_BLOCK_EXPLORER_NAME,
+      url: process.env.NEXT_PUBLIC_L1_BLOCK_EXPLORER_URL,
     },
   },
 });
@@ -46,11 +45,19 @@ type L2KnownChainId = keyof typeof l2KnownChains;
 const l2CustomChain = defineChain({
   ...chainConfig,
   id: Number(process.env.NEXT_PUBLIC_L2_CHAIN_ID),
+  caipNetworkId: `eip155:${process.env.NEXT_PUBLIC_L2_CHAIN_ID}`,
+  chainNamespace: "eip155",
   name: process.env.NEXT_PUBLIC_L2_NAME,
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
     default: {
       http: [process.env.NEXT_PUBLIC_L2_RPC_URL],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: process.env.NEXT_PUBLIC_L2_BLOCK_EXPLORER_NAME,
+      url: process.env.NEXT_PUBLIC_L2_BLOCK_EXPLORER_URL,
     },
   },
 });
@@ -68,50 +75,52 @@ const transportOptions: HttpTransportConfig = {
   fetchOptions: { cache: "no-store" },
   retryCount: 10,
 };
-const l1Transport = [
+const l1Transports = [
   http(process.env.NEXT_PUBLIC_L1_RPC_URL, transportOptions),
 ];
 if (process.env.NEXT_PUBLIC_L1_FALLBACK1_RPC_URL) {
-  l1Transport.push(
+  l1Transports.push(
     http(process.env.NEXT_PUBLIC_L1_FALLBACK1_RPC_URL, transportOptions),
   );
 }
 if (process.env.NEXT_PUBLIC_L1_FALLBACK2_RPC_URL) {
-  l1Transport.push(
+  l1Transports.push(
     http(process.env.NEXT_PUBLIC_L1_FALLBACK2_RPC_URL, transportOptions),
   );
 }
 if (process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL) {
-  l1Transport.push(
+  l1Transports.push(
     http(process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL, transportOptions),
   );
 }
 
 export const l1PublicClient = createPublicClient({
   chain: l1Chain,
-  transport: fallback(l1Transport),
+  transport: fallback(l1Transports),
 });
 
-const l2Transport = [
+const l2Transports = [
   http(process.env.NEXT_PUBLIC_L2_RPC_URL, transportOptions),
 ];
 if (process.env.NEXT_PUBLIC_L2_FALLBACK1_RPC_URL) {
-  l2Transport.push(
+  l2Transports.push(
     http(process.env.NEXT_PUBLIC_L2_FALLBACK1_RPC_URL, transportOptions),
   );
 }
 if (process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL) {
-  l2Transport.push(
+  l2Transports.push(
     http(process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL, transportOptions),
   );
 }
 if (process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL) {
-  l2Transport.push(
+  l2Transports.push(
     http(process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL, transportOptions),
   );
 }
 
+export const l2Transport = fallback(l2Transports);
+
 export const l2PublicClient = createPublicClient({
   chain: l2Chain,
-  transport: fallback(l2Transport),
+  transport: l2Transport,
 });

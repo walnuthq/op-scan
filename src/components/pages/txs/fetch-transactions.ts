@@ -21,8 +21,11 @@ const fetchTransactions = async (start: bigint, page: number) => {
     transactions.map(({ input }) => loadFunctions(input.slice(0, 10))),
   );
   return {
-    transactions: transactions.map((transaction, i) =>
-      fromPrismaTransactionWithReceiptAndAccounts(transaction, signatures[i]),
+    transactions: transactions.map((transaction, index) =>
+      fromPrismaTransactionWithReceiptAndAccounts(
+        transaction,
+        signatures[index],
+      ),
     ),
     totalCount,
   };

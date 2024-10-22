@@ -521,8 +521,13 @@ export const indexL1Block = async (blockNumber: bigint) => {
       };
     })
     .filter((transactionEnqueued) => transactionEnqueued !== null);
-  await prisma.$transaction(
-    transactionsEnqueued
+  await prisma.$transaction([
+    prisma.l1Block.upsert({
+      where: { number: blockNumber },
+      create: { number: blockNumber },
+      update: { number: blockNumber },
+    }),
+    ...transactionsEnqueued
       .map(toPrismaTransactionEnqueued)
       .map((prismaTransactionEnqueued) =>
         prisma.transactionEnqueued.upsert({
@@ -536,5 +541,5 @@ export const indexL1Block = async (blockNumber: bigint) => {
           update: prismaTransactionEnqueued,
         }),
       ),
-  );
+  ]);
 };

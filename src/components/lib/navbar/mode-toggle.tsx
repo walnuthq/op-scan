@@ -1,7 +1,8 @@
 "use client";
+import { useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-
+import { appKit } from "@/components/lib/providers";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,7 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const ModeToggle = () => {
-  const { setTheme } = useTheme();
+  const { setTheme, theme } = useTheme();
+  useEffect(() => {
+    if (!theme) {
+      return;
+    }
+    appKit.setThemeMode(theme === "dark" ? "dark" : "light");
+  });
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

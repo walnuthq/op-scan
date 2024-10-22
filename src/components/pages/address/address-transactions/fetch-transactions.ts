@@ -24,10 +24,10 @@ const fetchTransactions = async (address: Address, page: number) => {
     prismaTransactions.map(({ input }) => loadFunctions(input.slice(0, 10))),
   );
   return {
-    transactions: prismaTransactions.map((prismaTransaction, i) =>
+    transactions: prismaTransactions.map((prismaTransaction, index) =>
       fromPrismaTransactionWithReceiptAndAccounts(
         prismaTransaction,
-        signatures[i],
+        signatures[index],
       ),
     ),
     totalCount,

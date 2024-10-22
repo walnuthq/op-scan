@@ -21,7 +21,7 @@ const [firstEvmVersionKey, ...otherEvmVersionKeys] = evmVersionKeys;
 const advancedConfigurationSchema = {
   optimizerEnabled: z.enum(["yes", "no"]),
   optimizerRuns: z.coerce.number().int().nonnegative(),
-  evmVersion: z.enum([firstEvmVersionKey, ...otherEvmVersionKeys]),
+  evmVersion: z.enum([firstEvmVersionKey!, ...otherEvmVersionKeys]),
 };
 
 export const formSchema = z.discriminatedUnion("type", [

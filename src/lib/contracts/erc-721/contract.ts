@@ -1,11 +1,10 @@
-import { getContract, Address } from "viem";
+import { getContract, Address, erc721Abi } from "viem";
 import { l2PublicClient } from "@/lib/chains";
-import abi from "@/lib/contracts/erc-721/abi";
 
 const getErc721Contract = (address: Address) =>
   getContract({
     address,
-    abi,
+    abi: erc721Abi,
     client: l2PublicClient,
   });
 

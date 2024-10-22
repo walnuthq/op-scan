@@ -1,3 +1,5 @@
+import { prisma } from "@/lib/prisma";
+
 type FourByteSignatureResult = {
   count: number;
   next: string | null;
@@ -19,6 +21,22 @@ type OpenChainSignatureResult = {
   };
 };
 
+const loadSignaturesFromDatabase = async (hash: string) => {
+  const results = await prisma.signature.findMany({
+    where: { hash },
+    orderBy: [{ createdAt: "desc" }],
+  });
+  if (results.length === 0) {
+    return "";
+  }
+  const lastResult = results.at(-1);
+  if (!lastResult) {
+    return "";
+  }
+  const { signature } = lastResult;
+  return signature;
+};
+
 const loadFunctionsFromFourByte = async (selector: string) => {
   if (selector === "0x") {
     return "";
@@ -34,7 +52,11 @@ const loadFunctionsFromFourByte = async (selector: string) => {
   if (results.length === 0) {
     return "";
   }
-  const { text_signature: textSignature } = results[results.length - 1];
+  const lastResult = results.at(-1);
+  if (!lastResult) {
+    return "";
+  }
+  const { text_signature: textSignature } = lastResult;
   return textSignature;
 };
 
@@ -51,10 +73,14 @@ const loadFunctionsFromOpenChain = async (selector: string) => {
   const json = await response.json();
   const { result } = json as OpenChainSignatureResult;
   const results = result.function[selector];
-  if (results === null || results.length === 0) {
+  if (!results || results.length === 0) {
     return "";
   }
-  const { name } = results[results.length - 1];
+  const lastResult = results.at(-1);
+  if (!lastResult) {
+    return "";
+  }
+  const { name } = lastResult;
   return name;
 };
 
@@ -71,6 +97,12 @@ export const loadFunctions = async (selector: string) => {
     }
   };
   try {
+    if (process.env.DATABASE_URL) {
+      const signature = await loadSignaturesFromDatabase(selector);
+      if (signature !== "") {
+        return signature;
+      }
+    }
     const signature = await loadFunctionsFromFourByte(selector);
     if (signature === "") {
       return fallback();
@@ -96,7 +128,11 @@ const loadEventsFromFourByte = async (hash: string) => {
   if (results.length === 0) {
     return "";
   }
-  const { text_signature: textSignature } = results[results.length - 1];
+  const lastResult = results.at(-1);
+  if (!lastResult) {
+    return "";
+  }
+  const { text_signature: textSignature } = lastResult;
   return textSignature;
 };
 
@@ -113,10 +149,14 @@ const loadEventsFromOpenChain = async (hash: string) => {
   const json = await response.json();
   const { result } = json as OpenChainSignatureResult;
   const results = result.event[hash];
-  if (results === null || results.length === 0) {
+  if (!results || results.length === 0) {
     return "";
   }
-  const { name } = results[results.length - 1];
+  const lastResult = results.at(-1);
+  if (!lastResult) {
+    return "";
+  }
+  const { name } = lastResult;
   return name;
 };
 
@@ -133,6 +173,12 @@ export const loadEvents = async (hash?: string) => {
     }
   };
   try {
+    if (process.env.DATABASE_URL) {
+      const signature = await loadSignaturesFromDatabase(hash);
+      if (signature !== "") {
+        return signature;
+      }
+    }
     const signature = await loadEventsFromFourByte(hash);
     if (signature === "") {
       return fallback();

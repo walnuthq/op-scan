@@ -1,10 +1,7 @@
 import { decodeAbiParameters, Hex, Abi } from "viem";
 import { Network } from "lucide-react";
 import { Contract } from "@/lib/types";
-import {
-  getContractMetadata,
-  findAbiConstructor,
-} from "@/components/pages/address/address-contract/fetch-contract";
+import { getContractMetadata, findAbiConstructor } from "@/lib/utils";
 import PreCard from "@/components/lib/pre-card";
 import DecodedParameterValue from "@/components/lib/decoded-parameter-value";
 
@@ -17,11 +14,11 @@ const decodeDeployData = ({
   bytecode: Hex;
   data: Hex;
 }) => {
-  const last2Bytes = bytecode.slice(-4);
   const metadata = getContractMetadata(bytecode);
+  const last2Bytes = bytecode.slice(-4);
   const [, args] = data.split(`${metadata}${last2Bytes}`);
   const abiConstructor = findAbiConstructor(abi);
-  if (!abiConstructor) {
+  if (!args || !abiConstructor) {
     return { args: [], bytecode };
   }
   return {
@@ -61,7 +58,11 @@ const AddressContractConstructorArguments = ({
       <PreCard className="overflow-x-auto">
         <p>-----Decoded View---------------</p>
         {args.map((arg, index) => {
-          const { name, type } = abiConstructor.inputs[index];
+          const input = abiConstructor.inputs[index];
+          if (!input) {
+            return null;
+          }
+          const { name, type } = input;
           return (
             <p key={index}>
               Arg [{index}] : {name} ({type}):{" "}

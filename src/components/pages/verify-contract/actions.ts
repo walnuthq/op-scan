@@ -1,5 +1,14 @@
 "use server";
-import { Address } from "viem";
+import {
+  Address,
+  Abi,
+  AbiFunction,
+  AbiEvent,
+  toFunctionSignature,
+  toFunctionSelector,
+  toEventSignature,
+  toEventHash,
+} from "viem";
 import { redirect } from "next/navigation";
 import { CompilerType, CompilerVersion, EvmVersion } from "@/lib/types";
 import {
@@ -104,6 +113,24 @@ const getSolcJsonInput = ({
 const isMatch = (status: Status) =>
   status === "partial" || status === "perfect";
 
+const signaturesFromAbi = (abi: Abi) => {
+  const abiFunctions = abi.filter(
+    ({ type }) => type === "function",
+  ) as AbiFunction[];
+  const functions = abiFunctions
+    .filter((abiFunction) => abiFunction.stateMutability !== "view")
+    .map((abiFunction) => ({
+      signature: toFunctionSignature(abiFunction),
+      hash: toFunctionSelector(abiFunction),
+    }));
+  const abiEvents = abi.filter(({ type }) => type === "event") as AbiEvent[];
+  const events = abiEvents.map((abiEvent) => ({
+    signature: toEventSignature(abiEvent),
+    hash: toEventHash(abiEvent),
+  }));
+  return [...functions, ...events];
+};
+
 export const verifyContract = async ({
   address,
   type,
@@ -135,22 +162,34 @@ export const verifyContract = async ({
     solc.compile(version, solcJsonInput, true),
     prisma.account.findUnique({ where: { address } }),
   ]);
-  const [path] = Object.keys(solcJsonInput.sources);
-  const contracts = compiled.contracts[path];
+  const [firstPath] = Object.keys(solcJsonInput.sources);
+  if (!firstPath) {
+    throw new Error("No match found");
+  }
+  const contracts = compiled.contracts[firstPath];
+  if (!contracts) {
+    throw new Error("No match found");
+  }
   const [contractName] = Object.keys(contracts);
+  if (!contractName) {
+    throw new Error("No match found");
+  }
   const sources = Object.keys(solcJsonInput.sources).map((path) => ({
     path: `sources/${path}`,
-    content: solcJsonInput.sources[path].content ?? "",
+    content: solcJsonInput.sources[path]?.content ?? "",
   }));
   sources.push({
     path: "metadata.json",
-    content: contracts[contractName].metadata,
+    content: contracts[contractName]?.metadata ?? "",
   });
   const pathBuffers = sources.map((source) => ({
     path: source.path,
     buffer: Buffer.from(source.content),
   }));
   const [checkedContract] = await checkFiles(solc, pathBuffers);
+  if (!checkedContract) {
+    throw new Error("No match found");
+  }
   const match = await verifyDeployed(
     checkedContract,
     sourcifyChain,
@@ -184,10 +223,20 @@ export const verifyContract = async ({
     bytecode: checkedContract.runtimeBytecode,
     contract: JSON.stringify(contract),
   };
-  await prisma.account.upsert({
-    where: { address },
-    create: accountUpsert,
-    update: accountUpsert,
-  });
+  const signatures = signaturesFromAbi(contract.abi);
+  await prisma.$transaction([
+    prisma.account.upsert({
+      where: { address },
+      create: accountUpsert,
+      update: accountUpsert,
+    }),
+    ...signatures.map((signature) =>
+      prisma.signature.upsert({
+        where: { signature: signature.signature },
+        create: signature,
+        update: signature,
+      }),
+    ),
+  ]);
   redirect(`/address/${address}/contract`);
 };

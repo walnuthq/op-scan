@@ -6,6 +6,7 @@ import {
   fromPrismaTransaction,
 } from "@/lib/prisma";
 import { l2PublicClient } from "@/lib/chains";
+import { fetchContract } from "@/lib/fetch-contract";
 
 const fetchAccountFromDatabase = async (
   address: Address,
@@ -29,11 +30,17 @@ const fetchAccountFromDatabase = async (
     return fetchAccountFromJsonRpc(address);
   }
   const account = fromPrismaAccountWithTransactionAndToken(prismaAccount);
+  const contract = account.contract
+    ? account.contract
+    : account.bytecode
+      ? await fetchContract(address)
+      : null;
   const fundingTransaction =
     prismaTransaction && fromPrismaTransaction(prismaTransaction);
   const transaction = account.transaction ?? fundingTransaction;
   return {
     ...account,
+    contract,
     transactionHash: transaction ? transaction.hash : null,
     transaction,
   };
@@ -43,11 +50,12 @@ const fetchAccountFromJsonRpc = async (
   address: Address,
 ): Promise<AccountWithTransactionAndToken> => {
   const bytecode = await l2PublicClient.getCode({ address });
+  const contract = bytecode ? await fetchContract(address) : null;
   return {
     address,
     bytecode: bytecode ?? null,
     transactionHash: null,
-    contract: null,
+    contract,
     transaction: null,
     erc20Token: null,
     erc721Token: null,
