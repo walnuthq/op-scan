@@ -58,19 +58,10 @@
   }
 }
 
-/* .card {
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.125);
+[cmdk-input-wrapper]:has(> .shortcut)::after {
+  content: "/";
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px solid hsl(var(--border));
 }
-
-.custom-scroll::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-
-.custom-scroll::-webkit-scrollbar-thumb {
-  border-radius: 20px;
-  background: #c71c41;
-} */

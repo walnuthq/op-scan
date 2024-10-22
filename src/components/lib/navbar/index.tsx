@@ -47,7 +47,10 @@ const Navbar = () => (
       </SheetContent>
     </Sheet>
     <div className="flex w-full items-start justify-end gap-4 md:ml-auto md:gap-2 lg:gap-4">
-      <Search className="fixed mr-14 w-5/12 sm:w-3/5 md:w-3/6 lg:w-1/3" />
+      <Search
+        className="fixed mr-14 w-5/12 sm:w-3/5 md:w-3/6 lg:w-1/3"
+        shortcut
+      />
       <ModeToggle />
     </div>
   </header>

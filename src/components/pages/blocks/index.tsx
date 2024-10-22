@@ -37,7 +37,8 @@ const CardHeaderFooterContent = ({
 
 const Blocks = async ({ start, latest }: { start: bigint; latest: bigint }) => {
   const blocks = await fetchBlocks(start);
-  const end = blocks[blocks.length - 1].number;
+  const endBlock = blocks.at(-1);
+  const end = endBlock ? endBlock.number : BigInt(0);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h2 className="text-2xl font-bold tracking-tight">Blocks</h2>

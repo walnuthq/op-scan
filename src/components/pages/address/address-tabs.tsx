@@ -1,5 +1,6 @@
 "use client";
 import { ReactNode } from "react";
+import { CircleCheck } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
 import { AccountWithTransactionAndToken } from "@/lib/types";
@@ -13,8 +14,11 @@ const AddressTabs = ({
 }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const value = pathname.startsWith(`/address/${account.address}/contract`)
+    ? `/address/${account.address}/contract`
+    : pathname;
   return (
-    <Tabs defaultValue={pathname} onValueChange={(value) => router.push(value)}>
+    <Tabs defaultValue={value} onValueChange={(value) => router.push(value)}>
       <TabsList>
         <TabsTrigger value={`/address/${account.address}`}>
           Transactions
@@ -31,12 +35,18 @@ const AddressTabs = ({
           </TabsTrigger>
         )}
         {account.bytecode && (
-          <TabsTrigger value={`/address/${account.address}/contract`}>
+          <TabsTrigger
+            value={`/address/${account.address}/contract`}
+            className="flex gap-1"
+          >
             Contract
+            {account.contract && (
+              <CircleCheck className="size-4 text-green-400" />
+            )}
           </TabsTrigger>
         )}
       </TabsList>
-      <TabsContent value={pathname} className="pt-2">
+      <TabsContent value={value} className="pt-2">
         {children}
       </TabsContent>
     </Tabs>

@@ -6,7 +6,7 @@ import AddressDetails from "@/components/pages/address/address-details";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import CopyButton from "@/components/lib/copy-button";
 import AddressTabs from "@/components/pages/address/address-tabs";
-import fetchAccount from "@/components/pages/address/fetch-account";
+import fetchAccount from "@/lib/fetch-account";
 import { fetchTokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
 import AddressAvatar from "@/components/lib/address-avatar";
 

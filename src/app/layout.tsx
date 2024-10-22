@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
+import { headers } from "next/headers";
 import "@/styles/globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/lib/navbar";
@@ -19,23 +20,26 @@ const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) => (
-  <html lang="en">
-    <body
-      className={cn(
-        "min-h-screen bg-background font-sans antialiased",
-        fontSans.variable,
-      )}
-    >
-      <Providers>
-        <div className="flex min-h-screen w-full flex-col">
-          <Navbar />
-          {children}
-        </div>
-      </Providers>
-    </body>
-  </html>
-);
+}>) => {
+  const cookies = headers().get("cookie");
+  return (
+    <html lang="en">
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable,
+        )}
+      >
+        <Providers cookies={cookies}>
+          <div className="flex min-h-screen w-full flex-col">
+            <Navbar />
+            {children}
+          </div>
+        </Providers>
+      </body>
+    </html>
+  );
+};
 
 export const dynamic = "force-dynamic";
 

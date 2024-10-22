@@ -61,10 +61,14 @@ export const fetchTokenHoldings = async (
   const erc1155TransfersGrouped = erc1155Transfers
     .map(fromPrismaNftTransferWithToken)
     .reduce<Record<Address, Set<bigint>>>((previousValue, nftTransfer) => {
-      if (!previousValue[nftTransfer.address]) {
-        previousValue[nftTransfer.address] = new Set<bigint>();
+      const tokenIds = previousValue[nftTransfer.address];
+      if (tokenIds) {
+        tokenIds.add(nftTransfer.tokenId);
+      } else {
+        previousValue[nftTransfer.address] = new Set<bigint>([
+          nftTransfer.tokenId,
+        ]);
       }
-      previousValue[nftTransfer.address].add(nftTransfer.tokenId);
       return previousValue;
     }, {});
   const [erc20Holdings, erc721Holdings, erc1155Holdings] = await Promise.all([

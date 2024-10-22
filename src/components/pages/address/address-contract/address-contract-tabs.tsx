@@ -1,42 +1,31 @@
 "use client";
-import { useState } from "react";
+import { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Address } from "viem";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddressContractCode from "@/components/pages/address/address-contract/address-contract-code";
-import { AccountWithTransactionAndToken, Contract } from "@/lib/types";
 
 const AddressContractTabs = ({
-  account,
-  contract,
+  address,
+  children,
 }: {
-  account: AccountWithTransactionAndToken;
-  contract: Contract;
+  address: Address;
+  children: ReactNode;
 }) => {
-  const tabs = {
-    code: "Code",
-    "read-contract": "Read Contract",
-    "write-contract": "Write Contract",
-  };
-  const [tab, setTab] = useState<keyof typeof tabs>("code");
+  const pathname = usePathname();
+  const router = useRouter();
   return (
-    <Tabs
-      defaultValue={tab}
-      onValueChange={(value) => setTab(value as keyof typeof tabs)}
-    >
+    <Tabs defaultValue={pathname} onValueChange={(value) => router.push(value)}>
       <TabsList>
-        {Object.keys(tabs).map((key) => (
-          <TabsTrigger key={key} value={key}>
-            {tabs[key as keyof typeof tabs]}
-          </TabsTrigger>
-        ))}
+        <TabsTrigger value={`/address/${address}/contract`}>Code</TabsTrigger>
+        <TabsTrigger value={`/address/${address}/contract/read`}>
+          Read Contract
+        </TabsTrigger>
+        <TabsTrigger value={`/address/${address}/contract/write`}>
+          Write Contract
+        </TabsTrigger>
       </TabsList>
-      <TabsContent value="code" className="pt-4">
-        <AddressContractCode account={account} contract={contract} />
-      </TabsContent>
-      <TabsContent value="read-contract" className="pt-4">
-        READ CONTRACT (TODO)
-      </TabsContent>
-      <TabsContent value="write-contract" className="pt-4">
-        WRITE CONTRACT (TODO)
+      <TabsContent value={pathname} className="pt-4">
+        {children}
       </TabsContent>
     </Tabs>
   );

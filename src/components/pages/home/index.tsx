@@ -21,6 +21,7 @@ const Home = async () => {
     transactionsEnqueued,
     transactionsHistory,
   } = await fetchHomeData();
+  const [firstBlock] = blocks;
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h1 className="text-xl font-bold">{l2Chain.name} Explorer</h1>
@@ -32,7 +33,7 @@ const Home = async () => {
         </div>
         <div className="space-y-4">
           <LatestBlockAndTxs
-            blockNumber={blocks[0].number}
+            blockNumber={firstBlock ? firstBlock.number : BigInt(0)}
             transactionsCount={transactionsCount}
             tps={tps}
           />

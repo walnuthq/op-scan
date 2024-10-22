@@ -1,7 +1,6 @@
 "use client";
 import { useTheme } from "next-themes";
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -31,27 +30,24 @@ const getLanguage = (path: string) => {
 
 const ContractSourceItem = ({ source }: { source: ContractSource }) => {
   const { resolvedTheme } = useTheme();
-
   return (
-    <Accordion type="multiple">
-      <AccordionItem value={source.path}>
-        <AccordionTrigger>{source.path}</AccordionTrigger>
-        <AccordionContent>
-          <SyntaxHighlighter
-            className="h-96 overflow-y-scroll rounded-md"
-            showLineNumbers
-            showInlineLineNumbers
-            language={getLanguage(source.path)}
-            style={resolvedTheme === "light" ? vs : vscDarkPlus}
-            renderer={virtualizedRenderer()}
-          >
-            {source.path.endsWith(".json")
-              ? JSON.stringify(JSON.parse(source.content), null, 2)
-              : source.content}
-          </SyntaxHighlighter>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <AccordionItem value={source.path}>
+      <AccordionTrigger>{source.path}</AccordionTrigger>
+      <AccordionContent>
+        <SyntaxHighlighter
+          className="h-96 overflow-y-scroll rounded-md"
+          showLineNumbers
+          showInlineLineNumbers
+          language={getLanguage(source.path)}
+          style={resolvedTheme === "light" ? vs : vscDarkPlus}
+          renderer={virtualizedRenderer()}
+        >
+          {source.path.endsWith(".json")
+            ? JSON.stringify(JSON.parse(source.content), null, 2)
+            : source.content}
+        </SyntaxHighlighter>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 

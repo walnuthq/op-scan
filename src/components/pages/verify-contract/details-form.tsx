@@ -31,7 +31,7 @@ const [firstCompilerVersionKey, ...otherCompilerVersionKeys] = compilerVersions;
 
 const formSchema = z.object({
   address: z.string().startsWith("0x").length(42),
-  type: z.enum([firstCompilerTypeKey, ...otherCompilerTypeKeys]),
+  type: z.enum([firstCompilerTypeKey!, ...otherCompilerTypeKeys]),
   version: z.enum([firstCompilerVersionKey, ...otherCompilerVersionKeys]),
 });
 

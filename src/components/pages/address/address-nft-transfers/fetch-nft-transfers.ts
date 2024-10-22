@@ -55,6 +55,9 @@ const getTokenMetadata = async (tokenUri: string, tokenId: bigint) => {
   try {
     if (tokenUri.startsWith("data:application/json;")) {
       const [, base64] = tokenUri.split(",");
+      if (!base64) {
+        return { name: "NFT", imageUrl: "" };
+      }
       const json = JSON.parse(Buffer.from(base64, "base64").toString());
       return parseTokenMetadata(json, tokenId);
     }
@@ -62,7 +65,7 @@ const getTokenMetadata = async (tokenUri: string, tokenId: bigint) => {
       return { name: "NFT", imageUrl: tokenUri };
     }
     const tokenUriProcessed = processUri(tokenUri, tokenId);
-    const response = await fetch(tokenUriProcessed);
+    const response = await fetch(tokenUriProcessed, { cache: "no-cache" });
     if (!response.ok) {
       return { name: "NFT", imageUrl: "" };
     }

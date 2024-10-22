@@ -5,9 +5,33 @@ import { ChartContainer } from "@/components/ui/chart";
 import { formatPrice, formatNumber } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 
+type DataItem = {
+  name: string;
+  date: string;
+  price: number;
+  transactions: number;
+};
+
+const getTicks = (data: DataItem[]) => {
+  const firstItem = data.at(0);
+  const middleItem = data[Math.floor(data.length / 2)];
+  const lastItem = data.at(-1);
+  return data.length > 0
+    ? [
+        firstItem ? firstItem.name : "",
+        middleItem ? middleItem.name : "",
+        lastItem ? lastItem.name : "",
+      ]
+    : [];
+};
+
 const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   if (active && payload && payload.length) {
-    const { date, price, transactions } = payload[0].payload;
+    const [firstPayload] = payload;
+    if (!firstPayload) {
+      return null;
+    }
+    const { date, price, transactions } = firstPayload.payload;
     return (
       <div className="rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md">
         <p className="text-xs">
@@ -23,16 +47,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   return null;
 };
 
-const TransactionHistory = ({
-  data,
-}: {
-  data: {
-    name: string;
-    date: string;
-    price: number;
-    transactions: number;
-  }[];
-}) => (
+const TransactionHistory = ({ data }: { data: DataItem[] }) => (
   <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">
@@ -58,15 +73,7 @@ const TransactionHistory = ({
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            ticks={
-              data.length > 0
-                ? [
-                    data[0].name,
-                    data[Math.floor(data.length / 2)].name,
-                    data[data.length - 1].name,
-                  ]
-                : []
-            }
+            ticks={getTicks(data)}
           />
           <YAxis
             tickFormatter={(value) =>

@@ -22,7 +22,7 @@ const AddressContractAbi = ({ abi }: { abi: Abi }) => {
           <ListChecks className="size-4" />
           <span className="font-semibold">Contract ABI</span>
         </div>
-        <CopyButton content="Copy Bytecode" copy={abiString} />
+        <CopyButton content="Copy ABI" copy={abiString} />
       </div>
       <SyntaxHighlighter
         className="h-96 overflow-y-scroll rounded-md"

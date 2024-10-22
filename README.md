@@ -4,7 +4,7 @@
 > - [x] Milestone 1: Homepage and basic nav (current stage)
 > - [x] Milestone 2: Tx detail page
 > - [x] Milestone 3: Contract detail page
-> - [ ] Milestone 4: Feedback incorporation and polish
+> - [x] Milestone 4: Feedback incorporation and polish
 
 # 🔎 OP Scan
 

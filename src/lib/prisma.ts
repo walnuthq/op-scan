@@ -79,8 +79,8 @@ export const fromPrismaBlockWithTransactionsAndReceipts = (
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
-  transactions: block.transactions.map((transaction, i) =>
-    fromPrismaTransactionWithReceiptAndAccounts(transaction, signatures[i]),
+  transactions: block.transactions.map((transaction, index) =>
+    fromPrismaTransactionWithReceiptAndAccounts(transaction, signatures[index]),
   ),
 });
 

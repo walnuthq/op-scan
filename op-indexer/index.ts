@@ -3,7 +3,7 @@ import { range } from "lodash";
 import { createPublicClient, webSocket } from "viem";
 import { prisma } from "@/lib/prisma";
 import { l1Chain, l2Chain, l1PublicClient, l2PublicClient } from "@/lib/chains";
-import { indexL1Block, indexL2Block } from "./utils";
+import { indexL1Block, indexL2Block } from "@/lib/indexer";
 
 const l1PublicClientWs = createPublicClient({
   chain: l1Chain,
