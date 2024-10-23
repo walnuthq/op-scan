@@ -20,7 +20,7 @@ const getPlaceholder = (
     .slice(10)
     .match(/.{1,64}/g)
     ?.map((cd, index) => `[${index}]: ${cd}`)
-    .join("\n");
+    .join("\n") ?? '';
   return result;
 };
 
