@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 export const appKit = createAppKit({
   adapters: [wagmiAdapter],
-  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  projectId: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
   networks: [l2Chain],
   defaultNetwork: l2Chain,
   metadata: {
