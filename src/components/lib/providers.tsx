@@ -21,7 +21,6 @@ export const appKit = createAppKit({
     url: "https://www.opscan.co/",
     icons: ["https://www.opscan.co/img/logo.png"],
   },
-  themeMode: "light",
   themeVariables: {
     "--w3m-accent": "hsl(var(--destructive))",
   },
@@ -42,7 +41,7 @@ const Providers = ({
   >
     <WagmiProvider
       config={config}
-      initialState={cookieToInitialState(wagmiAdapter.wagmiConfig, cookies)}
+      // initialState={cookieToInitialState(wagmiAdapter.wagmiConfig, cookies)}
     >
       <QueryClientProvider client={queryClient}>
         <ContextProvider>{children}</ContextProvider>
