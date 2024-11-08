@@ -2,13 +2,17 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { isAddress, getAddress } from "viem";
 import AddressNftTransfers from "@/components/pages/address/address-nft-transfers";
 
-const AddressNftTransfersPage = ({
-  params: { address: rawAddress },
-  searchParams: { page },
+const AddressNftTransfersPage = async ({
+  params,
+  searchParams,
 }: {
-  params: { address: string };
-  searchParams: { page?: string };
+  params: Promise<{ address: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) => {
+  const [{ address: rawAddress }, { page }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   if (!isAddress(rawAddress)) {
     notFound();
   }

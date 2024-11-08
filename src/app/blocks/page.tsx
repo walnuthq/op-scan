@@ -2,10 +2,11 @@ import Blocks from "@/components/pages/blocks";
 import { fetchL2BlockNumber } from "@/lib/fetch-data";
 
 const BlocksPage = async ({
-  searchParams: { start, latest },
+  searchParams,
 }: {
-  searchParams: { start?: string; latest?: string };
+  searchParams: Promise<{ start?: string; latest?: string }>;
 }) => {
+  const { start, latest } = await searchParams;
   const latestBlockNumber = await fetchL2BlockNumber();
   return (
     <Blocks

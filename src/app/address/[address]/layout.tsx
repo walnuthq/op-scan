@@ -11,12 +11,13 @@ import { fetchTokenHoldings } from "@/components/pages/address/address-details/f
 import AddressAvatar from "@/components/lib/address-avatar";
 
 const AddressLayout = async ({
-  params: { address: rawAddress },
+  params,
   children,
 }: {
-  params: { address: string };
+  params: Promise<{ address: string }>;
   children: ReactNode;
 }) => {
+  const { address: rawAddress } = await params;
   const address = getAddress(rawAddress);
   const [account, balance, tokenHoldings, prices] = await Promise.all([
     fetchAccount(address),

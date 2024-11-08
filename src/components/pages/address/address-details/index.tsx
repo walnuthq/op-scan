@@ -118,7 +118,7 @@ const AddressDetails = ({
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Multichain Info</CardTitle>
+          <CardTitle>Superchain Info</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4"></CardContent>
       </Card>

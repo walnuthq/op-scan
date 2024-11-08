@@ -2,11 +2,12 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { isAddress, getAddress } from "viem";
 import AddressEvents from "@/components/pages/address/address-events";
 
-const AddressEventsPage = ({
-  params: { address: rawAddress },
+const AddressEventsPage = async ({
+  params,
 }: {
-  params: { address: string };
+  params: Promise<{ address: string }>;
 }) => {
+  const { address: rawAddress } = await params;
   if (!isAddress(rawAddress)) {
     notFound();
   }

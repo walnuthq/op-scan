@@ -19,7 +19,7 @@ const AddressContractWrite = ({
   );
   return (
     <div className="space-y-4">
-      <w3m-button />
+      <appkit-button />
       <Accordion className="space-y-4" type="multiple">
         {writeFunctions.map((writeFunction, index) => (
           <ReadWriteFunction

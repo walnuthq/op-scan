@@ -4,10 +4,11 @@ import fetchAccount from "@/lib/fetch-account";
 import AddressContractWrite from "@/components/pages/address/address-contract/address-contract-write";
 
 const AddressContractWritePage = async ({
-  params: { address: rawAddress },
+  params,
 }: {
-  params: { address: string };
+  params: Promise<{ address: string }>;
 }) => {
+  const { address: rawAddress } = await params;
   if (!isAddress(rawAddress)) {
     notFound();
   }
