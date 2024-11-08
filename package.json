@@ -14,6 +14,11 @@
     "prisma:studio": "dotenvx run -f .env.local -- prisma studio",
     "op-indexer": "dotenvx run -f .env.local -- bun op-indexer/index.ts"
   },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ]
+  },
   "dependencies": {
     "@date-fns/utc": "^2.1.0",
     "@ethereum-sourcify/bytecode-utils": "^1.2.12",
@@ -46,7 +51,7 @@
     "cmdk": "^1.0.4",
     "date-fns": "^4.1.0",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.454.0",
+    "lucide-react": "^0.455.0",
     "next": "^15.0.3",
     "next-themes": "^0.4.3",
     "react": "^18.3.1",
@@ -66,7 +71,6 @@
     "solc-0.8.5": "npm:solc@0.8.5",
     "solc-0.8.7": "npm:solc@0.8.7",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7",
     "viem": "^2.21.43",
     "wagmi": "^2.12.29",
     "zod": "^3.23.8"
@@ -81,6 +85,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9.14.0",
     "eslint-config-next": "^15.0.3",
     "eslint-config-prettier": "^9.1.0",
@@ -89,6 +94,7 @@
     "prettier-plugin-tailwindcss": "^0.6.8",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.14",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.6.3"
   }
 }
