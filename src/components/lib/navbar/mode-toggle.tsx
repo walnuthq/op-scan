@@ -17,7 +17,7 @@ const ModeToggle = () => {
     if (!theme) {
       return;
     }
-    appKit.setThemeMode(theme === "dark" ? "dark" : "light");
+    appKit.setThemeMode(theme === "light" ? "light" : "dark");
   });
   return (
     <DropdownMenu>

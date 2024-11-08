@@ -1,9 +1,9 @@
-import { cookieStorage, createStorage } from "wagmi";
+import { createStorage } from "wagmi";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { l2Chain, l2Transport } from "@/lib/chains";
 
 export const wagmiAdapter = new WagmiAdapter({
-  storage: createStorage({/* storage: cookieStorage */}),
+  storage: createStorage({}),
   ssr: true,
   projectId: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
   networks: [l2Chain],

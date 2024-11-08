@@ -2,13 +2,17 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { isAddress, getAddress } from "viem";
 import AddressTokenTransfers from "@/components/pages/address/address-token-transfers";
 
-const AddressTokenTransfersPage = ({
-  params: { address: rawAddress },
-  searchParams: { page },
+const AddressTokenTransfersPage = async ({
+  params,
+  searchParams,
 }: {
-  params: { address: string };
-  searchParams: { page?: string };
+  params: Promise<{ address: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) => {
+  const [{ address: rawAddress }, { page }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   if (!isAddress(rawAddress)) {
     notFound();
   }

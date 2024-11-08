@@ -4,10 +4,11 @@ import { l2PublicClient } from "@/lib/chains";
 import BlockTxs from "@/components/pages/block-txs";
 
 const BlockTxsPage = async ({
-  params: { numberOrHash },
+  params,
 }: {
-  params: { numberOrHash: string };
+  params: Promise<{ numberOrHash: string }>;
 }) => {
+  const { numberOrHash } = await params;
   if (numberOrHash.startsWith("0x")) {
     const block = await l2PublicClient.getBlock({
       blockHash: numberOrHash as Hash,

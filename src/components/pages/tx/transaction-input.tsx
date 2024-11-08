@@ -16,11 +16,12 @@ const getPlaceholder = (
     result += `Function: ${signature} ***\n\n`;
   }
   result += `MethodID: ${input.slice(0, 10)}\n`;
-  result += input
-    .slice(10)
-    .match(/.{1,64}/g)
-    ?.map((cd, index) => `[${index}]: ${cd}`)
-    .join("\n") ?? '';
+  result +=
+    input
+      .slice(10)
+      .match(/.{1,64}/g)
+      ?.map((cd, index) => `[${index}]: ${cd}`)
+      .join("\n") ?? "";
   return result;
 };
 

@@ -2,11 +2,12 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { isAddress, getAddress } from "viem";
 import AddressContract from "@/components/pages/address/address-contract";
 
-const AddressContractPage = ({
-  params: { address: rawAddress },
+const AddressContractPage = async ({
+  params,
 }: {
-  params: { address: string };
+  params: Promise<{ address: string }>;
 }) => {
+  const { address: rawAddress } = await params;
   if (!isAddress(rawAddress)) {
     notFound();
   }
