@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-// import { range } from "lodash";
+import { prisma } from "@/lib/prisma";
 import {
   fetchL2BlockNumberFromJsonRpc,
   fetchL2BlockNumberFromDatabase,
@@ -24,41 +24,31 @@ export const GET = async () => {
   const l1BlocksIndexed: number[] = [];
   try {
     for (
-      let blockNumber = l2BlockNumberFromDatabase + BigInt(1);
-      blockNumber <= l2BlockNumberFromJsonRpc;
-      ++blockNumber
+      let blockNumber = l2BlockNumberFromJsonRpc;
+      blockNumber > l2BlockNumberFromDatabase;
+      --blockNumber
     ) {
-      await indexL2Block(blockNumber);
-      l2BlocksIndexed.push(Number(blockNumber));
+      const block = await prisma.block.findUnique({
+        where: { number: blockNumber },
+      });
+      if (!block) {
+        await indexL2Block(blockNumber);
+        l2BlocksIndexed.push(Number(blockNumber));
+      }
     }
     for (
-      let blockNumber = l1BlockNumberFromDatabase + BigInt(1);
-      blockNumber <= l1BlockNumberFromJsonRpc;
-      ++blockNumber
+      let blockNumber = l1BlockNumberFromJsonRpc;
+      blockNumber > l1BlockNumberFromDatabase;
+      --blockNumber
     ) {
-      await indexL1Block(blockNumber);
-      l1BlocksIndexed.push(Number(blockNumber));
+      const block = await prisma.l1Block.findUnique({
+        where: { number: blockNumber },
+      });
+      if (!block) {
+        await indexL1Block(blockNumber);
+        l1BlocksIndexed.push(Number(blockNumber));
+      }
     }
-    /* await Promise.all([
-      Promise.all(
-        range(
-          Number(l2BlockNumberFromDatabase) + 1,
-          Number(l2BlockNumberFromJsonRpc) + 1,
-        ).map(async (blockNumber) => {
-          await indexL2Block(BigInt(blockNumber));
-          l2BlocksIndexed.push(blockNumber);
-        }),
-      ),
-      Promise.all(
-        range(
-          Number(l1BlockNumberFromDatabase) + 1,
-          Number(l1BlockNumberFromJsonRpc) + 1,
-        ).map(async (blockNumber) => {
-          await indexL1Block(BigInt(blockNumber));
-          l1BlocksIndexed.push(blockNumber);
-        }),
-      ),
-    ]); */
     return NextResponse.json({
       ok: true,
       l2BlockNumberFromJsonRpc: l2BlockNumberFromJsonRpc.toString(),
@@ -81,5 +71,3 @@ export const GET = async () => {
     });
   }
 };
-
-export const dynamic = "force-dynamic";

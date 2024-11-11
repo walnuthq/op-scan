@@ -1,8 +1,8 @@
 "use client";
 import { ReactNode } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Address } from "viem";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import RouterTabs from "@/components/lib/router-tabs";
 
 const AddressContractTabs = ({
   address,
@@ -10,25 +10,17 @@ const AddressContractTabs = ({
 }: {
   address: Address;
   children: ReactNode;
-}) => {
-  const pathname = usePathname();
-  const router = useRouter();
-  return (
-    <Tabs defaultValue={pathname} onValueChange={(value) => router.push(value)}>
-      <TabsList>
-        <TabsTrigger value={`/address/${address}/contract`}>Code</TabsTrigger>
-        <TabsTrigger value={`/address/${address}/contract/read`}>
-          Read Contract
-        </TabsTrigger>
-        <TabsTrigger value={`/address/${address}/contract/write`}>
-          Write Contract
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value={pathname} className="pt-4">
-        {children}
-      </TabsContent>
-    </Tabs>
-  );
-};
+}) => (
+  <RouterTabs
+    tabs={{
+      [`/address/${address}/contract`]: "Code",
+      [`/address/${address}/contract/read`]: "Read Contract",
+      [`/address/${address}/contract/write`]: "Write Contract",
+    }}
+    currentTab={usePathname()}
+  >
+    {children}
+  </RouterTabs>
+);
 
 export default AddressContractTabs;

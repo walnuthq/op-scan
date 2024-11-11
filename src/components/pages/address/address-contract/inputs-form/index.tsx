@@ -61,8 +61,9 @@ const InputsForm = ({
                 return newResults;
               });
             } catch (error) {
-              console.error(error);
-              setError(error as Error);
+              if (error instanceof Error) {
+                setError(error as Error);
+              }
             }
             setLoading(false);
           } else {

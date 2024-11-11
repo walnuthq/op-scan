@@ -1,9 +1,9 @@
 "use client";
 import { ReactNode } from "react";
 import { CircleCheck } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AccountWithTransactionAndToken } from "@/lib/types";
+import RouterTabs from "@/components/lib/router-tabs";
 
 const AddressTabs = ({
   account,
@@ -13,43 +13,31 @@ const AddressTabs = ({
   children: ReactNode;
 }) => {
   const pathname = usePathname();
-  const router = useRouter();
-  const value = pathname.startsWith(`/address/${account.address}/contract`)
-    ? `/address/${account.address}/contract`
-    : pathname;
+  const tabs: Record<string, ReactNode> = {
+    [`/address/${account.address}`]: "Transactions",
+    [`/address/${account.address}/token-transfers`]: "Token Transfers (ERC-20)",
+    [`/address/${account.address}/nft-transfers`]: "NFT Transfers",
+  };
+  if (account.bytecode) {
+    tabs[`/address/${account.address}/events`] = "Events";
+    tabs[`/address/${account.address}/contract`] = (
+      <div className="flex items-center gap-1">
+        Contract
+        {account.contract && <CircleCheck className="size-4 text-green-400" />}
+      </div>
+    );
+  }
   return (
-    <Tabs defaultValue={value} onValueChange={(value) => router.push(value)}>
-      <TabsList>
-        <TabsTrigger value={`/address/${account.address}`}>
-          Transactions
-        </TabsTrigger>
-        <TabsTrigger value={`/address/${account.address}/token-transfers`}>
-          Token Transfers (ERC-20)
-        </TabsTrigger>
-        <TabsTrigger value={`/address/${account.address}/nft-transfers`}>
-          NFT Transfers
-        </TabsTrigger>
-        {account.bytecode && (
-          <TabsTrigger value={`/address/${account.address}/events`}>
-            Events
-          </TabsTrigger>
-        )}
-        {account.bytecode && (
-          <TabsTrigger
-            value={`/address/${account.address}/contract`}
-            className="flex gap-1"
-          >
-            Contract
-            {account.contract && (
-              <CircleCheck className="size-4 text-green-400" />
-            )}
-          </TabsTrigger>
-        )}
-      </TabsList>
-      <TabsContent value={value} className="pt-2">
-        {children}
-      </TabsContent>
-    </Tabs>
+    <RouterTabs
+      tabs={tabs}
+      currentTab={
+        pathname.startsWith(`/address/${account.address}/contract`)
+          ? `/address/${account.address}/contract`
+          : pathname
+      }
+    >
+      {children}
+    </RouterTabs>
   );
 };
 

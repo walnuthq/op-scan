@@ -2,10 +2,11 @@ import Txs from "@/components/pages/txs";
 import { fetchL2BlockNumber } from "@/lib/fetch-data";
 
 const TxsPage = async ({
-  searchParams: { start, page },
+  searchParams,
 }: {
-  searchParams: { start?: string; page?: string };
+  searchParams: Promise<{ start?: string; page?: string }>;
 }) => {
+  const { start, page } = await searchParams;
   const latestBlockNumber = await fetchL2BlockNumber();
   return (
     <Txs

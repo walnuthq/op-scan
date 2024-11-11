@@ -2,7 +2,6 @@ import { Abi } from "viem";
 import { useTheme } from "next-themes";
 import { ListChecks } from "lucide-react";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import virtualizedRenderer from "react-syntax-highlighter-virtualized-renderer";
 import json from "react-syntax-highlighter/dist/esm/languages/prism/json";
 import {
   vs,
@@ -28,7 +27,6 @@ const AddressContractAbi = ({ abi }: { abi: Abi }) => {
         className="h-96 overflow-y-scroll rounded-md"
         language="json"
         style={resolvedTheme === "light" ? vs : vscDarkPlus}
-        renderer={virtualizedRenderer()}
       >
         {abiString}
       </SyntaxHighlighter>

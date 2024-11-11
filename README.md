@@ -73,6 +73,12 @@ Note that you always need to provide the proxy address, not the underlying contr
 
 If you don't want to run the explorer with your local chain setup, you will find all the necessary environment variables commented in `.env.local.example` to configure the explorer with OP Sepolia or OP Mainnet.
 
+If you want to be able to use the Write Contract feature on verified contracts, you will also need to provide a [Reown](https://docs.reown.com/) project ID.
+
+```
+NEXT_PUBLIC_REOWN_PROJECT_ID="..."
+```
+
 ### Indexer Configuration
 
 To run the indexer, you first need to setup your `DATABASE_URL` in `.env.local` as well as websocket connections to your L1/L2 chains (once again you can get them from a 3rd-party provider):
@@ -149,7 +155,7 @@ Make sure your local chain is started and the indexer is running, then launch th
 pnpm start
 ```
 
-Alternatively you can launch the explorer in dev mode if you want to customize it
+Alternatively you can launch the explorer in dev mode if you want to customize it:
 
 ```
 pnpm dev

@@ -1,8 +1,9 @@
 import { Hash } from "viem";
 import Tx from "@/components/pages/tx";
 
-const TxPage = ({ params: { hash } }: { params: { hash: string } }) => (
-  <Tx hash={hash as Hash} />
-);
+const TxPage = async ({ params }: { params: Promise<{ hash: string }> }) => {
+  const { hash } = await params;
+  return <Tx hash={hash as Hash} />;
+};
 
 export default TxPage;

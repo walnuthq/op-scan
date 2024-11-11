@@ -5,13 +5,9 @@ import {
   fallback,
   HttpTransportConfig,
 } from "viem";
-import { mainnet, sepolia, optimism, optimismSepolia } from "viem/chains";
 import { chainConfig } from "viem/op-stack";
 
-const l1KnownChains = { [mainnet.id]: mainnet, [sepolia.id]: sepolia } as const;
-type L1KnownChainId = keyof typeof l1KnownChains;
-
-const l1CustomChain = defineChain({
+export const l1Chain = defineChain({
   id: Number(process.env.NEXT_PUBLIC_L1_CHAIN_ID),
   name: process.env.NEXT_PUBLIC_L1_NAME,
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
@@ -28,25 +24,9 @@ const l1CustomChain = defineChain({
   },
 });
 
-const l1ChainId = Number(process.env.NEXT_PUBLIC_L1_CHAIN_ID);
-
-export const l1Chain = Object.keys(l1KnownChains).includes(
-  process.env.NEXT_PUBLIC_L1_CHAIN_ID,
-)
-  ? l1KnownChains[l1ChainId as L1KnownChainId]
-  : l1CustomChain;
-
-const l2KnownChains = {
-  [optimism.id]: optimism,
-  [optimismSepolia.id]: optimismSepolia,
-} as const;
-type L2KnownChainId = keyof typeof l2KnownChains;
-
-const l2CustomChain = defineChain({
+export const l2Chain = defineChain({
   ...chainConfig,
   id: Number(process.env.NEXT_PUBLIC_L2_CHAIN_ID),
-  caipNetworkId: `eip155:${process.env.NEXT_PUBLIC_L2_CHAIN_ID}`,
-  chainNamespace: "eip155",
   name: process.env.NEXT_PUBLIC_L2_NAME,
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
@@ -61,14 +41,6 @@ const l2CustomChain = defineChain({
     },
   },
 });
-
-const l2ChainId = Number(process.env.NEXT_PUBLIC_L2_CHAIN_ID);
-
-export const l2Chain = Object.keys(l2KnownChains).includes(
-  process.env.NEXT_PUBLIC_L2_CHAIN_ID,
-)
-  ? l2KnownChains[l2ChainId as L2KnownChainId]
-  : l2CustomChain;
 
 const transportOptions: HttpTransportConfig = {
   batch: true,

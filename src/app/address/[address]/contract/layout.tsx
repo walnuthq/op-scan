@@ -5,12 +5,13 @@ import fetchAccount from "@/lib/fetch-account";
 import AddressContractTabs from "@/components/pages/address/address-contract/address-contract-tabs";
 
 const AddressContractLayout = async ({
-  params: { address: rawAddress },
+  params,
   children,
 }: {
-  params: { address: string };
+  params: Promise<{ address: string }>;
   children: ReactNode;
 }) => {
+  const { address: rawAddress } = await params;
   const address = getAddress(rawAddress);
   const account = await fetchAccount(address);
   return (
