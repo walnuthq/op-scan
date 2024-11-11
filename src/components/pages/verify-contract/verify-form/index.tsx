@@ -109,8 +109,9 @@ const VerifyContractVerifyForm = ({
             : defaultValues.evmVersion,
       });
     } catch (error) {
-      console.error(error);
-      setError(error as Error);
+      if (error instanceof Error && error.message !== "NEXT_REDIRECT") {
+        setError(error);
+      }
     }
     setLoading(false);
   };
