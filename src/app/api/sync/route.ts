@@ -49,22 +49,6 @@ export const GET = async () => {
         l1BlocksIndexed.push(Number(blockNumber));
       }
     }
-    /* for (
-      let blockNumber = l2BlockNumberFromDatabase + BigInt(1);
-      blockNumber <= l2BlockNumberFromJsonRpc;
-      ++blockNumber
-    ) {
-      await indexL2Block(blockNumber);
-      l2BlocksIndexed.push(Number(blockNumber));
-    }
-    for (
-      let blockNumber = l1BlockNumberFromDatabase + BigInt(1);
-      blockNumber <= l1BlockNumberFromJsonRpc;
-      ++blockNumber
-    ) {
-      await indexL1Block(blockNumber);
-      l1BlocksIndexed.push(Number(blockNumber));
-    } */
     return NextResponse.json({
       ok: true,
       l2BlockNumberFromJsonRpc: l2BlockNumberFromJsonRpc.toString(),
