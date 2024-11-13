@@ -65,7 +65,7 @@ const getTokenMetadata = async (tokenUri: string, tokenId: bigint) => {
       return { name: "NFT", imageUrl: tokenUri };
     }
     const tokenUriProcessed = processUri(tokenUri, tokenId);
-    const response = await fetch(tokenUriProcessed, { cache: "no-cache" });
+    const response = await fetch(tokenUriProcessed);
     if (!response.ok) {
       return { name: "NFT", imageUrl: "" };
     }

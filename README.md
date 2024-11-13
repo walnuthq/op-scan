@@ -116,7 +116,7 @@ pnpm prisma:db:push
 ```
 
 Indexing a blockchain is putting a heavy load on the RPC as you need to perform a large number of JSON-RPC requests to fully index a block (along with transactions and logs).
-When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 3 fallback RPC URLs in case this happens:
+When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 5 fallback RPC URLs in case this happens:
 
 ```
 NEXT_PUBLIC_L1_FALLBACK1_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK1_API_KEY"
@@ -125,6 +125,10 @@ NEXT_PUBLIC_L1_FALLBACK2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK2
 NEXT_PUBLIC_L2_FALLBACK2_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK2_API_KEY"
 NEXT_PUBLIC_L1_FALLBACK3_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK3_API_KEY"
 NEXT_PUBLIC_L2_FALLBACK3_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK3_API_KEY"
+NEXT_PUBLIC_L1_FALLBACK4_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK4_API_KEY"
+NEXT_PUBLIC_L2_FALLBACK4_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK4_API_KEY"
+NEXT_PUBLIC_L1_FALLBACK5_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK5_API_KEY"
+NEXT_PUBLIC_L2_FALLBACK5_RPC_URL="https://opt-mainnet.g.alchemy.com/v2/FALLBACK5_API_KEY"
 ```
 
 You can pass several parameters to the indexer to control the indexing range and execution:
