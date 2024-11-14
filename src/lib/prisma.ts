@@ -37,8 +37,10 @@ import {
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 neonConfig.webSocketConstructor = ws;
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaNeon(pool);
+const pool = process.env.DATABASE_URL.startsWith("postgresql")
+  ? new Pool({ connectionString: process.env.DATABASE_URL })
+  : null;
+const adapter = pool ? new PrismaNeon(pool) : null;
 export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

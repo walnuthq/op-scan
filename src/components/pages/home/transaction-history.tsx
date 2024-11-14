@@ -51,7 +51,7 @@ const TransactionHistory = ({ data }: { data: DataItem[] }) => (
   <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium">
-        Transaction history in 14 days
+        Transaction history in {data.length - 1} days
       </CardTitle>
     </CardHeader>
     <CardContent className="h-40">

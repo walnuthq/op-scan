@@ -79,8 +79,8 @@ model Log {
   transactionHash  String
   removed          Boolean
   topics           String
-  // transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
-  // receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+  //transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
+  //receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
   transaction      Transaction        @relation(fields: [transactionHash], references: [hash], map: "Log_transaction_transactionHash_fkey")
   receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], map: "Log_receipt_transactionHash_fkey")
   erc20Transfer    Erc20Transfer?
@@ -119,8 +119,8 @@ model Erc20Transfer {
   to               String
   value            String
   token            Erc20Token         @relation(fields: [address], references: [address])
-  // transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
-  // receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+  //transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
+  //receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
   transaction      Transaction        @relation(fields: [transactionHash], references: [hash], map: "Erc20Transfer_transaction_transactionHash_fkey")
   receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], map: "Erc20Transfer_receipt_transactionHash_fkey")
   log              Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex])
@@ -157,8 +157,8 @@ model NftTransfer {
   erc1155TokenAddress String?
   erc721Token         Erc721Token?       @relation(fields: [erc721TokenAddress], references: [address])
   erc1155Token        Erc1155Token?      @relation(fields: [erc1155TokenAddress], references: [address])
-  // transaction         Transaction        @relation(fields: [transactionHash], references: [hash])
-  // receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
+  //transaction         Transaction        @relation(fields: [transactionHash], references: [hash])
+  //receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
   transaction         Transaction        @relation(fields: [transactionHash], references: [hash], map: "NftTransfer_transaction_transactionHash_fkey")
   receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], map: "NftTransfer_receipt_transactionHash_fkey")
   log                 Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex])
@@ -185,4 +185,10 @@ model Signature {
   signature String   @id
   hash      String
   createdAt DateTime @default(now())
+}
+
+model TransactionsHistory {
+  date         DateTime @id
+  price        Float
+  transactions Int
 }
