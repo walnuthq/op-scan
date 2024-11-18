@@ -7,8 +7,6 @@ declare global {
       readonly DATABASE_URL: string;
       readonly L1_RPC_WS: string;
       readonly L2_RPC_WS: string;
-      readonly ETHERSCAN_BASE_URL: string;
-      readonly ETHERSCAN_API_KEY: string;
       readonly CRON_SECRET: string;
       // public
       // L1 chain config
