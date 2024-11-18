@@ -1,4 +1,5 @@
 import { Address, Hash } from "viem";
+import { txsPerPage } from "@/lib/constants";
 import { NFTMetadata, NftTransferWithToken } from "@/lib/types";
 import { prisma, fromPrismaNftTransferWithToken } from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
@@ -10,6 +11,7 @@ export type NftTransfer = {
   selector: string;
   signature: string;
   blockNumber: bigint;
+  logIndex: number;
   timestamp: bigint;
   from: Address;
   to: Address;
@@ -99,7 +101,6 @@ const fetchNFTMetadata = async (nftTransfer: NftTransferWithToken) => {
 };
 
 export const fetchNftTransfers = async (address: Address, page: number) => {
-  const txsPerPage = Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
   const where = { OR: [{ to: address }, { from: address }] };
   const [prismaNftTransfers, totalCount] = await Promise.all([
     prisma.nftTransfer.findMany({
@@ -111,14 +112,18 @@ export const fetchNftTransfers = async (address: Address, page: number) => {
       ],
       take: txsPerPage,
       skip: (page - 1) * txsPerPage,
-      include: { transaction: true, erc721Token: true, erc1155Token: true },
+      include: {
+        receipt: { include: { transaction: true } },
+        erc721Token: true,
+        erc1155Token: true,
+      },
     }),
     prisma.nftTransfer.count({ where }),
   ]);
   const nftTransfers = await Promise.all(
     prismaNftTransfers.map(async (prismaNftTransfer) => {
       const nftTransfer = fromPrismaNftTransferWithToken(prismaNftTransfer);
-      const selector = prismaNftTransfer.transaction.input.slice(0, 10);
+      const selector = prismaNftTransfer.receipt.transaction.input.slice(0, 10);
       const [signature, metadata] = await Promise.all([
         loadFunctions(selector),
         fetchNFTMetadata(nftTransfer),
@@ -128,7 +133,8 @@ export const fetchNftTransfers = async (address: Address, page: number) => {
         selector,
         signature,
         blockNumber: nftTransfer.blockNumber,
-        timestamp: prismaNftTransfer.transaction.timestamp,
+        logIndex: nftTransfer.logIndex,
+        timestamp: prismaNftTransfer.receipt.transaction.timestamp,
         from: nftTransfer.from,
         to: nftTransfer.to,
         type: "ERC-721" as const,

@@ -1,5 +1,6 @@
 "use client";
 import { LineChart, Line, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
+import { uniq } from "lodash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { formatPrice, formatNumber } from "@/lib/utils";
@@ -82,10 +83,10 @@ const TransactionHistory = ({ data }: { data: DataItem[] }) => (
             tickLine={false}
             axisLine={false}
             domain={["dataMin", "dataMax"]}
-            ticks={[
+            ticks={uniq([
               Math.min(...data.map(({ transactions }) => transactions)),
               Math.max(...data.map(({ transactions }) => transactions)),
-            ]}
+            ])}
           />
           <Line
             type="monotone"

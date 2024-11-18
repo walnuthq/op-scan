@@ -27,12 +27,18 @@ declare global {
       readonly NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS: `0x${string}`;
       readonly NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS: `0x${string}`;
       // constants
-      readonly NEXT_PUBLIC_L1_BLOCK_TIME: string;
-      readonly NEXT_PUBLIC_L2_BLOCK_TIME: string;
-      readonly NEXT_PUBLIC_BLOCKS_PER_PAGE: string;
-      readonly NEXT_PUBLIC_TXS_PER_PAGE: string;
-      readonly NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE: string;
-      readonly NEXT_PUBLIC_EVENTS_PER_PAGE: string;
+      readonly NEXT_PUBLIC_L1_BLOCK_TIME?: string;
+      readonly NEXT_PUBLIC_L2_BLOCK_TIME?: string;
+      readonly NEXT_PUBLIC_BLOCKS_PER_PAGE?: string;
+      readonly NEXT_PUBLIC_TXS_PER_PAGE?: string;
+      readonly NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE?: string;
+      readonly NEXT_PUBLIC_EVENTS_PER_PAGE?: string;
+      readonly NEXT_PUBLIC_TRANSACTIONS_HISTORY_COUNT?: string;
+      // metadata
+      readonly NEXT_PUBLIC_METADATA_TITLE: string;
+      readonly NEXT_PUBLIC_METADATA_DESCRIPTION: string;
+      readonly NEXT_PUBLIC_METADATA_URL: string;
+      readonly NEXT_PUBLIC_METADATA_ICON: string;
       // fallback rpc urls
       readonly NEXT_PUBLIC_L1_FALLBACK1_RPC_URL: string;
       readonly NEXT_PUBLIC_L2_FALLBACK1_RPC_URL: string;

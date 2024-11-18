@@ -25,4 +25,6 @@ const AddressTransactionsPage = async ({
   );
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressTransactionsPage;

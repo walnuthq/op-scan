@@ -56,7 +56,7 @@ const NftTransfersTable = ({
         ) : (
           nftTransfers.map((nftTransfer) => (
             <NftTransfersTableRow
-              key={nftTransfer.transactionHash}
+              key={`${nftTransfer.blockNumber}-${nftTransfer.transactionHash}-${nftTransfer.logIndex}`}
               address={address}
               nftTransfer={nftTransfer}
               timestampFormattedAsDate={timestampFormattedAsDate}

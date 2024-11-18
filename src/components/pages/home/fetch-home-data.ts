@@ -4,15 +4,23 @@ import {
   fromPrismaTransaction,
   fromPrismaTransactionEnqueued,
 } from "@/lib/prisma";
-import { subDays, format, formatISO, getUnixTime } from "date-fns";
+import { transactionsHistoryCount } from "@/lib/constants";
+import {
+  format,
+  formatISO,
+  getUnixTime,
+  startOfDay,
+  addDays,
+  subDays,
+} from "date-fns";
+import { UTCDate } from "@date-fns/utc";
+import { secondsInDay } from "date-fns/constants";
 import { fetchSpotPrices } from "@/lib/fetch-data";
-
-const SECONDS_IN_DAY = 24 * 60 * 60;
 
 const fetchPrices = () =>
   Promise.all([
     fetchSpotPrices(
-      formatISO(subDays(new Date().setUTCHours(0, 0, 0, 0), 1), {
+      formatISO(subDays(startOfDay(new UTCDate()), 1), {
         representation: "date",
       }),
     ),
@@ -20,24 +28,24 @@ const fetchPrices = () =>
   ]);
 
 const fetchTransactionsCount = async () => {
-  const timestamp = getUnixTime(new Date().setUTCHours(0, 0, 0, 0));
+  const today = startOfDay(new UTCDate());
   const rawResult = await prisma.$queryRawUnsafe(`
-    SELECT COUNT(*) AS "total",
-    COUNT(CASE WHEN "timestamp" BETWEEN ${timestamp} AND
-      ${timestamp + SECONDS_IN_DAY} THEN 1 ELSE NULL END) AS "totalToday"
+    SELECT COUNT(*) AS "transactionsCount",
+    COUNT(CASE WHEN "timestamp" >= ${getUnixTime(today)} AND "timestamp" <
+      ${getUnixTime(addDays(today, 1))} THEN 1 ELSE NULL END) AS "transactionsCountToday"
     FROM "Transaction";
   `);
   const result = rawResult as {
-    total: bigint;
-    totalToday: bigint;
+    transactionsCount: bigint;
+    transactionsCountToday: bigint;
   }[];
   const firstResult = result[0];
   if (!firstResult) {
     return { transactionsCount: 0, transactionsCountToday: 0 };
   }
   return {
-    transactionsCount: Number(firstResult.total),
-    transactionsCountToday: Number(firstResult.totalToday),
+    transactionsCount: Number(firstResult.transactionsCount),
+    transactionsCountToday: Number(firstResult.transactionsCountToday),
   };
 };
 
@@ -67,23 +75,9 @@ const fetchHomeData = async () => {
     }),
     prisma.transactionsHistory.findMany({
       orderBy: { date: "desc" },
-      take: 14,
+      take: transactionsHistoryCount,
     }),
   ]);
-  if (transactionsHistory.length === 0) {
-    transactionsHistory.push(
-      {
-        date: subDays(new Date().setUTCHours(0, 0, 0, 0), 1),
-        price: prices[0].OP,
-        transactions: Math.random() * 100000,
-      },
-      {
-        date: subDays(new Date().setUTCHours(0, 0, 0, 0), 2),
-        price: prices[0].OP,
-        transactions: Math.random() * 100000,
-      },
-    );
-  }
   const transactionsHistorySum = transactionsHistory.reduce(
     (previousValue, currentValue) => previousValue + currentValue.transactions,
     0,
@@ -96,14 +90,14 @@ const fetchHomeData = async () => {
       fromPrismaTransaction(transaction),
     ),
     transactionsCount,
-    tps: transactionsHistorySum / (transactionsHistory.length * SECONDS_IN_DAY),
+    tps: transactionsHistorySum / (transactionsHistory.length * secondsInDay),
     transactionsEnqueued: transactionsEnqueued.map(
       fromPrismaTransactionEnqueued,
     ),
     transactionsHistory: [
       ...transactionsHistory.reverse(),
       {
-        date: new Date(),
+        date: startOfDay(new UTCDate()),
         price: prices[1].OP,
         transactions: transactionsCountToday,
       },

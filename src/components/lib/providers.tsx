@@ -10,21 +10,23 @@ import { l2Chain } from "@/lib/chains";
 
 const queryClient = new QueryClient();
 
-export const appKit = createAppKit({
-  adapters: [wagmiAdapter],
-  projectId: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
-  networks: [l2Chain],
-  metadata: {
-    name: "op-scan",
-    description: "op-scan",
-    url: "https://www.opscan.co/",
-    icons: ["https://www.opscan.co/img/logo.png"],
-  },
-  themeMode: "dark",
-  themeVariables: {
-    "--w3m-accent": "hsl(var(--destructive))",
-  },
-});
+export const appKit = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID
+  ? createAppKit({
+      adapters: [wagmiAdapter],
+      projectId: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
+      networks: [l2Chain],
+      metadata: {
+        name: process.env.NEXT_PUBLIC_METADATA_TITLE,
+        description: process.env.NEXT_PUBLIC_METADATA_DESCRIPTION,
+        url: process.env.NEXT_PUBLIC_METADATA_URL,
+        icons: [process.env.NEXT_PUBLIC_METADATA_ICON],
+      },
+      themeMode: "dark",
+      themeVariables: {
+        "--w3m-accent": "hsl(var(--destructive))",
+      },
+    })
+  : null;
 
 const Providers = ({ children }: { children: ReactNode }) => (
   <ThemeProvider

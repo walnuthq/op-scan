@@ -9,6 +9,7 @@ import TxsTable from "@/components/lib/txs-table";
 import fetchTransactions from "@/components/pages/address/address-transactions/fetch-transactions";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import Pagination from "@/components/lib/pagination";
+import { txsPerPage } from "@/lib/constants";
 
 const CardHeaderFooterContent = ({
   totalCount,
@@ -29,9 +30,7 @@ const CardHeaderFooterContent = ({
       <Pagination
         pathname={`/address/${address}`}
         page={page}
-        totalPages={Math.ceil(
-          totalCount / Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE),
-        )}
+        totalPages={Math.ceil(totalCount / txsPerPage)}
       />
     </>
   );

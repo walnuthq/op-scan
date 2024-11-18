@@ -45,7 +45,7 @@ const EventsTable = ({ events }: { events: Event[] }) => {
         ) : (
           events.map((event) => (
             <EventsTableRow
-              key={event.logIndex}
+              key={`${event.blockNumber}-${event.transactionHash}-${event.logIndex}`}
               event={event}
               timestampFormattedAsDate={timestampFormattedAsDate}
             />

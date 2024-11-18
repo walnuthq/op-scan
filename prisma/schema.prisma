@@ -5,8 +5,8 @@ generator client {
 }
 
 datasource db {
-  // provider = "sqlite"
-  provider = "postgresql"
+  provider = "sqlite"
+  //provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -44,11 +44,8 @@ model Transaction {
   transactionIndex     Int
   input                String
   timestamp            BigInt
-  block                Block               @relation(fields: [blockNumber], references: [number])
+  block                Block               @relation(fields: [blockNumber], references: [number], onDelete: Cascade)
   receipt              TransactionReceipt?
-  logs                 Log[]
-  erc20Transfers       Erc20Transfer[]
-  nftTransfers         NftTransfer[]
   accounts             Account[]
 }
 
@@ -63,7 +60,7 @@ model TransactionReceipt {
   l1GasPrice        String?
   l1GasUsed         String?
   l1FeeScalar       Int?
-  transaction       Transaction     @relation(fields: [transactionHash], references: [hash])
+  transaction       Transaction     @relation(fields: [transactionHash], references: [hash], onDelete: Cascade)
   logs              Log[]
   erc20Transfers    Erc20Transfer[]
   nftTransfers      NftTransfer[]
@@ -79,10 +76,7 @@ model Log {
   transactionHash  String
   removed          Boolean
   topics           String
-  //transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
-  //receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
-  transaction      Transaction        @relation(fields: [transactionHash], references: [hash], map: "Log_transaction_transactionHash_fkey")
-  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], map: "Log_receipt_transactionHash_fkey")
+  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], onDelete: Cascade)
   erc20Transfer    Erc20Transfer?
   nftTransfer      NftTransfer?
 
@@ -105,7 +99,7 @@ model Erc20Token {
   name      String
   symbol    String
   decimals  Int
-  account   Account         @relation(fields: [address], references: [address])
+  account   Account         @relation(fields: [address], references: [address], onDelete: Cascade)
   transfers Erc20Transfer[]
 }
 
@@ -119,11 +113,8 @@ model Erc20Transfer {
   to               String
   value            String
   token            Erc20Token         @relation(fields: [address], references: [address])
-  //transaction      Transaction        @relation(fields: [transactionHash], references: [hash])
-  //receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
-  transaction      Transaction        @relation(fields: [transactionHash], references: [hash], map: "Erc20Transfer_transaction_transactionHash_fkey")
-  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], map: "Erc20Transfer_receipt_transactionHash_fkey")
-  log              Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex])
+  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], onDelete: Cascade)
+  log              Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex], onDelete: Cascade)
 
   @@id([blockNumber, transactionIndex, logIndex])
 }
@@ -132,13 +123,13 @@ model Erc721Token {
   address   String        @id
   name      String
   symbol    String
-  account   Account       @relation(fields: [address], references: [address])
+  account   Account       @relation(fields: [address], references: [address], onDelete: Cascade)
   transfers NftTransfer[]
 }
 
 model Erc1155Token {
   address   String        @id
-  account   Account       @relation(fields: [address], references: [address])
+  account   Account       @relation(fields: [address], references: [address], onDelete: Cascade)
   transfers NftTransfer[]
 }
 
@@ -157,11 +148,8 @@ model NftTransfer {
   erc1155TokenAddress String?
   erc721Token         Erc721Token?       @relation(fields: [erc721TokenAddress], references: [address])
   erc1155Token        Erc1155Token?      @relation(fields: [erc1155TokenAddress], references: [address])
-  //transaction         Transaction        @relation(fields: [transactionHash], references: [hash])
-  //receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash])
-  transaction         Transaction        @relation(fields: [transactionHash], references: [hash], map: "NftTransfer_transaction_transactionHash_fkey")
-  receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], map: "NftTransfer_receipt_transactionHash_fkey")
-  log                 Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex])
+  receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], onDelete: Cascade)
+  log                 Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex], onDelete: Cascade)
 
   @@id([blockNumber, transactionIndex, logIndex])
 }

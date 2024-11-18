@@ -1,6 +1,7 @@
 "use client";
 import { AbiFunction, Address } from "viem";
 import { Contract } from "@/lib/types";
+import { appKit } from "@/components/lib/providers";
 import { Accordion } from "@/components/ui/accordion";
 import ReadWriteFunction from "@/components/pages/address/address-contract/read-write-function";
 
@@ -19,7 +20,7 @@ const AddressContractWrite = ({
   );
   return (
     <div className="space-y-4">
-      <appkit-button />
+      {appKit && <appkit-button />}
       <Accordion className="space-y-4" type="multiple">
         {writeFunctions.map((writeFunction, index) => (
           <ReadWriteFunction

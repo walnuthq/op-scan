@@ -14,7 +14,7 @@ import {
 const ModeToggle = () => {
   const { setTheme, theme } = useTheme();
   useEffect(() => {
-    if (!theme) {
+    if (!theme || !appKit) {
       return;
     }
     appKit.setThemeMode(theme === "light" ? "light" : "dark");

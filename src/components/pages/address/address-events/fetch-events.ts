@@ -12,6 +12,7 @@ import {
 import { prisma, fromPrismaLog } from "@/lib/prisma";
 import { loadEvents, loadFunctions } from "@/lib/signatures";
 import fetchAccount from "@/lib/fetch-account";
+import { eventsPerPage } from "@/lib/constants";
 
 export type DecodedData = {
   hex: Hex;
@@ -74,20 +75,20 @@ export const fetchEvents = async (address: Address): Promise<Event[]> => {
   const [logs, account] = await Promise.all([
     prisma.log.findMany({
       where: { address },
-      include: { transaction: true },
+      include: { receipt: { include: { transaction: true } } },
       orderBy: [
         { blockNumber: "desc" },
         { transactionIndex: "desc" },
         { logIndex: "desc" },
       ],
-      take: Number(process.env.NEXT_PUBLIC_EVENTS_PER_PAGE),
+      take: eventsPerPage,
     }),
     fetchAccount(address),
   ]);
   return Promise.all(
     logs.map(async (prismaLog) => {
       const log = fromPrismaLog(prismaLog);
-      const selector = prismaLog.transaction.input.slice(0, 10);
+      const selector = prismaLog.receipt.transaction.input.slice(0, 10);
       const [signature, abiEvent] = await Promise.all([
         loadFunctions(selector),
         findAbiEventFromHash(account.contract?.abi, log.topics[0]),
@@ -96,7 +97,7 @@ export const fetchEvents = async (address: Address): Promise<Event[]> => {
         logIndex: log.logIndex,
         transactionHash: log.transactionHash,
         blockNumber: log.blockNumber,
-        timestamp: prismaLog.transaction.timestamp,
+        timestamp: prismaLog.receipt.transaction.timestamp,
         selector,
         signature,
         abiEvent,
