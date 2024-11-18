@@ -38,16 +38,16 @@ declare global {
       readonly NEXT_PUBLIC_METADATA_URL: string;
       readonly NEXT_PUBLIC_METADATA_ICON: string;
       // fallback rpc urls
-      readonly NEXT_PUBLIC_L1_FALLBACK1_RPC_URL: string;
-      readonly NEXT_PUBLIC_L2_FALLBACK1_RPC_URL: string;
-      readonly NEXT_PUBLIC_L1_FALLBACK2_RPC_URL: string;
-      readonly NEXT_PUBLIC_L2_FALLBACK2_RPC_URL: string;
-      readonly NEXT_PUBLIC_L1_FALLBACK3_RPC_URL: string;
-      readonly NEXT_PUBLIC_L2_FALLBACK3_RPC_URL: string;
-      readonly NEXT_PUBLIC_L1_FALLBACK4_RPC_URL: string;
-      readonly NEXT_PUBLIC_L2_FALLBACK4_RPC_URL: string;
-      readonly NEXT_PUBLIC_L1_FALLBACK5_RPC_URL: string;
-      readonly NEXT_PUBLIC_L2_FALLBACK5_RPC_URL: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK1_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK1_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK2_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK2_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK3_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK3_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK4_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK4_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L1_FALLBACK5_RPC_URL?: string;
+      readonly NEXT_PUBLIC_L2_FALLBACK5_RPC_URL?: string;
       // reown
       readonly NEXT_PUBLIC_REOWN_PROJECT_ID: string;
     }
