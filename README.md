@@ -36,13 +36,13 @@ pnpm >= 9
 
 Clone this repository:
 
-```
+```sh
 git clone git@github.com:walnuthq/op-scan
 ```
 
 Install the dependencies:
 
-```
+```sh
 pnpm install
 ```
 
@@ -91,25 +91,25 @@ L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 
 Then you can sync your local database with the Prisma schema:
 
-```
+```sh
 pnpm prisma:db:push
 ```
 
 Now you will be able to start indexing the blockchain by running the `op-indexer` command:
 
-```
+```sh
 pnpm op-indexer
 ```
 
 You should start seeing blocks getting indexed in your terminal and you can explore the state of your local database using Prisma studio:
 
-```
+```sh
 pnpm prisma:studio
 ```
 
 If you need to change the Prisma schema at some point, make sure to regenerate the Prisma client and push to your local database:
 
-```
+```sh
 pnpm prisma:generate
 pnpm prisma:db:push
 ```
@@ -140,7 +140,7 @@ You can pass several parameters to the indexer to control the indexing range and
 
 Example of running the indexer:
 
-```
+```sh
 pnpm op-indexer -f 123416717 --l1-index-block 20426733 --l1-index-block 20426726 -d 500
 ```
 
@@ -148,19 +148,19 @@ pnpm op-indexer -f 123416717 --l1-index-block 20426733 --l1-index-block 20426726
 
 When you're done configuring your environment variables you can build the app:
 
-```
+```sh
 pnpm build
 ```
 
 Make sure your local chain is started and the indexer is running, then launch the explorer to see it live at `http://localhost:3000`
 
-```
+```sh
 pnpm start
 ```
 
 Alternatively you can launch the explorer in dev mode if you want to customize it:
 
-```
+```sh
 pnpm dev
 ```
 
