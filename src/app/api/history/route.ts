@@ -1,15 +1,21 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { range } from "lodash";
-import { addDays, subDays, formatISO, getUnixTime, startOfDay } from "date-fns";
+import {
+  addDays,
+  subDays,
+  formatISO,
+  getUnixTime,
+  eachDayOfInterval,
+} from "date-fns";
 import { UTCDate } from "@date-fns/utc";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import { transactionsHistoryCount } from "@/lib/constants";
 
 const getDates = () =>
-  range(transactionsHistoryCount, 0, -1).map((offset) =>
-    subDays(startOfDay(new UTCDate()), offset),
-  );
+  eachDayOfInterval({
+    start: subDays(new UTCDate(), transactionsHistoryCount),
+    end: subDays(new UTCDate(), 1),
+  });
 
 const fetchPrices = () =>
   Promise.all(

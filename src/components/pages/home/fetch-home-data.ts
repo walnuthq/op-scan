@@ -12,9 +12,9 @@ import {
   startOfDay,
   addDays,
   subDays,
+  differenceInSeconds,
 } from "date-fns";
 import { UTCDate } from "@date-fns/utc";
-import { secondsInDay } from "date-fns/constants";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 
 const fetchPrices = () =>
@@ -80,7 +80,7 @@ const fetchHomeData = async () => {
   ]);
   const transactionsHistorySum = transactionsHistory.reduce(
     (previousValue, currentValue) => previousValue + currentValue.transactions,
-    0,
+    transactionsCountToday,
   );
   return {
     pricesYesterday: prices[0]!,
@@ -90,7 +90,12 @@ const fetchHomeData = async () => {
       fromPrismaTransaction(transaction),
     ),
     transactionsCount,
-    tps: transactionsHistorySum / (transactionsHistory.length * secondsInDay),
+    tps:
+      transactionsHistorySum /
+      differenceInSeconds(
+        new UTCDate(),
+        subDays(startOfDay(new UTCDate()), transactionsHistoryCount),
+      ),
     transactionsEnqueued: transactionsEnqueued.map(
       fromPrismaTransactionEnqueued,
     ),

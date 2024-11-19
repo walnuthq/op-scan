@@ -60,7 +60,7 @@ const main = async () => {
   const l1FromBlock = values["l1-from-block"]
     ? BigInt(values["l1-from-block"])
     : defaultL1FromBlock;
-  const indexL1Blocks = values["l1-index-block"] ?? [];
+  const indexL1Blocks = values["l1-index-block"];
   const l1BlocksToIndex = new Set<bigint>([
     ...indexL1Blocks.map(BigInt),
     ...range(Number(l1FromBlock), Number(latestL1BlockNumber) + 1).map(BigInt),
@@ -70,7 +70,7 @@ const main = async () => {
   const l2FromBlock = values["l2-from-block"]
     ? BigInt(values["l2-from-block"])
     : defaultL2FromBlock;
-  const indexL2Blocks = values["l2-index-block"] ?? [];
+  const indexL2Blocks = values["l2-index-block"];
   const l2BlocksToIndex = new Set<bigint>([
     ...indexL2Blocks.map(BigInt),
     ...range(Number(l2FromBlock), Number(latestL2BlockNumber) + 1).map(BigInt),
@@ -84,19 +84,23 @@ const main = async () => {
     onBlockNumber: (blockNumber) => l2BlocksToIndex.add(blockNumber),
   });
 
-  const indexDelay = Number(values["index-delay"] ?? "400");
+  const indexDelay = Number(values["index-delay"]);
 
   setInterval(async () => {
     const [blockNumber] = l1BlocksToIndex;
     if (blockNumber === undefined) {
       return;
     }
-    l1BlocksToIndex.delete(blockNumber);
     console.info(`Indexing L1 Block #${blockNumber}`);
-    console.time(`l1-${blockNumber}`);
-    await indexL1Block(blockNumber);
-    console.timeEnd(`l1-${blockNumber}`);
-    console.info(`L1 Block #${blockNumber} indexed`);
+    try {
+      console.time(`l1-${blockNumber}`);
+      await indexL1Block(blockNumber);
+      console.timeEnd(`l1-${blockNumber}`);
+      l1BlocksToIndex.delete(blockNumber);
+      console.info(`Indexed  L1 Block #${blockNumber}`);
+    } catch (error) {
+      console.error(error);
+    }
   }, indexDelay);
 
   setInterval(async () => {
@@ -104,12 +108,16 @@ const main = async () => {
     if (blockNumber === undefined) {
       return;
     }
-    l2BlocksToIndex.delete(blockNumber);
     console.info(`Indexing L2 Block #${blockNumber}`);
-    console.time(`l2-${blockNumber}`);
-    await indexL2Block(blockNumber);
-    console.timeEnd(`l2-${blockNumber}`);
-    console.info(`L2 Block #${blockNumber} indexed`);
+    try {
+      console.time(`l2-${blockNumber}`);
+      await indexL2Block(blockNumber);
+      console.timeEnd(`l2-${blockNumber}`);
+      l2BlocksToIndex.delete(blockNumber);
+      console.info(`Indexed  L2 Block #${blockNumber}`);
+    } catch (error) {
+      console.error(error);
+    }
   }, indexDelay);
 };
 
