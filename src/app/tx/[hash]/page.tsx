@@ -6,4 +6,6 @@ const TxPage = async ({ params }: { params: Promise<{ hash: string }> }) => {
   return <Tx hash={hash as Hash} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default TxPage;

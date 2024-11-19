@@ -21,4 +21,6 @@ const BlockTxsPage = async ({
   return <BlockTxs number={BigInt(numberOrHash)} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default BlockTxsPage;

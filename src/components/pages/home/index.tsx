@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { l2Chain } from "@/lib/chains";
 import Search from "@/components/lib/search";
 import EthPrice from "@/components/pages/home/eth-price";
@@ -22,11 +23,17 @@ const Home = async () => {
     transactionsHistory,
   } = await fetchHomeData();
   const [firstBlock] = blocks;
+  const hasTransactionsHistory = transactionsHistory.length >= 3;
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h1 className="text-xl font-bold">{l2Chain.name} Explorer</h1>
       <Search className="max-w-2xl" />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div
+        className={cn("grid gap-4", {
+          "lg:grid-cols-2": !hasTransactionsHistory,
+          "lg:grid-cols-3": hasTransactionsHistory,
+        })}
+      >
         <div className="space-y-4">
           <EthPrice today={pricesToday.ETH} yesterday={pricesYesterday.ETH} />
           <OpPrice today={pricesToday.OP} yesterday={pricesYesterday.OP} />
@@ -39,7 +46,9 @@ const Home = async () => {
           />
           <LatestL1TxBatch />
         </div>
-        <TransactionHistory data={transactionsHistory} />
+        {hasTransactionsHistory && (
+          <TransactionHistory data={transactionsHistory} />
+        )}
       </div>
       <div className="grid gap-4 md:gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <LatestBlocks blocks={blocks} />

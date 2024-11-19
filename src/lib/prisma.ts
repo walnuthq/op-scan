@@ -12,6 +12,9 @@ import {
   TransactionEnqueued as PrismaTransactionEnqueued,
   Account as PrismaAccount,
 } from "@/prisma/generated/client";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import ws from "ws";
 import {
   Block,
   Transaction,
@@ -33,7 +36,12 @@ import {
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+neonConfig.webSocketConstructor = ws;
+const pool = process.env.DATABASE_URL.startsWith("postgresql")
+  ? new Pool({ connectionString: process.env.DATABASE_URL })
+  : null;
+const adapter = pool ? new PrismaNeon(pool) : null;
+export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 

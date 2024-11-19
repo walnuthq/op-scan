@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Server } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatNumber } from "@/lib/utils";
+import { l2BlockTime } from "@/lib/constants";
 
 const LatestBlockAndTxs = ({
   blockNumber,
@@ -29,7 +30,7 @@ const LatestBlockAndTxs = ({
           {blockNumber.toString()}
         </Link>
         <span className="text-xs text-muted-foreground">
-          ({process.env.NEXT_PUBLIC_L2_BLOCK_TIME}.0s)
+          ({l2BlockTime}.0s)
         </span>
       </div>
       <div className="flex items-center gap-1 text-sm">

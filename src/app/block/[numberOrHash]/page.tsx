@@ -21,4 +21,6 @@ const BlockPage = async ({
   return <Block number={BigInt(numberOrHash)} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default BlockPage;

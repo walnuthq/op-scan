@@ -8,6 +8,7 @@ import {
 import { fetchNftTransfers } from "@/components/pages/address/address-nft-transfers/fetch-nft-transfers";
 import NftTransfersTable from "@/components/pages/address/address-nft-transfers/nft-transfers-table";
 import Pagination from "@/components/lib/pagination";
+import { txsPerPage } from "@/lib/constants";
 
 const CardHeaderFooterContent = ({
   totalCount,
@@ -29,9 +30,7 @@ const CardHeaderFooterContent = ({
       <Pagination
         pathname={`/address/${address}/nft-transfers`}
         page={page}
-        totalPages={Math.ceil(
-          totalCount / Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE),
-        )}
+        totalPages={Math.ceil(totalCount / txsPerPage)}
       />
     </>
   );

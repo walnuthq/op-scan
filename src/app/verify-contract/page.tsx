@@ -30,4 +30,6 @@ const VerifyContractPage = async ({
   );
 };
 
+export const dynamic = "force-dynamic";
+
 export default VerifyContractPage;

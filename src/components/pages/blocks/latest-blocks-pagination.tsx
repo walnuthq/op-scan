@@ -1,4 +1,5 @@
 "use client";
+import { blocksPerPage } from "@/lib/constants";
 import {
   Pagination,
   PaginationContent,
@@ -18,12 +19,9 @@ const LatestBlocksPagination = ({
   start: bigint;
   latest: bigint;
 }) => {
-  const blocksPerPage = BigInt(process.env.NEXT_PUBLIC_BLOCKS_PER_PAGE);
   const totalBlocks = latest + BigInt(1);
-  const page = (latest - start) / blocksPerPage + BigInt(1);
-  const totalPages = BigInt(
-    Math.ceil(Number(totalBlocks) / Number(blocksPerPage)),
-  );
+  const page = (latest - start) / BigInt(blocksPerPage) + BigInt(1);
+  const totalPages = BigInt(Math.ceil(Number(totalBlocks) / blocksPerPage));
   return (
     <Pagination className="mx-0 w-auto">
       <PaginationContent>
@@ -48,7 +46,7 @@ const LatestBlocksPagination = ({
         <PaginationItem>
           <PaginationPrevious
             className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${start + blocksPerPage}&latest=${latest}`}
+            href={`/blocks?start=${start + BigInt(blocksPerPage)}&latest=${latest}`}
             aria-disabled={page === BigInt(1)}
           />
         </PaginationItem>
@@ -58,14 +56,14 @@ const LatestBlocksPagination = ({
         <PaginationItem>
           <PaginationNext
             className="text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${start - blocksPerPage}&latest=${latest}`}
+            href={`/blocks?start=${start - BigInt(blocksPerPage)}&latest=${latest}`}
             aria-disabled={page === totalPages}
           />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink
             className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
-            href={`/blocks?start=${latest - (totalPages - BigInt(1)) * blocksPerPage}&latest=${latest}`}
+            href={`/blocks?start=${latest - (totalPages - BigInt(1)) * BigInt(blocksPerPage)}&latest=${latest}`}
             aria-disabled={page === totalPages}
           >
             Last

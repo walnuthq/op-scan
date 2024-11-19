@@ -9,6 +9,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { formatTimestamp } from "@/lib/utils";
+import { l2BlockTime } from "@/lib/constants";
 
 const LatestBlock = ({ block }: { block: Block }) => (
   <div className="flex items-center gap-4 pt-6">
@@ -36,9 +37,7 @@ const LatestBlock = ({ block }: { block: Block }) => (
             {block.transactions.length} txn
             {block.transactions.length === 1 ? "" : "s"}
           </Link>
-          <span className="text-muted-foreground">
-            in {process.env.NEXT_PUBLIC_L2_BLOCK_TIME} secs
-          </span>
+          <span className="text-muted-foreground">in {l2BlockTime} secs</span>
         </div>
       </div>
     </div>

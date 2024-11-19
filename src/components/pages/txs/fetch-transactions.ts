@@ -1,3 +1,4 @@
+import { txsPerPage } from "@/lib/constants";
 import {
   prisma,
   fromPrismaTransactionWithReceiptAndAccounts,
@@ -5,7 +6,6 @@ import {
 import { loadFunctions } from "@/lib/signatures";
 
 const fetchTransactions = async (start: bigint, page: number) => {
-  const txsPerPage = Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
   const where = { blockNumber: { lte: start } };
   const [transactions, totalCount] = await Promise.all([
     prisma.transaction.findMany({

@@ -25,4 +25,6 @@ const AddressTokenTransfersPage = async ({
   );
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressTokenTransfersPage;

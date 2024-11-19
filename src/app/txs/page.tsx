@@ -16,4 +16,6 @@ const TxsPage = async ({
   );
 };
 
+export const dynamic = "force-dynamic";
+
 export default TxsPage;
