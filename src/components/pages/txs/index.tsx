@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import LatestTxsPagination from "@/components/pages/txs/latest-txs-pagination";
 import TxsTable from "@/components/lib/txs-table";
 import { fetchSpotPrices } from "@/lib/fetch-data";
+import { txsPerPage } from "@/lib/constants";
 
 const CardHeaderFooterContent = ({
   totalCount,
@@ -30,9 +31,7 @@ const CardHeaderFooterContent = ({
     <LatestTxsPagination
       start={start}
       page={page}
-      totalPages={Math.ceil(
-        totalCount / Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE),
-      )}
+      totalPages={Math.ceil(totalCount / txsPerPage)}
     />
   </>
 );

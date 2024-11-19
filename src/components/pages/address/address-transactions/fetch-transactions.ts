@@ -4,9 +4,9 @@ import {
   fromPrismaTransactionWithReceiptAndAccounts,
 } from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
+import { txsPerPage } from "@/lib/constants";
 
 const fetchTransactions = async (address: Address, page: number) => {
-  const txsPerPage = Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
   const where = {
     OR: [{ from: address }, { to: address }],
   };

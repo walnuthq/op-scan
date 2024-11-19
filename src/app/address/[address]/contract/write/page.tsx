@@ -23,4 +23,6 @@ const AddressContractWritePage = async ({
   return <AddressContractWrite address={address} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressContractWritePage;

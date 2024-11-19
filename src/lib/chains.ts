@@ -65,6 +65,16 @@ if (process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL) {
     http(process.env.NEXT_PUBLIC_L1_FALLBACK3_RPC_URL, transportOptions),
   );
 }
+if (process.env.NEXT_PUBLIC_L1_FALLBACK4_RPC_URL) {
+  l1Transports.push(
+    http(process.env.NEXT_PUBLIC_L1_FALLBACK4_RPC_URL, transportOptions),
+  );
+}
+if (process.env.NEXT_PUBLIC_L1_FALLBACK5_RPC_URL) {
+  l1Transports.push(
+    http(process.env.NEXT_PUBLIC_L1_FALLBACK5_RPC_URL, transportOptions),
+  );
+}
 
 export const l1PublicClient = createPublicClient({
   chain: l1Chain,
@@ -87,6 +97,16 @@ if (process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL) {
 if (process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL) {
   l2Transports.push(
     http(process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL, transportOptions),
+  );
+}
+if (process.env.NEXT_PUBLIC_L2_FALLBACK4_RPC_URL) {
+  l2Transports.push(
+    http(process.env.NEXT_PUBLIC_L2_FALLBACK4_RPC_URL, transportOptions),
+  );
+}
+if (process.env.NEXT_PUBLIC_L2_FALLBACK5_RPC_URL) {
+  l2Transports.push(
+    http(process.env.NEXT_PUBLIC_L2_FALLBACK5_RPC_URL, transportOptions),
   );
 }
 

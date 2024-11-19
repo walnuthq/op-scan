@@ -4,51 +4,61 @@ import {
   fromPrismaTransaction,
   fromPrismaTransactionEnqueued,
 } from "@/lib/prisma";
-import { range } from "lodash";
-import { subDays, format, formatISO, getUnixTime } from "date-fns";
+import { transactionsHistoryCount } from "@/lib/constants";
+import {
+  format,
+  formatISO,
+  getUnixTime,
+  startOfDay,
+  addDays,
+  subDays,
+  differenceInSeconds,
+} from "date-fns";
+import { UTCDate } from "@date-fns/utc";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 
-const SECONDS_IN_DAY = 24 * 60 * 60;
-
-const fetchTransactionsHistory = () =>
-  Promise.all(
-    range(14, -1).map(async (i) => {
-      const rawDate = subDays(new Date().setUTCHours(0, 0, 0, 0), i);
-      const timestamp = getUnixTime(rawDate);
-      const date = formatISO(rawDate, { representation: "date" });
-      const [transactions, prices] = await Promise.all([
-        prisma.transaction.count({
-          where: {
-            timestamp: { gte: timestamp, lt: timestamp + SECONDS_IN_DAY },
-          },
-        }),
-        fetchSpotPrices(date),
-      ]);
-      return {
-        name: format(rawDate, "MMM d"),
-        date,
-        price: prices.OP,
-        transactions,
-      };
-    }),
-  );
-
-const fetchHomeData = async () => {
-  const [
-    pricesToday,
-    pricesYesterday,
-    blocks,
-    transactions,
-    transactionsCount,
-    transactionsEnqueued,
-    transactionsHistory,
-  ] = await Promise.all([
-    fetchSpotPrices(),
+const fetchPrices = () =>
+  Promise.all([
     fetchSpotPrices(
-      formatISO(subDays(new Date(), 1), {
+      formatISO(subDays(startOfDay(new UTCDate()), 1), {
         representation: "date",
       }),
     ),
+    fetchSpotPrices(),
+  ]);
+
+const fetchTransactionsCount = async () => {
+  const today = startOfDay(new UTCDate());
+  const rawResult = await prisma.$queryRawUnsafe(`
+    SELECT COUNT(*) AS "transactionsCount",
+    COUNT(CASE WHEN "timestamp" >= ${getUnixTime(today)} AND "timestamp" <
+      ${getUnixTime(addDays(today, 1))} THEN 1 ELSE NULL END) AS "transactionsCountToday"
+    FROM "Transaction";
+  `);
+  const result = rawResult as {
+    transactionsCount: bigint;
+    transactionsCountToday: bigint;
+  }[];
+  const firstResult = result[0];
+  if (!firstResult) {
+    return { transactionsCount: 0, transactionsCountToday: 0 };
+  }
+  return {
+    transactionsCount: Number(firstResult.transactionsCount),
+    transactionsCountToday: Number(firstResult.transactionsCountToday),
+  };
+};
+
+const fetchHomeData = async () => {
+  const [
+    prices,
+    blocks,
+    transactions,
+    { transactionsCount, transactionsCountToday },
+    transactionsEnqueued,
+    transactionsHistory,
+  ] = await Promise.all([
+    fetchPrices(),
     prisma.block.findMany({
       include: { transactions: true },
       orderBy: { number: "desc" },
@@ -58,30 +68,51 @@ const fetchHomeData = async () => {
       orderBy: [{ blockNumber: "desc" }, { transactionIndex: "desc" }],
       take: 6,
     }),
-    prisma.transaction.count(),
+    fetchTransactionsCount(),
     prisma.transactionEnqueued.findMany({
       orderBy: [{ l1BlockNumber: "desc" }, { l2TxHash: "asc" }],
       take: 10,
     }),
-    fetchTransactionsHistory(),
+    prisma.transactionsHistory.findMany({
+      orderBy: { date: "desc" },
+      take: transactionsHistoryCount,
+    }),
   ]);
   const transactionsHistorySum = transactionsHistory.reduce(
     (previousValue, currentValue) => previousValue + currentValue.transactions,
-    0,
+    transactionsCountToday,
   );
   return {
-    pricesToday,
-    pricesYesterday,
+    pricesYesterday: prices[0]!,
+    pricesToday: prices[1]!,
     blocks: blocks.map((block) => fromPrismaBlock(block)),
     transactions: transactions.map((transaction) =>
       fromPrismaTransaction(transaction),
     ),
     transactionsCount,
-    tps: transactionsHistorySum / (transactionsHistory.length * SECONDS_IN_DAY),
+    tps:
+      transactionsHistorySum /
+      differenceInSeconds(
+        new UTCDate(),
+        subDays(startOfDay(new UTCDate()), transactionsHistoryCount),
+      ),
     transactionsEnqueued: transactionsEnqueued.map(
       fromPrismaTransactionEnqueued,
     ),
-    transactionsHistory,
+    transactionsHistory: [
+      ...transactionsHistory.reverse(),
+      {
+        date: startOfDay(new UTCDate()),
+        price: prices[1].OP,
+        transactions: transactionsCountToday,
+      },
+    ].map((transactionsHistoryItem) => ({
+      ...transactionsHistoryItem,
+      name: format(transactionsHistoryItem.date, "MMM d"),
+      date: formatISO(transactionsHistoryItem.date, {
+        representation: "date",
+      }),
+    })),
   };
 };
 

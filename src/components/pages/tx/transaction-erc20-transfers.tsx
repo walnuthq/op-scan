@@ -11,19 +11,33 @@ const TransactionErc20Transfers = ({
 }) => (
   <DescriptionListItem title="ERC-20 Tokens Transferred">
     <ul className="max-h-64 list-inside overflow-y-auto pr-2">
-      {erc20Transfers.map((erc20Transfer, index) => (
-        <li key={index} className="flex items-center gap-1">
-          <ChevronRight className="size-4" />
-          <span className="font-semibold">From</span>
-          <AddressLink address={erc20Transfer.from} formatted />
-          <span className="font-semibold">To</span>
-          <AddressLink address={erc20Transfer.to} formatted />
-          <span className="font-semibold">For</span>
-          {formatUnits(erc20Transfer.value, erc20Transfer.token.decimals)}
-          <span className="font-semibold">Token</span>
-          <AddressLink address={erc20Transfer.address} formatted />
-        </li>
-      ))}
+      {erc20Transfers.map(
+        ({
+          blockNumber,
+          transactionHash,
+          logIndex,
+          from,
+          to,
+          value,
+          token,
+          address,
+        }) => (
+          <li
+            key={`${blockNumber}-${transactionHash}-${logIndex}`}
+            className="flex items-center gap-1"
+          >
+            <ChevronRight className="size-4" />
+            <span className="font-semibold">From</span>
+            <AddressLink address={from} formatted />
+            <span className="font-semibold">To</span>
+            <AddressLink address={to} formatted />
+            <span className="font-semibold">For</span>
+            {formatUnits(value, token.decimals)}
+            <span className="font-semibold">Token</span>
+            <AddressLink address={address} formatted />
+          </li>
+        ),
+      )}
     </ul>
   </DescriptionListItem>
 );

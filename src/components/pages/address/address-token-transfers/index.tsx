@@ -8,6 +8,7 @@ import {
 import { fetchTokenTransfers } from "@/components/pages/address/address-token-transfers/fetch-token-transfers";
 import TokenTransfersTable from "@/components/pages/address/address-token-transfers/token-transfers-table";
 import Pagination from "@/components/lib/pagination";
+import { txsPerPage } from "@/lib/constants";
 
 const CardHeaderFooterContent = ({
   totalCount,
@@ -29,9 +30,7 @@ const CardHeaderFooterContent = ({
       <Pagination
         pathname={`/address/${address}/token-transfers`}
         page={page}
-        totalPages={Math.ceil(
-          totalCount / Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE),
-        )}
+        totalPages={Math.ceil(totalCount / txsPerPage)}
       />
     </>
   );

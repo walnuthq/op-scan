@@ -65,7 +65,7 @@ const TokenTransfersTable = ({
         ) : (
           tokenTransfers.map((tokenTransfer) => (
             <TokenTransfersTableRow
-              key={`${tokenTransfer.transactionHash}-${tokenTransfer.tokenAddress}`}
+              key={`${tokenTransfer.blockNumber}-${tokenTransfer.transactionHash}-${tokenTransfer.logIndex}`}
               tokenTransfer={tokenTransfer}
               timestampFormattedAsDate={timestampFormattedAsDate}
               usdValueShown={usdValueShown}

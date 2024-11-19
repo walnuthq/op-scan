@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import Pagination from "@/components/lib/pagination";
 import LatestTxsEnqueuedTable from "@/components/pages/txs-enqueued/latest-txs-enqueued-table";
 import fetchTransactionsEnqueued from "@/components/pages/txs-enqueued/fetch-transactions-enqueued";
+import { txsEnqueuedPerPage } from "@/lib/constants";
 
 const CardHeaderFooterContent = ({
   page,
@@ -28,9 +29,7 @@ const CardHeaderFooterContent = ({
     <Pagination
       pathname="/txs-enqueued"
       page={page}
-      totalPages={Math.ceil(
-        totalCount / Number(process.env.NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE),
-      )}
+      totalPages={Math.ceil(totalCount / txsEnqueuedPerPage)}
     />
   </>
 );

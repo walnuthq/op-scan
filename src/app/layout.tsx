@@ -12,8 +12,8 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "OP Scan",
-  description: "OP Stack Blockchain Explorer",
+  title: process.env.NEXT_PUBLIC_METADATA_TITLE,
+  description: process.env.NEXT_PUBLIC_METADATA_DESCRIPTION,
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => (

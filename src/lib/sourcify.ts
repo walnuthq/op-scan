@@ -59,6 +59,12 @@ if (process.env.NEXT_PUBLIC_L2_FALLBACK2_RPC_URL) {
 if (process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL) {
   rpc.push(process.env.NEXT_PUBLIC_L2_FALLBACK3_RPC_URL);
 }
+if (process.env.NEXT_PUBLIC_L2_FALLBACK4_RPC_URL) {
+  rpc.push(process.env.NEXT_PUBLIC_L2_FALLBACK4_RPC_URL);
+}
+if (process.env.NEXT_PUBLIC_L2_FALLBACK5_RPC_URL) {
+  rpc.push(process.env.NEXT_PUBLIC_L2_FALLBACK5_RPC_URL);
+}
 
 export const sourcifyChain = new SourcifyChain({
   chainId: l2Chain.id,

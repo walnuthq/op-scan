@@ -18,4 +18,6 @@ const AddressContractPage = async ({
   return <AddressContract address={address} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressContractPage;

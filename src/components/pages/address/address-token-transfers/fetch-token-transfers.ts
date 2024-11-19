@@ -1,5 +1,6 @@
 import { Address, formatUnits, Hash } from "viem";
 import { fromPrismaErc20TransferWithToken, prisma } from "@/lib/prisma";
+import { txsPerPage } from "@/lib/constants";
 import { loadFunctions } from "@/lib/signatures";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import { formatPrice } from "@/lib/utils";
@@ -9,6 +10,7 @@ export type TokenTransfer = {
   selector: string;
   signature: string;
   blockNumber: bigint;
+  logIndex: number;
   timestamp: bigint;
   from: Address;
   to: Address;
@@ -18,7 +20,6 @@ export type TokenTransfer = {
 };
 
 export const fetchTokenTransfers = async (address: Address, page: number) => {
-  const txsPerPage = Number(process.env.NEXT_PUBLIC_TXS_PER_PAGE);
   const where = {
     OR: [{ from: address }, { to: address }],
   };
@@ -34,15 +35,15 @@ export const fetchTokenTransfers = async (address: Address, page: number) => {
       skip: (page - 1) * txsPerPage,
       include: {
         token: true,
-        transaction: true,
+        receipt: { include: { transaction: true } },
       },
     }),
     prisma.erc20Transfer.count({ where }),
     fetchSpotPrices(),
   ]);
   const signatures = await Promise.all(
-    prismaErc20Transfers.map(({ transaction }) =>
-      loadFunctions(transaction.input.slice(0, 10)),
+    prismaErc20Transfers.map(({ receipt }) =>
+      loadFunctions(receipt.transaction.input.slice(0, 10)),
     ),
   );
   return {
@@ -56,10 +57,11 @@ export const fetchTokenTransfers = async (address: Address, page: number) => {
       const price = prices[erc20Transfer.token.symbol] ?? 0;
       return {
         transactionHash: erc20Transfer.transactionHash,
-        selector: prismaErc20Transfer.transaction.input.slice(0, 10),
+        selector: prismaErc20Transfer.receipt.transaction.input.slice(0, 10),
         signature: signatures[index] ?? "",
         blockNumber: erc20Transfer.blockNumber,
-        timestamp: prismaErc20Transfer.transaction.timestamp,
+        logIndex: erc20Transfer.logIndex,
+        timestamp: prismaErc20Transfer.receipt.transaction.timestamp,
         from: erc20Transfer.from,
         to: erc20Transfer.to,
         amount,

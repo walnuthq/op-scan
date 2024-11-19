@@ -23,4 +23,6 @@ const AddressContractReadPage = async ({
   return <AddressContractRead address={address} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressContractReadPage;

@@ -18,4 +18,6 @@ const AddressEventsPage = async ({
   return <AddressEvents address={address} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressEventsPage;

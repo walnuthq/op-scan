@@ -1,9 +1,7 @@
 import { fromPrismaTransactionEnqueued, prisma } from "@/lib/prisma";
+import { txsEnqueuedPerPage } from "@/lib/constants";
 
 const fetchTransactionsEnqueued = async (page: number) => {
-  const txsEnqueuedPerPage = Number(
-    process.env.NEXT_PUBLIC_TXS_ENQUEUED_PER_PAGE,
-  );
   const [prismaTransactionsEnqueued, totalCount] = await Promise.all([
     prisma.transactionEnqueued.findMany({
       orderBy: [{ l1BlockNumber: "desc" }, { l2TxHash: "asc" }],

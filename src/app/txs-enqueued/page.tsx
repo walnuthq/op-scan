@@ -9,4 +9,6 @@ const TxsEnqueuedPage = async ({
   return <TxsEnqueued page={page ? Number(page) : 1} />;
 };
 
+export const dynamic = "force-dynamic";
+
 export default TxsEnqueuedPage;

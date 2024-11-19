@@ -25,4 +25,6 @@ const AddressNftTransfersPage = async ({
   );
 };
 
+export const dynamic = "force-dynamic";
+
 export default AddressNftTransfersPage;
