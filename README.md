@@ -25,6 +25,12 @@ OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/bu
 
 # ⚙️ Installation
 
+### Getting Started Video
+
+[Here's a video walkthrough](https://www.loom.com/share/3b79f0b25e44443eb16d296aba021764) on how to launch the explorer locally configured for OP Sepolia testnet.
+
+### Required Dependencies
+
 The app requires the following dependencies:
 
 ```
