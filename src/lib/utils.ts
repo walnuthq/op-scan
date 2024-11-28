@@ -14,16 +14,29 @@ import {
   erc20Abi,
   erc721Abi,
   Abi,
+  Hash,
 } from "viem";
 import { AbiConstructor } from "abitype";
 import { capitalize } from "lodash";
 import { Erc20Transfer, NftTransfer } from "@/lib/types";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
+import { l2PublicClient } from "@/lib/chains";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getBlockNumberSafe = async (blockHash: Hash) => {
+  try {
+    const block = await l2PublicClient.getBlock({
+      blockHash,
+    });
+    return block.number;
+  } catch (error) {
+    return null;
+  }
+};
 
 export const formatEther = (wei: bigint, precision = 5) =>
   new Intl.NumberFormat("en-US", {

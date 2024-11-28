@@ -9,7 +9,7 @@ import fetchTransactionDetails from "@/components/pages/tx/fetch-transaction-det
 const Tx = async ({ hash }: { hash: Hash }) => {
   const [{ transaction, confirmations, erc20Transfers }, prices] =
     await Promise.all([fetchTransactionDetails(hash), fetchSpotPrices()]);
-  if (!transaction) {
+  if (transaction === null) {
     notFound();
   }
   return (

@@ -1,6 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import { Hash } from "viem";
-import { l2PublicClient } from "@/lib/chains";
+import { getBlockNumberSafe } from "@/lib/utils";
 import BlockTxs from "@/components/pages/block-txs";
 
 const BlockTxsPage = async ({
@@ -10,13 +10,11 @@ const BlockTxsPage = async ({
 }) => {
   const { numberOrHash } = await params;
   if (numberOrHash.startsWith("0x")) {
-    const block = await l2PublicClient.getBlock({
-      blockHash: numberOrHash as Hash,
-    });
-    if (!block) {
+    const number = await getBlockNumberSafe(numberOrHash as Hash);
+    if (number === null) {
       notFound();
     }
-    permanentRedirect(`/block/${block.number}/txs`);
+    permanentRedirect(`/block/${number}/txs`);
   }
   return <BlockTxs number={BigInt(numberOrHash)} />;
 };

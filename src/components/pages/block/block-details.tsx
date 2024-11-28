@@ -8,17 +8,23 @@ import BlockHeight from "@/components/pages/block/block-height";
 import BlockExtraData from "@/components/pages/block/block-extra-data";
 import CopyButton from "@/components/lib/copy-button";
 
-const BlockDetails = ({ block }: { block: Block }) => (
+const BlockDetails = ({
+  block,
+  latestBlockNumber,
+}: {
+  block: Block;
+  latestBlockNumber: bigint;
+}) => (
   <dl>
-    <BlockHeight number={block.number} />
+    <BlockHeight number={block.number} latestBlockNumber={latestBlockNumber} />
     <TimestampListItem timestamp={block.timestamp} />
     <DescriptionListItem title="Transactions">
       <Link
         href={`/block/${block.number}/txs`}
         className="mr-1 text-primary hover:brightness-150"
       >
-        {block.transactions.length} transaction
-        {block.transactions.length === 1 ? "" : "s"}
+        {block.transactionsCount} transaction
+        {block.transactionsCount === 1 ? "" : "s"}
       </Link>
       in this block
     </DescriptionListItem>
@@ -42,12 +48,16 @@ const BlockDetails = ({ block }: { block: Block }) => (
     </DescriptionListItem>
     <DescriptionListItem title="Parent Hash">
       <div className="flex items-center gap-2">
-        <Link
-          href={`/block/${block.parentHash}`}
-          className="text-primary hover:brightness-150"
-        >
-          {block.parentHash}
-        </Link>
+        {block.number > BigInt(0) ? (
+          <Link
+            href={`/block/${block.number - BigInt(1)}`}
+            className="text-primary hover:brightness-150"
+          >
+            {block.parentHash}
+          </Link>
+        ) : (
+          block.parentHash
+        )}
         <CopyButton content="Copy Parent Hash" copy={block.parentHash} />
       </div>
     </DescriptionListItem>

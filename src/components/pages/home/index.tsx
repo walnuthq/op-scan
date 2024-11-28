@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { l2Chain } from "@/lib/chains";
+import { transactionsHistoryCount } from "@/lib/constants";
 import Search from "@/components/lib/search";
 import EthPrice from "@/components/pages/home/eth-price";
 import OpPrice from "@/components/pages/home/op-price";
@@ -23,7 +24,8 @@ const Home = async () => {
     transactionsHistory,
   } = await fetchHomeData();
   const [firstBlock] = blocks;
-  const hasTransactionsHistory = transactionsHistory.length >= 3;
+  const hasTransactionsHistory =
+    transactionsHistory.length === transactionsHistoryCount + 1;
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <h1 className="text-xl font-bold">{l2Chain.name} Explorer</h1>
