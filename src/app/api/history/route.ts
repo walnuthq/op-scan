@@ -14,7 +14,7 @@ import { transactionsHistoryCount } from "@/lib/constants";
 const getDates = () =>
   eachDayOfInterval({
     start: subDays(new UTCDate(), transactionsHistoryCount),
-    end: subDays(new UTCDate(), 1),
+    end: new UTCDate(),
   });
 
 const fetchPrices = () =>
@@ -24,7 +24,7 @@ const fetchPrices = () =>
     ),
   );
 
-const fetchTransactionsCount = async () => {
+const fetchTransactionsHistoryCount = async () => {
   const queryCounts = getDates()
     .map(
       (date, index) =>
@@ -40,9 +40,10 @@ const fetchTransactionsCount = async () => {
   if (!firstResult) {
     return [];
   }
-  return Array.from({ ...firstResult, length: transactionsHistoryCount }).map(
-    Number,
-  );
+  return Array.from({
+    ...firstResult,
+    length: transactionsHistoryCount + 1,
+  }).map(Number);
 };
 
 export const GET = async (request: NextRequest) => {
@@ -56,15 +57,20 @@ export const GET = async (request: NextRequest) => {
     });
   }
   try {
-    const [prices, transactionsHistoryCount] = await Promise.all([
-      fetchPrices(),
-      fetchTransactionsCount(),
-    ]);
-    const transactionsHistory = getDates().map((date, i) => ({
-      date,
-      price: prices[i]!.OP,
-      transactions: transactionsHistoryCount[i]!,
-    }));
+    const [prices, transactionsHistoryCount, transactionsCount] =
+      await Promise.all([
+        fetchPrices(),
+        fetchTransactionsHistoryCount(),
+        prisma.transaction.count(),
+      ]);
+    const transactionsHistory = [
+      { date: new UTCDate(0), price: 0, transactions: transactionsCount },
+      ...getDates().map((date, i) => ({
+        date,
+        price: prices[i]!.OP,
+        transactions: transactionsHistoryCount[i]!,
+      })),
+    ];
     await prisma.$transaction(
       transactionsHistory.map((transactionsHistoryItem) =>
         prisma.transactionsHistory.upsert({

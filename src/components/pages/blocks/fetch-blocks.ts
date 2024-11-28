@@ -4,15 +4,6 @@ import { l2PublicClient } from "@/lib/chains";
 import { prisma, fromPrismaBlock } from "@/lib/prisma";
 import { fromViemBlock } from "@/lib/viem";
 
-const fetchBlocksFromJsonRpc = async (start: bigint) => {
-  const blocks = await Promise.all(
-    range(Number(start), Math.max(Number(start) - blocksPerPage), -1).map((i) =>
-      l2PublicClient.getBlock({ blockNumber: BigInt(i) }),
-    ),
-  );
-  return blocks.map(fromViemBlock);
-};
-
 const fetchBlocksFromDatabase = async (start: bigint) => {
   const blocks = await prisma.block.findMany({
     where: {
@@ -26,6 +17,15 @@ const fetchBlocksFromDatabase = async (start: bigint) => {
     return fetchBlocksFromJsonRpc(start);
   }
   return blocks.map(fromPrismaBlock);
+};
+
+const fetchBlocksFromJsonRpc = async (start: bigint) => {
+  const blocks = await Promise.all(
+    range(Number(start), Math.max(Number(start) - blocksPerPage, -1)).map((i) =>
+      l2PublicClient.getBlock({ blockNumber: BigInt(i) }),
+    ),
+  );
+  return blocks.map(fromViemBlock);
 };
 
 const fetchBlocks = process.env.DATABASE_URL

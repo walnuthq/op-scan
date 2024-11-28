@@ -53,7 +53,7 @@ const LatestBlocksTableRow = ({
           href={`/block/${block.number}/txs`}
           className="text-sm font-medium leading-none text-primary hover:brightness-150"
         >
-          {block.transactions.length}
+          {block.transactionsCount}
         </Link>
       </TableCell>
       <TableCell>

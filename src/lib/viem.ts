@@ -71,7 +71,7 @@ export const fromViemBlock = (block: ViemBlock): Block => ({
   gasLimit: block.gasLimit,
   extraData: block.extraData,
   parentHash: block.parentHash,
-  transactions: block.transactions,
+  transactionsCount: block.transactions.length,
 });
 
 export const fromViemBlockWithTransactionsAndReceipts = (
@@ -86,6 +86,7 @@ export const fromViemBlockWithTransactionsAndReceipts = (
   gasLimit: block.gasLimit,
   extraData: block.extraData,
   parentHash: block.parentHash,
+  transactionsCount: block.transactions.length,
   transactions: block.transactions
     .map((transaction, index) => {
       const receipt = receipts[index];

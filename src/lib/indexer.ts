@@ -48,6 +48,7 @@ const toPrismaBlock = ({
   gasLimit,
   extraData,
   parentHash,
+  transactions,
 }: ViemBlockWithTransactions): PrismaBlock => ({
   number,
   hash,
@@ -56,6 +57,7 @@ const toPrismaBlock = ({
   gasLimit: `0x${gasLimit.toString(16)}`,
   extraData,
   parentHash,
+  transactionsCount: transactions.length,
 });
 
 const toPrismaTransaction = (

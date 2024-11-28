@@ -7,6 +7,7 @@ import {
   Erc1155Token as PrismaErc1155Token,
   Erc20Transfer as PrismaErc20Transfer,
   NftTransfer as PrismaNftTransfer,
+  Block as PrismaBlock,
   Log as PrismaLog,
   Transaction as PrismaTransaction,
   TransactionEnqueued as PrismaTransactionEnqueued,
@@ -45,18 +46,7 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-const prismaBlockWithTransactionsHashes =
-  Prisma.validator<Prisma.BlockDefaultArgs>()({
-    include: { transactions: { select: { hash: true } } },
-  });
-
-type PrismaBlockWithTransactionsHashes = Prisma.BlockGetPayload<
-  typeof prismaBlockWithTransactionsHashes
->;
-
-export const fromPrismaBlock = (
-  block: PrismaBlockWithTransactionsHashes,
-): Block => ({
+export const fromPrismaBlock = (block: PrismaBlock): Block => ({
   number: block.number,
   hash: block.hash as Hash,
   timestamp: block.timestamp,
@@ -64,7 +54,7 @@ export const fromPrismaBlock = (
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
-  transactions: block.transactions.map(({ hash }) => hash as Hash),
+  transactionsCount: block.transactionsCount,
 });
 
 const prismaBlockWithTransactionsAndReceipts =
@@ -87,6 +77,7 @@ export const fromPrismaBlockWithTransactionsAndReceipts = (
   gasLimit: BigInt(block.gasLimit),
   extraData: block.extraData as Hex,
   parentHash: block.parentHash as Hash,
+  transactionsCount: block.transactionsCount,
   transactions: block.transactions.map((transaction, index) =>
     fromPrismaTransactionWithReceiptAndAccounts(transaction, signatures[index]),
   ),

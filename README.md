@@ -34,7 +34,7 @@ OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/bu
 The app requires the following dependencies:
 
 ```
-NodeJS >= 22
+Node.js >= 20
 pnpm >= 9
 ```
 
@@ -52,9 +52,8 @@ Install the dependencies:
 pnpm install
 ```
 
-You will need to copy `.env.local.example` into `.env.local` at the root of your repository and populate it with your own values.
-
-In particular you will need to provide configuration for both L1 and L2 chains:
+Copy `.env.local.example` into `.env.local` at the root of your repository and populate it with your own values.
+In particular, configure both L1 and L2 chains:
 
 ```
 NEXT_PUBLIC_L1_CHAIN_ID="11155111"
@@ -67,7 +66,7 @@ NEXT_PUBLIC_L2_RPC_URL="https://optimism-sepolia-rpc.publicnode.com"
 
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/) or [QuickNode](https://www.quicknode.com/).
 
-You will also need to provide your L1 contracts addresses when using a devnet:
+For devnet usage, specify the L1 contract addresses:
 
 ```
 NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS="..."
@@ -87,7 +86,7 @@ NEXT_PUBLIC_REOWN_PROJECT_ID="REOWN_PROJECT_ID"
 
 ### Indexer Configuration
 
-To run the indexer, you first need to setup your `DATABASE_URL` in `.env.local` (we use SQLite by default but you can switch to PostgreSQL by changing the Prisma provider in `prisma/schema.prisma`) as well as websocket connections to your L1/L2 chains:
+To run the indexer, first set up your `DATABASE_URL` in `.env.local` (we use SQLite by default, but you can switch to PostgreSQL by changing the Prisma provider in `prisma/schema.prisma`) and configure websocket connections to your L1/L2 chains:
 
 ```
 DATABASE_URL="file:dev.db"
@@ -107,7 +106,7 @@ Now you will be able to start indexing the blockchain by running the `op-indexer
 pnpm op-indexer
 ```
 
-You should start seeing blocks getting indexed in your terminal and you can explore the state of your local database using Prisma studio:
+You should start seeing blocks getting indexed in your terminal, and you can explore the state of your local database using Prisma studio:
 
 ```sh
 pnpm prisma:studio
@@ -120,7 +119,7 @@ pnpm prisma:generate
 pnpm prisma:db:push
 ```
 
-Indexing a blockchain is putting a heavy load on the RPC as you need to perform a large number of JSON-RPC requests to fully index a block (along with transactions and logs).
+Indexing a blockchain puts a heavy load on the RPC as you need to perform many JSON-RPC requests to fully index a block (along with transactions and logs).
 When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 5 fallback RPC URLs in case this happens:
 
 ```
@@ -158,13 +157,13 @@ When you're done configuring your environment variables you can build the app:
 pnpm build
 ```
 
-Make sure your local chain is started and the indexer is running, then launch the explorer to see it live at `http://localhost:3000`
+Make sure the indexer is running, then launch the explorer to see it live at `http://localhost:3000`
 
 ```sh
 pnpm start
 ```
 
-Alternatively you can launch the explorer in dev mode if you want to customize it:
+Alternatively, you can launch the explorer in dev mode if you want to customize it:
 
 ```sh
 pnpm dev

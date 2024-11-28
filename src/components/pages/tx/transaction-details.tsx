@@ -120,17 +120,26 @@ const TransactionDetails = ({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <span className="text-muted-foreground">Base:</span>
-            {formatGwei(transaction.gasPrice ?? BigInt(0), 9)} Gwei
+            {formatGwei(
+              transaction.gasPrice ?? BigInt(0),
+              9,
+            )} Gwei
           </div>
           <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-1">
             <span className="text-muted-foreground">Max:</span>
-            {formatGwei(transaction.maxFeePerGas ?? BigInt(0), 9)} Gwei
+            {formatGwei(
+              transaction.maxFeePerGas ?? BigInt(0),
+              9,
+            )} Gwei
           </div>
           <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-1">
             <span className="text-muted-foreground">Max Priority:</span>
-            {formatGwei(transaction.maxPriorityFeePerGas ?? BigInt(0), 9)} Gwei
+            {formatGwei(
+              transaction.maxPriorityFeePerGas ?? BigInt(0),
+              9,
+            )} Gwei
           </div>
         </div>
       </DescriptionListItem>
