@@ -8,7 +8,7 @@ export type Block = {
   gasLimit: bigint;
   extraData: Hex;
   parentHash: Hash;
-  transactions: Hash[];
+  transactionsCount: number;
 };
 
 export type Transaction = {
@@ -30,7 +30,7 @@ export type Transaction = {
   timestamp: bigint;
 };
 
-export type BlockWithTransactions = Omit<Block, "transactions"> & {
+export type BlockWithTransactions = Block & {
   transactions: Transaction[];
 };
 

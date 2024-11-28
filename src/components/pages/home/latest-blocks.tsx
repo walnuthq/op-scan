@@ -34,8 +34,8 @@ const LatestBlock = ({ block }: { block: Block }) => (
             href={`/block/${block.number}/txs`}
             className="text-primary hover:brightness-150"
           >
-            {block.transactions.length} txn
-            {block.transactions.length === 1 ? "" : "s"}
+            {block.transactionsCount} txn
+            {block.transactionsCount === 1 ? "" : "s"}
           </Link>
           <span className="text-muted-foreground">in {l2BlockTime} secs</span>
         </div>

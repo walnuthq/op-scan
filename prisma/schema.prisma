@@ -18,14 +18,15 @@ model DeployConfig {
 }
 
 model Block {
-  number       BigInt        @id
-  hash         String        @unique
-  timestamp    BigInt
-  gasUsed      String
-  gasLimit     String
-  extraData    String
-  parentHash   String
-  transactions Transaction[]
+  number            BigInt        @id
+  hash              String        @unique
+  timestamp         BigInt
+  gasUsed           String
+  gasLimit          String
+  extraData         String
+  parentHash        String
+  transactionsCount Int
+  transactions      Transaction[]
 }
 
 model Transaction {

@@ -36,7 +36,6 @@ const fetchHomeData = async () => {
   ] = await Promise.all([
     fetchPrices(),
     prisma.block.findMany({
-      include: { transactions: true },
       orderBy: { number: "desc" },
       take: 6,
     }),

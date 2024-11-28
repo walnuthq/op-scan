@@ -7,8 +7,8 @@ import fetchBlockTransactions from "@/components/pages/block-txs/fetch-block-tra
 
 const BlockTxs = async ({ number }: { number: bigint }) => {
   const block = await fetchBlockTransactions(number);
-  if (!block) {
-    return notFound();
+  if (block === null) {
+    notFound();
   }
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
