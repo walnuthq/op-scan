@@ -34,7 +34,10 @@ const AddressDetails = ({
             </span>
             <div className="flex items-center text-sm font-semibold">
               <EthereumIcon className="mr-1 size-4" />
-              {formatEther(balance, 18)} ETH
+              {formatEther(
+                balance,
+                18,
+              )} ETH
             </div>
           </div>
           <div className="space-y-0.5">

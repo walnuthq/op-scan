@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/history",
-      "schedule": "0 0 * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }
