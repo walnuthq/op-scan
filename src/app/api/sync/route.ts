@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+/* import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   fetchL2BlockNumberFromJsonRpc,
@@ -6,10 +6,11 @@ import {
   fetchL1BlockNumberFromJsonRpc,
   fetchL1BlockNumberFromDatabase,
 } from "@/lib/fetch-data";
-import { indexL1Block, indexL2Block } from "@/lib/indexer";
+import { indexL1Block, indexL2Block } from "@/lib/indexer"; */
 
-export const GET = async (request: NextRequest) => {
-  const authHeader = request.headers.get("authorization");
+export const GET = async (/*request: NextRequest*/) => {
+  return Response.json({ ok: true });
+  /* const authHeader = request.headers.get("authorization");
   if (
     process.env.NODE_ENV === "production" &&
     authHeader !== `Bearer ${process.env.CRON_SECRET}`
@@ -75,5 +76,5 @@ export const GET = async (request: NextRequest) => {
       },
       { status: 500 },
     );
-  }
+  } */
 };
