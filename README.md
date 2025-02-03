@@ -61,7 +61,7 @@ L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/) or [QuickNode](https://www.quicknode.com/).
 
 For devnet usage, follow [this tutorial](https://docs.optimism.io/stack/dev-node) to run a local development environment that will spawn both L1 and L2 chains.
-Once your OP Stack devnet is ready, copy your L1 and L2 RPC urls and get the corresponding chain ids using [Foundry's cast](https://book.getfoundry.sh/reference/cast/):
+Once your OP Stack devnet is ready, copy your L1 (`el-1-geth-lighthouse`) and L2 (`op-el-1-op-geth-op-node-rollup-1`) RPC urls and get the corresponding chain ids using [Foundry's cast](https://book.getfoundry.sh/reference/cast/):
 
 ```
 cast chain-id --rpc-url http://127.0.0.1:32771
