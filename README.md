@@ -1,14 +1,6 @@
-> [!WARNING]
-> This project is under active development and not yet suitable for production. For questions or feature requests, [contact us on Telegram](https://t.me/+DYI4FMia43I1NDI8) or [submit an issue](https://github.com/walnuthq/op-scan/issues). To track progress, star the repository. [Supported by an Optimism grant](https://gov.optimism.io/t/season-5-cycle-19-intent-1-developer-advisory-board-finalists-review/7899?u=0xmilton), the project is divided into four milestones. This warning will be removed after completion of Milestone 4.
->
-> - [x] Milestone 1: Homepage and basic nav (current stage)
-> - [x] Milestone 2: Tx detail page
-> - [x] Milestone 3: Contract detail page
-> - [x] Milestone 4: Feedback incorporation and polish
-
 # 🔎 OP Scan
 
-OP Scan is a transaction explorer tailored specifically for the [OP Stack](https://docs.optimism.io/builders/chain-operators/tutorials/create-l2-rollup) and the [Superchain vision](https://www.youtube.com/watch?v=O6vYNgrQ1LE). It's focused on being lightweight so that anyone can run it locally next to an OP Stack devnet or any other compatible OP Stack based rollup.
+OP Scan is a transaction explorer tailored specifically for the [OP Stack](https://docs.optimism.io/stack/getting-started) and the [Superchain vision](https://docs.optimism.io/superchain/superchain-explainer). It's focused on being lightweight so that anyone can run it locally next to an OP Stack devnet or any other compatible OP Stack based rollup.
 
 ![screenshot](screenshot.png)
 
@@ -21,7 +13,7 @@ OP Scan is a transaction explorer tailored specifically for the [OP Stack](https
 
 # 🙋‍♀️ Share Feedback by Submitting an Issue
 
-OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/builders/chain-operators/tutorials/create-l2-rollup). If you are interested in it, have feedback or feature request, submit an issue [here](https://github.com/walnuthq/op-scan/issues).
+OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/stack/getting-started). If you are interested in it, have feedback or feature request, submit an issue [here](https://github.com/walnuthq/op-scan/issues).
 
 # ⚙️ Installation
 
@@ -34,7 +26,7 @@ OP Scan is built for rollups built on the [OP Stack](https://docs.optimism.io/bu
 The app requires the following dependencies:
 
 ```
-Node.js >= 20
+Node.js >= 22
 pnpm >= 9
 ```
 
@@ -43,7 +35,7 @@ pnpm >= 9
 Clone this repository:
 
 ```sh
-git clone git@github.com:walnuthq/op-scan
+git clone https://github.com/walnuthq/op-scan.git
 ```
 
 Install the dependencies:
@@ -59,22 +51,61 @@ In particular, configure both L1 and L2 chains:
 NEXT_PUBLIC_L1_CHAIN_ID="11155111"
 NEXT_PUBLIC_L1_NAME="Sepolia"
 NEXT_PUBLIC_L1_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com"
+L1_RPC_WS="wss://ethereum-sepolia-rpc.publicnode.com"
 NEXT_PUBLIC_L2_CHAIN_ID="11155420"
 NEXT_PUBLIC_L2_NAME="OP Sepolia"
 NEXT_PUBLIC_L2_RPC_URL="https://optimism-sepolia-rpc.publicnode.com"
+L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 ```
 
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/) or [QuickNode](https://www.quicknode.com/).
 
-For devnet usage, specify the L1 contract addresses:
+For devnet usage, follow [this tutorial](https://docs.optimism.io/stack/dev-node) to run a local development environment that will spawn both L1 and L2 chains.
+Once your OP Stack devnet is ready, copy your L1 and L2 RPC urls and get the corresponding chain ids using [Foundry's cast](https://book.getfoundry.sh/reference/cast/):
 
 ```
-NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS="..."
-NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS="..."
+cast chain-id --rpc-url http://127.0.0.1:32771
+cast chain-id --rpc-url http://127.0.0.1:32780
 ```
 
-You will find theses addresses in your rollup deployment artifacts in `contracts-bedrock/deployments/your-deployment/L1Contract.json`.
-Note that you always need to provide the proxy address, not the underlying contract.
+This will give you the following local chain config:
+
+```
+NEXT_PUBLIC_L1_CHAIN_ID="3151908"
+NEXT_PUBLIC_L1_NAME="Goerli"
+NEXT_PUBLIC_L1_RPC_URL="http://127.0.0.1:32771"
+L1_RPC_WS="ws://127.0.0.1:32772"
+NEXT_PUBLIC_L2_CHAIN_ID="12345"
+NEXT_PUBLIC_L2_NAME="rollup-1"
+NEXT_PUBLIC_L2_RPC_URL="http://127.0.0.1:32780"
+L2_RPC_WS="ws://127.0.0.1:32781"
+```
+
+Next you will need to find the L1 contract addresses for both the Optimism Portal and the Cross Domain Messenger.
+You will find the L1CrossDomainMessenger address in your local devnet logs:
+
+```
+- L1CrossDomainMessengerProxy: 0x170d06930Ce8c7487EF12Be36d20C400Eb0fA8B2
+```
+
+Then fetch the Portal address from the Cross Domain Messenger using `cast call`:
+
+```
+cast call 0x170d06930Ce8c7487EF12Be36d20C400Eb0fA8B2 "PORTAL()" --rpc-url http://127.0.0.1:32771
+```
+
+The result being an address, only take the first 20 bytes from the returned value:
+
+```
+0x000000000000000000000000e373471c58424978b4652db046817c209f09e645 -> 0xe373471c58424978b4652db046817c209f09e645
+```
+
+Copy these addresses to your local chain config:
+
+```
+NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS="0x170d06930Ce8c7487EF12Be36d20C400Eb0fA8B2"
+NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS="0xe373471c58424978b4652db046817c209f09e645"
+```
 
 If you don't want to run the explorer with your local chain setup, you will find all the necessary environment variables in `.env.local.example` to configure the explorer with OP Sepolia or OP Mainnet.
 
@@ -119,7 +150,7 @@ pnpm prisma:generate
 pnpm prisma:db:push
 ```
 
-Indexing a blockchain puts a heavy load on the RPC as you need to perform many JSON-RPC requests to fully index a block (along with transactions and logs).
+Indexing a blockchain puts a heavy load on the RPC endpoint, as you need to perform many JSON-RPC requests to fully index a block (along with transactions and logs).
 When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 5 fallback RPC URLs in case this happens:
 
 ```
@@ -151,7 +182,7 @@ pnpm op-indexer -f 123416717 --l1-index-block 20426733 --l1-index-block 20426726
 
 ### Running the Explorer
 
-When you're done configuring your environment variables you can build the app:
+When you're done configuring your environment variables, you can build the app:
 
 ```sh
 pnpm build
