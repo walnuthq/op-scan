@@ -43,7 +43,10 @@ const AddressContractCode = ({
       />
     )}
     {account.contract && account.bytecode && (
-      <AddressContractSwarmSource bytecode={account.bytecode} />
+      <AddressContractSwarmSource
+        bytecode={account.bytecode}
+        contract={account.contract}
+      />
     )}
   </div>
 );

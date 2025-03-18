@@ -51,11 +51,9 @@ In particular, configure both L1 and L2 chains:
 NEXT_PUBLIC_L1_CHAIN_ID="11155111"
 NEXT_PUBLIC_L1_NAME="Sepolia"
 NEXT_PUBLIC_L1_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com"
-L1_RPC_WS="wss://ethereum-sepolia-rpc.publicnode.com"
 NEXT_PUBLIC_L2_CHAIN_ID="11155420"
 NEXT_PUBLIC_L2_NAME="OP Sepolia"
 NEXT_PUBLIC_L2_RPC_URL="https://optimism-sepolia-rpc.publicnode.com"
-L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 ```
 
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/) or [QuickNode](https://www.quicknode.com/).
@@ -74,11 +72,9 @@ This will give you the following local chain config:
 NEXT_PUBLIC_L1_CHAIN_ID="3151908"
 NEXT_PUBLIC_L1_NAME="Goerli"
 NEXT_PUBLIC_L1_RPC_URL="http://127.0.0.1:32771"
-L1_RPC_WS="ws://127.0.0.1:32772"
 NEXT_PUBLIC_L2_CHAIN_ID="12345"
 NEXT_PUBLIC_L2_NAME="rollup-1"
 NEXT_PUBLIC_L2_RPC_URL="http://127.0.0.1:32780"
-L2_RPC_WS="ws://127.0.0.1:32781"
 ```
 
 Next you will need to find the L1 contract addresses for both the Optimism Portal and the Cross Domain Messenger.
@@ -117,12 +113,10 @@ NEXT_PUBLIC_REOWN_PROJECT_ID="REOWN_PROJECT_ID"
 
 ### Indexer Configuration
 
-To run the indexer, first set up your `DATABASE_URL` in `.env.local` (we use SQLite by default, but you can switch to PostgreSQL by changing the Prisma provider in `prisma/schema.prisma`) and configure websocket connections to your L1/L2 chains:
+To run the indexer, first set up your `DATABASE_URL` in `.env.local` (we use SQLite by default, but you can switch to PostgreSQL by changing the Prisma provider in `prisma/schema.prisma`).
 
 ```
 DATABASE_URL="file:dev.db"
-L1_RPC_WS="wss://ethereum-sepolia-rpc.publicnode.com"
-L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 ```
 
 Then you can sync your local database with the Prisma schema:

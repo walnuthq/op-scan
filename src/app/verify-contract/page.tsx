@@ -3,8 +3,8 @@ import VerifyContract from "@/components/pages/verify-contract";
 import {
   CompilerType,
   compilerTypeKeys,
-  compilerVersions,
-  CompilerVersion,
+  solidityCompilerVersionKeys,
+  SolidityCompilerVersion,
 } from "@/lib/types";
 
 const VerifyContractPage = async ({
@@ -22,8 +22,9 @@ const VerifyContractPage = async ({
           : undefined
       }
       version={
-        version && compilerVersions.includes(version as CompilerVersion)
-          ? (version as CompilerVersion)
+        version &&
+        solidityCompilerVersionKeys.includes(version as SolidityCompilerVersion)
+          ? (version as SolidityCompilerVersion)
           : undefined
       }
     />

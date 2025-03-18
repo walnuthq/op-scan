@@ -10,15 +10,15 @@ import {
   toEventHash,
 } from "viem";
 import { redirect } from "next/navigation";
-import { CompilerType, CompilerVersion, EvmVersion } from "@/lib/types";
 import {
   JsonInput,
-  checkFiles,
+  checkFilesWithMetadata,
   verifyDeployed,
   Status,
 } from "@ethereum-sourcify/lib-sourcify";
 import { prisma } from "@/lib/prisma";
-import { solc, sourcifyChain } from "@/lib/sourcify";
+import { EvmVersion, CompilerType, SolidityCompilerVersion } from "@/lib/types";
+import { solc, vyper, sourcifyChain } from "@/lib/sourcify";
 
 export const submitContractDetails = async ({
   address,
@@ -27,7 +27,7 @@ export const submitContractDetails = async ({
 }: {
   address: Address;
   type: CompilerType;
-  version: CompilerVersion;
+  version: SolidityCompilerVersion;
 }) =>
   redirect(
     `/verify-contract?address=${address}&type=${type}&version=${encodeURIComponent(version)}`,
@@ -143,7 +143,7 @@ export const verifyContract = async ({
 }: {
   address: Address;
   type: CompilerType;
-  version: CompilerVersion;
+  version: SolidityCompilerVersion;
   singleFile: string;
   standardJsonInput: string;
   optimizerEnabled: "yes" | "no";
@@ -186,7 +186,11 @@ export const verifyContract = async ({
     path: source.path,
     buffer: Buffer.from(source.content),
   }));
-  const [checkedContract] = await checkFiles(solc, pathBuffers);
+  const [checkedContract] = await checkFilesWithMetadata(
+    solc,
+    vyper,
+    pathBuffers,
+  );
   if (!checkedContract) {
     throw new Error("No match found");
   }

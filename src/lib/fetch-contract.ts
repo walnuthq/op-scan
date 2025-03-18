@@ -39,7 +39,7 @@ export const fetchContract = async (
     info: {
       name: metadata.output.devdoc.title ?? "",
       match: status,
-      evmVersion: metadata.settings.evmVersion,
+      evmVersion: metadata.settings.evmVersion ?? "default",
       compilerVersion: metadata.compiler.version,
       optimizer: metadata.settings.optimizer!,
       license: "",

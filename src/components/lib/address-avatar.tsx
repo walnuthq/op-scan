@@ -10,7 +10,7 @@ const AddressAvatar = ({
 }) => (
   <Avatar className={className}>
     <AvatarImage
-      src={`https://effigy.im/a/${address}.png`}
+      src={`https://effigy.im/a/${address}.svg`}
       alt="Ethereum avatar"
     />
     <AvatarFallback>0x</AvatarFallback>

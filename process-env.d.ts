@@ -5,8 +5,6 @@ declare global {
       readonly NODE_ENV: "development" | "production" | "test";
       // private
       readonly DATABASE_URL: string;
-      readonly L1_RPC_WS: string;
-      readonly L2_RPC_WS: string;
       readonly CRON_SECRET: string;
       // public
       // L1 chain config

@@ -92,7 +92,7 @@ const toPrismaTransaction = (
     : null,
   type: type ?? "legacy",
   typeHex: typeHex ?? "0x1",
-  nonce,
+  nonce: nonce ?? 0,
   transactionIndex,
   input,
   timestamp,

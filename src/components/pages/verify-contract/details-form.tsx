@@ -23,16 +23,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { compilerTypes, compilerTypeKeys, compilerVersions } from "@/lib/types";
+import {
+  compilerTypes,
+  compilerTypeKeys,
+  solidityCompilerVersionKeys,
+} from "@/lib/types";
 import { submitContractDetails } from "@/components/pages/verify-contract/actions";
 
 const [firstCompilerTypeKey, ...otherCompilerTypeKeys] = compilerTypeKeys;
-const [firstCompilerVersionKey, ...otherCompilerVersionKeys] = compilerVersions;
+const [firstCompilerVersionKey, ...otherCompilerVersionKeys] =
+  solidityCompilerVersionKeys;
 
 const formSchema = z.object({
   address: z.string().startsWith("0x").length(42),
   type: z.enum([firstCompilerTypeKey!, ...otherCompilerTypeKeys]),
-  version: z.enum([firstCompilerVersionKey, ...otherCompilerVersionKeys]),
+  version: z.enum([firstCompilerVersionKey!, ...otherCompilerVersionKeys]),
 });
 
 const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
@@ -111,7 +116,7 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {compilerVersions.map((compilerVersion) => (
+                      {solidityCompilerVersionKeys.map((compilerVersion) => (
                         <SelectItem
                           key={compilerVersion}
                           value={compilerVersion}

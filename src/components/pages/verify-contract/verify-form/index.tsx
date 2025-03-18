@@ -10,7 +10,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { CompilerType, CompilerVersion, evmVersionKeys } from "@/lib/types";
+import {
+  CompilerType,
+  evmVersionKeys,
+  SolidityCompilerVersion,
+} from "@/lib/types";
 import { verifyContract } from "@/components/pages/verify-contract/actions";
 import VerifyContractVerifyFormSingleFile from "@/components/pages/verify-contract/verify-form/single-file";
 import VerifyContractVerifyFormStandardJsonInput from "@/components/pages/verify-contract/verify-form/standard-json-input";
@@ -63,7 +67,7 @@ const VerifyContractVerifyForm = ({
 }: {
   address: Address;
   type: CompilerType;
-  version: CompilerVersion;
+  version: SolidityCompilerVersion;
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

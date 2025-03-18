@@ -1,18 +1,27 @@
 import { Hex } from "viem";
 import { FileBox } from "lucide-react";
-import { decode } from "@ethereum-sourcify/bytecode-utils";
+import { decode, AuxdataStyle } from "@ethereum-sourcify/bytecode-utils";
 import PreCard from "@/components/lib/pre-card";
+import { Contract } from "@/lib/types";
 
-const getSwarmSource = (bytecode: Hex) => {
-  const { ipfs, bzzr0, bzzr1 } = decode(bytecode);
-  if (ipfs) {
-    return `ipfs://${ipfs}`;
+const getSwarmSource = (bytecode: Hex, language: string) => {
+  if (language === "solidity") {
+    const { ipfs } = decode(bytecode, AuxdataStyle.SOLIDITY);
+    if (ipfs) {
+      return `ipfs://${ipfs}`;
+    }
   }
   return null;
 };
 
-const AddressContractSwarmSource = ({ bytecode }: { bytecode: Hex }) => {
-  const swarmSource = getSwarmSource(bytecode);
+const AddressContractSwarmSource = ({
+  bytecode,
+  contract,
+}: {
+  bytecode: Hex;
+  contract: Contract;
+}) => {
+  const swarmSource = getSwarmSource(bytecode, contract.info.language);
   if (!swarmSource) {
     return null;
   }
