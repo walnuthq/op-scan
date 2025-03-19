@@ -109,6 +109,7 @@ export const loadFunctions = async (selector: string) => {
     }
     return signature;
   } catch (error) {
+    console.error(error);
     return fallback();
   }
 };
@@ -185,6 +186,7 @@ export const loadEvents = async (hash?: string) => {
     }
     return signature;
   } catch (error) {
+    console.error(error);
     return fallback();
   }
 };

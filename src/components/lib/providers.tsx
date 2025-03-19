@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
 import { wagmiAdapter, config } from "@/lib/wagmi";
 import { ThemeProvider } from "@/components/lib/theme-provider";
-import ContextProvider from "@/components/lib/context/provider";
+import GlobalContextProvider from "@/components/lib/context/provider";
 import { l2Chain } from "@/lib/chains";
 
 const queryClient = new QueryClient();
@@ -21,10 +21,9 @@ export const appKit = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID
         url: process.env.NEXT_PUBLIC_METADATA_URL,
         icons: [process.env.NEXT_PUBLIC_METADATA_ICON],
       },
-      themeMode: "dark",
-      themeVariables: {
-        "--w3m-accent": "hsl(var(--destructive))",
-      },
+      /* themeVariables: {
+        "--w3m-accent": "var(--destructive)",
+      }, */
     })
   : null;
 
@@ -34,10 +33,11 @@ const Providers = ({ children }: { children: ReactNode }) => (
     defaultTheme="system"
     enableSystem
     disableTransitionOnChange
+    enableColorScheme
   >
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ContextProvider>{children}</ContextProvider>
+        <GlobalContextProvider>{children}</GlobalContextProvider>
       </QueryClientProvider>
     </WagmiProvider>
   </ThemeProvider>

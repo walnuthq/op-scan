@@ -36,7 +36,7 @@ const TxsTable = ({
           <TableHead>Block</TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleTimestampFormattedAsDate}
             >
@@ -48,7 +48,7 @@ const TxsTable = ({
           <TableHead>To</TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleUSDValueShown}
             >
@@ -57,7 +57,7 @@ const TxsTable = ({
           </TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleTxGasPriceShown}
             >

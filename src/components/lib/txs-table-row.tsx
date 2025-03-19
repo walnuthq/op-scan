@@ -39,7 +39,7 @@ const TxsTableRow = ({
         <div className="flex items-center gap-2">
           <Link
             href={`/tx/${transaction.hash}`}
-            className="truncate text-primary hover:brightness-150"
+            className="text-primary truncate hover:brightness-150"
           >
             {transaction.hash}
           </Link>

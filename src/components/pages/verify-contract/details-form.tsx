@@ -87,7 +87,7 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
                   <FormLabel>Please select Compiler Type</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Please Select" />
                       </SelectTrigger>
                     </FormControl>
@@ -111,7 +111,7 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
                   <FormLabel>Please select Compiler Version</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Please Select" />
                       </SelectTrigger>
                     </FormControl>
@@ -131,7 +131,7 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
               )}
             />
             <div className="flex justify-between">
-              <Button type="submit" variant="destructive" disabled={loading}>
+              <Button type="submit" disabled={loading}>
                 {loading && <ReloadIcon className="mr-2 size-4 animate-spin" />}
                 {loading ? "Loading…" : "Continue"}
               </Button>

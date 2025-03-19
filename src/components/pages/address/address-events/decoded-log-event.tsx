@@ -36,7 +36,7 @@ const DecodedParameter = ({
 }) => (
   <div className="flex flex-col gap-1">
     <div className="flex gap-2 font-semibold">
-      <span className="italic text-muted-foreground">{input.type}</span>
+      <span className="text-muted-foreground italic">{input.type}</span>
       <span>{input.name}</span>
     </div>
     <DecodedParameterValue value={value} />

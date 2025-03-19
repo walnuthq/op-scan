@@ -18,20 +18,20 @@ const LatestTxsEnqueuedTableRow = ({
     <TableRow>
       <TableCell>
         <a
-          className="inline-flex items-center gap-1 truncate text-primary hover:brightness-150"
+          className="text-primary inline-flex items-center gap-1 truncate hover:brightness-150"
           href={`${l1Chain.blockExplorers.default.url}/block/${transactionEnqueued.l1BlockNumber}`}
           target="_blank"
           rel="noopener noreferrer"
         >
           {transactionEnqueued.l1BlockNumber.toString()}
-          <SquareArrowOutUpRight className="size-4 flex-shrink-0" />
+          <SquareArrowOutUpRight className="size-4 shrink-0" />
         </a>
       </TableCell>
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
           <Link
             href={`/tx/${transactionEnqueued.l2TxHash}`}
-            className="truncate text-sm font-medium leading-none text-primary hover:brightness-150"
+            className="text-primary truncate text-sm leading-none font-medium hover:brightness-150"
           >
             {transactionEnqueued.l2TxHash}
           </Link>
@@ -47,13 +47,13 @@ const LatestTxsEnqueuedTableRow = ({
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
           <a
-            className="inline-flex items-center gap-1 truncate text-primary hover:brightness-150"
+            className="text-primary inline-flex items-center gap-1 truncate hover:brightness-150"
             href={`${l1Chain.blockExplorers.default.url}/tx/${transactionEnqueued.l1TxHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <span className="truncate">{transactionEnqueued.l1TxHash}</span>
-            <SquareArrowOutUpRight className="size-4 flex-shrink-0" />
+            <SquareArrowOutUpRight className="size-4 shrink-0" />
           </a>
           <CopyButton
             content="Copy L1 Tx Hash"
@@ -64,13 +64,13 @@ const LatestTxsEnqueuedTableRow = ({
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
           <a
-            className="inline-flex items-center gap-1 truncate text-primary hover:brightness-150"
+            className="text-primary inline-flex items-center gap-1 truncate hover:brightness-150"
             href={`${l1Chain.blockExplorers.default.url}/address/${transactionEnqueued.l1TxOrigin}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <span className="truncate">{transactionEnqueued.l1TxOrigin}</span>
-            <SquareArrowOutUpRight className="size-4 flex-shrink-0" />
+            <SquareArrowOutUpRight className="size-4 shrink-0" />
           </a>
           <CopyButton
             content="Copy L1 Tx Origin"

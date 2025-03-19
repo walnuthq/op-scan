@@ -12,7 +12,7 @@ const AddressContractBytecode = ({ bytecode }: { bytecode: Hex }) => (
       </div>
       <CopyButton content="Copy Bytecode" copy={bytecode} />
     </div>
-    <PreCard className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
+    <PreCard className="max-h-64 overflow-y-auto break-words whitespace-pre-wrap">
       {bytecode}
     </PreCard>
   </div>

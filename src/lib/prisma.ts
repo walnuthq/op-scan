@@ -21,6 +21,7 @@ import {
   Transaction,
   BlockWithTransactionsAndReceipts,
   TransactionWithReceipt,
+  TransactionWithAccounts,
   TransactionWithReceiptAndAccounts,
   Log,
   Erc20Token,
@@ -57,6 +58,7 @@ export const fromPrismaBlock = (block: PrismaBlock): Block => ({
   transactionsCount: block.transactionsCount,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const prismaBlockWithTransactionsAndReceipts =
   Prisma.validator<Prisma.BlockDefaultArgs>()({
     include: { transactions: { include: { receipt: true, accounts: true } } },
@@ -109,6 +111,7 @@ export const fromPrismaTransaction = (
   timestamp: transaction.timestamp,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const prismaTransactionWithReceipt =
   Prisma.validator<Prisma.TransactionDefaultArgs>()({
     include: { receipt: true },
@@ -147,6 +150,25 @@ export const fromPrismaTransactionWithReceipt = (
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const prismaTransactionWithAccounts =
+  Prisma.validator<Prisma.TransactionDefaultArgs>()({
+    include: { accounts: true },
+  });
+
+type PrismaTransactionWithAccounts = Prisma.TransactionGetPayload<
+  typeof prismaTransactionWithAccounts
+>;
+
+export const fromPrismaTransactionWithAccounts = (
+  transaction: PrismaTransactionWithAccounts,
+  signature: string = "",
+): TransactionWithAccounts => ({
+  ...fromPrismaTransaction(transaction, signature),
+  accounts: transaction.accounts.map(fromPrismaAccount),
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const prismaTransactionWithReceiptAndAccounts =
   Prisma.validator<Prisma.TransactionDefaultArgs>()({
     include: { receipt: true, accounts: true },
@@ -199,6 +221,7 @@ export const fromPrismaErc20Transfer = (
   value: BigInt(erc20Transfer.value),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const prismaErc20TransferWithToken =
   Prisma.validator<Prisma.Erc20TransferDefaultArgs>()({
     include: { token: true },
@@ -250,6 +273,7 @@ export const fromPrismaNftTransfer = (
     : null,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const prismaNftTransferWithToken =
   Prisma.validator<Prisma.NftTransferDefaultArgs>()({
     include: { erc721Token: true, erc1155Token: true },
@@ -289,6 +313,7 @@ export const fromPrismaAccount = (account: PrismaAccount): Account => ({
   contract: account.contract ? JSON.parse(account.contract) : null,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const prismaAccountWithTransactionAndToken =
   Prisma.validator<Prisma.AccountDefaultArgs>()({
     include: {

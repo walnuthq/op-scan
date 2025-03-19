@@ -24,7 +24,7 @@ const FieldTemplate = ({
       <Label htmlFor={id} className="flex gap-1">
         {labelPrefix}
         {index ? `[${Number(index) - 1}]` : ""}
-        <span className="italic text-muted-foreground">{description}</span>
+        <span className="text-muted-foreground italic">{description}</span>
       </Label>
       {children}
     </div>
@@ -73,7 +73,7 @@ const SubmitButton = ({ uiSchema }: SubmitButtonProps) => {
     uiSchema && uiSchema["ui:options"]?.submitButtonOptions;
   const disabled = submitButtonOptions?.props?.disabled;
   return (
-    <Button variant="destructive" type="submit" disabled={disabled}>
+    <Button type="submit" disabled={disabled}>
       {disabled && <ReloadIcon className="mr-2 size-4 animate-spin" />}
       {disabled ? "Loading…" : submitButtonOptions?.submitText}
     </Button>

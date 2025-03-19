@@ -51,6 +51,7 @@ const fetchTransactionDetailsFromDatabase = async (
       ),
     };
   } catch (error) {
+    console.error(error);
     return { transaction: null, confirmations: BigInt(0), erc20Transfers: [] };
   }
 };
@@ -100,6 +101,7 @@ const fetchTransactionDetailsFromJsonRpc = async (
       erc20Transfers: erc20TransfersWithToken,
     };
   } catch (error) {
+    console.error(error);
     return { transaction: null, confirmations: BigInt(0), erc20Transfers: [] };
   }
 };

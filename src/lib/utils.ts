@@ -34,6 +34,7 @@ export const getBlockNumberSafe = async (blockHash: Hash) => {
     });
     return block.number;
   } catch (error) {
+    console.error(error);
     return null;
   }
 };

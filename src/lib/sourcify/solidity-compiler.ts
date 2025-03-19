@@ -81,6 +81,7 @@ class Solc implements ISolidityCompiler {
   async compile(
     version: string,
     solcJsonInput: JsonInput,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     forceEmscripten = false,
   ): Promise<SolidityOutput> {
     const solidityCompiler = getSolidityCompiler(

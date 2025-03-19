@@ -20,7 +20,7 @@ const EventsTableRow = ({
         <div className="flex items-center gap-2">
           <Link
             href={`/tx/${event.transactionHash}`}
-            className="truncate text-primary hover:brightness-150"
+            className="text-primary truncate hover:brightness-150"
           >
             {event.transactionHash}
           </Link>

@@ -45,7 +45,7 @@ const OutputResultValue = ({ value }: { value: unknown }) => {
       <div className="ml-2 inline-flex items-center gap-2">
         <Link
           href={`/address/${value}`}
-          className="font-mono text-primary hover:brightness-150"
+          className="text-primary font-mono hover:brightness-150"
         >
           {value}
         </Link>
@@ -70,7 +70,7 @@ const OutputResultField = ({
 }) => (
   <div className={cn("flex", { "gap-2": isLeaf, "gap-4": !isLeaf })}>
     {output.name && <span className="font-semibold">{output.name}</span>}
-    <span className="italic text-muted-foreground">
+    <span className="text-muted-foreground italic">
       {output.internalType ?? output.type}
     </span>
     {value !== undefined && <OutputResultValue value={value} />}

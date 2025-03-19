@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Address } from "viem";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const VerifyContractWizard = ({
   step,
@@ -12,14 +13,12 @@ const VerifyContractWizard = ({
 }) => (
   <div className="flex items-center gap-4">
     <div className="flex items-center gap-2">
-      <div
-        className={cn("flex size-8 items-center justify-center rounded-full", {
-          "bg-muted": step === 2,
-          "bg-destructive": step === 1,
-        })}
+      <Badge
+        className="size-4 rounded-full p-4"
+        variant={step === 1 ? "default" : "secondary"}
       >
-        <span className="text-sm font-semibold">1</span>
-      </div>
+        1
+      </Badge>
       <Link
         className={cn("text-sm", {
           "pointer-events-none font-semibold": step === 1,
@@ -33,20 +32,19 @@ const VerifyContractWizard = ({
         Enter Contract Details
       </Link>
     </div>
-    <Separator className="w-8" />
+    <Separator className="data-[orientation=horizontal]:w-8" />
     <div className="flex items-center gap-2">
-      <div
-        className={cn("flex size-8 items-center justify-center rounded-full", {
-          "bg-muted": step === 1,
-          "bg-destructive": step === 2,
-        })}
+      <Badge
+        className="size-4 rounded-full p-4"
+        variant={step === 1 ? "secondary" : "default"}
       >
-        <span className="text-sm font-semibold">2</span>
-      </div>
+        2
+      </Badge>
       <span className={cn("text-sm", { "font-semibold": step === 2 })}>
         Verify & Publish
       </span>
     </div>
   </div>
 );
+
 export default VerifyContractWizard;

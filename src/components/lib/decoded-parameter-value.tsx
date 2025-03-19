@@ -8,7 +8,7 @@ const DecodedParameterValueSingle = ({ value }: { value: unknown }) => {
     return isAddress(value) ? (
       <Link
         href={`/address/${value}`}
-        className="font-mono text-primary hover:brightness-150"
+        className="text-primary font-mono hover:brightness-150"
       >
         {value}
       </Link>

@@ -51,9 +51,12 @@ export type TransactionWithReceipt = Transaction & {
   receipt: TransactionReceipt;
 };
 
-export type TransactionWithReceiptAndAccounts = TransactionWithReceipt & {
+export type TransactionWithAccounts = Transaction & {
   accounts: Account[];
 };
+
+export type TransactionWithReceiptAndAccounts = TransactionWithReceipt &
+  TransactionWithAccounts;
 
 export type BlockWithTransactionsAndReceipts = Omit<Block, "transactions"> & {
   transactions: TransactionWithReceiptAndAccounts[];

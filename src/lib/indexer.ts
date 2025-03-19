@@ -265,7 +265,7 @@ const indexErc20Token = async (
       decimals,
     });
   } catch (error) {
-    // console.error(error);
+    console.error(error);
     unindexedTokens.add(address);
   }
 };
@@ -293,7 +293,7 @@ const indexErc721Token = async (
       symbol,
     });
   } catch (error) {
-    // console.error(error);
+    console.error(error);
     unindexedTokens.add(address);
   }
 };
@@ -340,7 +340,7 @@ export const indexL2Block = async (blockNumber: bigint) => {
     toPrismaTransactionReceipt,
   );
   const contractDeployments = new Map<Address, Account>();
-  for (let transactionReceipt of transactionReceipts) {
+  for (const transactionReceipt of transactionReceipts) {
     if (transactionReceipt.contractAddress) {
       const bytecode = await l2PublicClient.getCode({
         address: transactionReceipt.contractAddress,

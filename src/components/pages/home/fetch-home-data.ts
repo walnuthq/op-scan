@@ -1,7 +1,7 @@
 import {
   prisma,
   fromPrismaBlock,
-  fromPrismaTransaction,
+  fromPrismaTransactionWithAccounts,
   fromPrismaTransactionEnqueued,
 } from "@/lib/prisma";
 import { transactionsHistoryCount } from "@/lib/constants";
@@ -41,6 +41,7 @@ const fetchHomeData = async () => {
     }),
     prisma.transaction.findMany({
       orderBy: [{ blockNumber: "desc" }, { transactionIndex: "desc" }],
+      include: { accounts: true },
       take: 6,
     }),
     prisma.transactionEnqueued.findMany({
@@ -64,7 +65,7 @@ const fetchHomeData = async () => {
     pricesToday: prices[1],
     blocks: blocks.map((block) => fromPrismaBlock(block)),
     transactions: transactions.map((transaction) =>
-      fromPrismaTransaction(transaction),
+      fromPrismaTransactionWithAccounts(transaction),
     ),
     transactionsCount: transactionHistory ? transactionHistory.transactions : 0,
     tps:

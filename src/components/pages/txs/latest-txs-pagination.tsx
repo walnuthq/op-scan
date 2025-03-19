@@ -33,7 +33,7 @@ const LatestTxsPagination = ({
       </PaginationItem>
       <PaginationItem>
         <PaginationLink
-          className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
+          className="text-primary hover:bg-primary w-auto px-4 py-2 aria-disabled:pointer-events-none aria-disabled:text-inherit"
           href={`/txs?start=${start}`}
           aria-disabled={page === 1}
         >
@@ -59,7 +59,7 @@ const LatestTxsPagination = ({
       </PaginationItem>
       <PaginationItem>
         <PaginationLink
-          className="w-auto px-4 py-2 text-primary hover:bg-primary aria-disabled:pointer-events-none aria-disabled:text-inherit"
+          className="text-primary hover:bg-primary w-auto px-4 py-2 aria-disabled:pointer-events-none aria-disabled:text-inherit"
           href={`/txs?start=${start}&page=${totalPages}`}
           aria-disabled={page === totalPages}
         >

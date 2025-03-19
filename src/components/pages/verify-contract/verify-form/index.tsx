@@ -147,7 +147,7 @@ const VerifyContractVerifyForm = ({
             </Alert>
           )}
           <div className="flex justify-center">
-            <Button variant="destructive" type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading}>
               {loading && <ReloadIcon className="mr-2 size-4 animate-spin" />}
               {loading ? "Loading…" : "Verify & Publish"}
             </Button>

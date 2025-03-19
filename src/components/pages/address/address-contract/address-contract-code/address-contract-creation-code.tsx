@@ -16,7 +16,7 @@ const AddressContractCreationCode = ({
       </div>
       <CopyButton content="Copy Creation Code" copy={creationCode} />
     </div>
-    <PreCard className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
+    <PreCard className="max-h-64 overflow-y-auto break-words whitespace-pre-wrap">
       {creationCode}
     </PreCard>
   </div>

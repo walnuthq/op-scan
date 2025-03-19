@@ -29,19 +29,16 @@ const AddressDetails = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-0.5">
-            <span className="text-xs font-semibold text-muted-foreground">
+            <span className="text-muted-foreground text-xs font-semibold">
               ETH BALANCE
             </span>
             <div className="flex items-center text-sm font-semibold">
               <EthereumIcon className="mr-1 size-4" />
-              {formatEther(
-                balance,
-                18,
-              )} ETH
+              {formatEther(balance, 18)} ETH
             </div>
           </div>
           <div className="space-y-0.5">
-            <span className="text-xs font-semibold text-muted-foreground">
+            <span className="text-muted-foreground text-xs font-semibold">
               ETH VALUE
             </span>
             <div className="flex items-center gap-1 text-sm font-semibold">
@@ -52,7 +49,7 @@ const AddressDetails = ({
             </div>
           </div>
           <div className="space-y-0.5">
-            <span className="text-xs font-semibold text-muted-foreground">
+            <span className="text-muted-foreground text-xs font-semibold">
               TOKEN HOLDINGS
             </span>
             <div className="flex items-center">
@@ -68,13 +65,13 @@ const AddressDetails = ({
         <CardContent className="space-y-4">
           {account.transaction && (
             <div className="space-y-0.5">
-              <span className="text-xs font-semibold text-muted-foreground">
+              <span className="text-muted-foreground text-xs font-semibold">
                 {account.bytecode ? "CONTRACT CREATOR" : "FUNDED BY"}
               </span>
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <Link
                   href={`/address/${account.transaction.from}`}
-                  className="text-nowrap text-primary hover:brightness-150"
+                  className="text-primary text-nowrap hover:brightness-150"
                 >
                   {formatAddress(account.transaction.from)}
                 </Link>
@@ -85,7 +82,7 @@ const AddressDetails = ({
                 <span className="text-nowrap">at txn</span>
                 <Link
                   href={`/tx/${account.transactionHash}`}
-                  className="max-w-40 truncate text-primary hover:brightness-150"
+                  className="text-primary max-w-40 truncate hover:brightness-150"
                 >
                   {account.transactionHash}
                 </Link>
@@ -94,7 +91,7 @@ const AddressDetails = ({
           )}
           {isToken && (
             <div className="space-y-0.5">
-              <span className="text-xs font-semibold text-muted-foreground">
+              <span className="text-muted-foreground text-xs font-semibold">
                 TOKEN TRACKER
               </span>
               <div className="flex items-center text-sm font-semibold">

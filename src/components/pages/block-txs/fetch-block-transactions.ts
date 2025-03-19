@@ -1,5 +1,4 @@
 import { l2PublicClient } from "@/lib/chains";
-import { BlockWithTransactionsAndReceipts } from "@/lib/types";
 import { fromViemBlockWithTransactionsAndReceipts } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
 import {
@@ -45,6 +44,7 @@ const fetchBlockTransactionsFromJsonRpc = async (number: bigint) => {
       signatures,
     );
   } catch (error) {
+    console.error(error);
     return null;
   }
 };

@@ -15,6 +15,7 @@ const fetchBlockDetailsFromJsonRpc = async (number: bigint) => {
     const block = await l2PublicClient.getBlock({ blockNumber: number });
     return fromViemBlock(block);
   } catch (error) {
+    console.error(error);
     return null;
   }
 };

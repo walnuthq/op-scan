@@ -31,7 +31,7 @@ const Search = ({
   const [blockResult, setBlockResult] = useState<bigint | null>(null);
   const [addressResult, setAddressResult] = useState<Address | null>(null);
   const [transactionResult, setTransactionResult] = useState<Hash | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (!shortcut) {
       return;

@@ -31,7 +31,7 @@ const VerifyContractVerifyFormStandardJsonInput = ({
           <FormField
             control={form.control}
             name="standardJsonInput"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>
                   Please select the Standard-Input-Json (*.json) file to upload

@@ -9,8 +9,10 @@ interface VyperCompiler {
 }
 
 const getVyperCompiler = (version: string): VyperCompiler => {
+  console.info(version);
   const compiler = {
     compile(vyperJsonInput: string) {
+      console.info(vyperJsonInput);
       return "";
     },
   };

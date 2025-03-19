@@ -14,7 +14,7 @@ const BlockTxs = async ({ number }: { number: bigint }) => {
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-4">
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">Transactions</h2>
-        <p className="inline-flex items-center gap-1 text-muted-foreground">
+        <p className="text-muted-foreground inline-flex items-center gap-1">
           For Block
           <Link
             className="text-primary hover:brightness-150"

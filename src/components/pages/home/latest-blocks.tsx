@@ -12,20 +12,20 @@ import { formatTimestamp } from "@/lib/utils";
 import { l2BlockTime } from "@/lib/constants";
 
 const LatestBlock = ({ block }: { block: Block }) => (
-  <div className="flex items-center gap-4 pt-6">
-    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+  <div className="flex items-center gap-4 pb-6 last:pb-0">
+    <div className="bg-accent text-accent-foreground flex h-9 w-9 items-center justify-center rounded-lg">
       <Box className="h-5 w-5" />
     </div>
-    <div className="grid flex-grow gap-1">
+    <div className="grid grow gap-1">
       <div className="flex items-center justify-between gap-1 py-0.5 text-sm">
         <div>
           <Link
             href={`/block/${block.number}`}
-            className="text-sm font-medium leading-none text-primary hover:brightness-150"
+            className="text-primary text-sm leading-none font-medium hover:brightness-150"
           >
             {block.number.toString()}
           </Link>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {formatTimestamp(block.timestamp).distance}
           </p>
         </div>
@@ -55,7 +55,7 @@ const LatestBlocks = ({ blocks }: { blocks: Block[] }) => (
       ))}
     </CardContent>
     <CardFooter className="flex justify-center border-t">
-      <Link href="/blocks" className="pt-6 text-primary hover:brightness-150">
+      <Link href="/blocks" className="text-primary pt-6 hover:brightness-150">
         View all blocks →
       </Link>
     </CardFooter>
