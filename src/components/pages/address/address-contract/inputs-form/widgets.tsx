@@ -1,6 +1,6 @@
-import { ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 import { zeroAddress } from "viem";
-import { WidgetProps } from "@rjsf/utils";
+import { type WidgetProps } from "@rjsf/utils";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 

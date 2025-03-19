@@ -29,11 +29,11 @@ import solc_0_8_2 from "solc-0.8.2";
 import solc_0_8_1 from "solc-0.8.1";
 import solc_0_8_0 from "solc-0.8.0";
 import {
-  ISolidityCompiler,
-  SolidityOutput,
-  JsonInput,
+  type ISolidityCompiler,
+  type SolidityOutput,
+  type JsonInput,
 } from "@ethereum-sourcify/lib-sourcify";
-import { SolidityCompilerVersion } from "@/lib/types";
+import { type SolidityCompilerVersion } from "@/lib/types";
 
 interface SolidityCompiler {
   compile: (solcJsonInput: string) => string;

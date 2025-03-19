@@ -1,6 +1,6 @@
-import { Address, Hex } from "viem";
+import { type Address, type Hex } from "viem";
 import { CircleCheck, CircleX } from "lucide-react";
-import { TransactionReceipt, Account } from "@/lib/types";
+import { type TransactionReceipt, type Account } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import AddressLink from "@/components/lib/address-link";
 import CopyButton from "@/components/lib/copy-button";

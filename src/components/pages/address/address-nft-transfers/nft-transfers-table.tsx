@@ -1,5 +1,5 @@
 "use client";
-import { Address } from "viem";
+import { type Address } from "viem";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import useGlobalContext from "@/components/lib/context/hook";
-import { NftTransfer } from "@/components/pages/address/address-nft-transfers/fetch-nft-transfers";
+import { type NftTransfer } from "@/components/pages/address/address-nft-transfers/fetch-nft-transfers";
 import NftTransfersTableRow from "@/components/pages/address/address-nft-transfers/nft-transfers-table-row";
 
 const NftTransfersTable = ({

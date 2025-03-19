@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { TransactionWithReceiptAndAccounts } from "@/lib/types";
+import { type TransactionWithReceiptAndAccounts } from "@/lib/types";
 import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";

@@ -1,8 +1,8 @@
 "use client";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { CircleCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 import RouterTabs from "@/components/lib/router-tabs";
 
 const AddressTabs = ({

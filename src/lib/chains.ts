@@ -3,7 +3,7 @@ import {
   http,
   defineChain,
   fallback,
-  HttpTransportConfig,
+  type HttpTransportConfig,
 } from "viem";
 import { chainConfig } from "viem/op-stack";
 

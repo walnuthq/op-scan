@@ -1,5 +1,5 @@
-import { AbiEvent, Hex, decodeAbiParameters } from "viem";
-import { AbiEventParameter } from "abitype";
+import { type AbiEvent, type Hex, decodeAbiParameters } from "viem";
+import { type AbiEventParameter } from "abitype";
 import {
   Accordion,
   AccordionContent,

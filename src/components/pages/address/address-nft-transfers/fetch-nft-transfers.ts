@@ -1,6 +1,6 @@
-import { Address, Hash } from "viem";
+import { type Address, type Hash } from "viem";
 import { txsPerPage } from "@/lib/constants";
-import { NFTMetadata, NftTransferWithToken } from "@/lib/types";
+import { type NFTMetadata, type NftTransferWithToken } from "@/lib/types";
 import { prisma, fromPrismaNftTransferWithToken } from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
 import getErc721Contract from "@/lib/contracts/erc-721/contract";

@@ -5,20 +5,20 @@ import { utc } from "@date-fns/utc";
 import {
   formatEther as viemFormatEther,
   formatGwei as viemFormatGwei,
-  Address,
-  Hex,
-  TransactionType,
-  Log,
+  type Address,
+  type Hex,
+  type TransactionType,
+  type Log,
   getAddress,
   parseEventLogs,
   erc20Abi,
   erc721Abi,
-  Abi,
-  Hash,
+  type Abi,
+  type Hash,
 } from "viem";
-import { AbiConstructor } from "abitype";
+import { type AbiConstructor } from "abitype";
 import { capitalize } from "lodash";
-import { Erc20Transfer, NftTransfer } from "@/lib/types";
+import { type Erc20Transfer, type NftTransfer } from "@/lib/types";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
 import { l2PublicClient } from "@/lib/chains";
 

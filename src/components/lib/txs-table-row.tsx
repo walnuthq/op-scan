@@ -1,6 +1,10 @@
 import Link from "next/link";
-import { Address, zeroAddress, formatEther as viemFormatEther } from "viem";
-import { TransactionWithReceiptAndAccounts } from "@/lib/types";
+import {
+  type Address,
+  zeroAddress,
+  formatEther as viemFormatEther,
+} from "viem";
+import { type TransactionWithReceiptAndAccounts } from "@/lib/types";
 import {
   formatTimestamp,
   formatEther,

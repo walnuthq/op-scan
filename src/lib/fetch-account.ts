@@ -1,5 +1,5 @@
-import { Address } from "viem";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { type Address } from "viem";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 import {
   prisma,
   fromPrismaAccountWithTransactionAndToken,

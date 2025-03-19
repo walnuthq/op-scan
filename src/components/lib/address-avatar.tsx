@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const AddressAvatar = ({

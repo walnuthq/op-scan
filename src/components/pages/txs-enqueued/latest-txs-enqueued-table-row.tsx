@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TransactionEnqueued } from "@/lib/types";
+import { type TransactionEnqueued } from "@/lib/types";
 import { formatTimestamp, formatGas } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { l1Chain } from "@/lib/chains";

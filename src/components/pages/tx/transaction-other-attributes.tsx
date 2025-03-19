@@ -1,4 +1,4 @@
-import { TransactionType, Hex } from "viem";
+import { type TransactionType, type Hex } from "viem";
 import { formatTransactionType } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import DescriptionListItem from "@/components/lib/description-list-item";

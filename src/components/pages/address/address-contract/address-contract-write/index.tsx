@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import fetchAccount from "@/lib/fetch-account";
 import AddressContractWriteContract from "@/components/pages/address/address-contract/address-contract-write/address-contract-write-contract";
 

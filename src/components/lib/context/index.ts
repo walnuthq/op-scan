@@ -1,10 +1,9 @@
 import { createContext } from "react";
 
-import { defaultState, Action } from "@/components/lib/context/reducer";
+import { defaultState, type Action } from "@/components/lib/context/reducer";
 
 export default createContext({
   state: defaultState(),
-  dispatch: (action: Action) => {
-    console.info(action);
-  },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  dispatch: (action: Action) => {},
 });

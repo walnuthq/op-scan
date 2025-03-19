@@ -1,8 +1,8 @@
-import { Hex } from "viem";
+import { type Hex } from "viem";
 import { FileBox } from "lucide-react";
 import { decode, AuxdataStyle } from "@ethereum-sourcify/bytecode-utils";
 import PreCard from "@/components/lib/pre-card";
-import { Contract } from "@/lib/types";
+import { type Contract } from "@/lib/types";
 
 const getSwarmSource = (bytecode: Hex, language: string) => {
   if (language === "solidity") {

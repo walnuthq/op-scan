@@ -1,4 +1,4 @@
-import { Address, formatUnits, Hash } from "viem";
+import { type Address, formatUnits, type Hash } from "viem";
 import { fromPrismaErc20TransferWithToken, prisma } from "@/lib/prisma";
 import { txsPerPage } from "@/lib/constants";
 import { loadFunctions } from "@/lib/signatures";

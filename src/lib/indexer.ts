@@ -1,32 +1,32 @@
-import { Log, getAddress, Address, Hex } from "viem";
+import { type Log, getAddress, type Address, type Hex } from "viem";
 import {
   extractTransactionDepositedLogs,
   getL2TransactionHash,
 } from "viem/op-stack";
 import {
-  Account,
-  Erc20Token,
-  Erc20Transfer,
-  Erc721Token,
-  Erc1155Token,
-  NftTransfer,
-  TransactionEnqueued,
+  type Account,
+  type Erc20Token,
+  type Erc20Transfer,
+  type Erc721Token,
+  type Erc1155Token,
+  type NftTransfer,
+  type TransactionEnqueued,
 } from "@/lib/types";
 import {
-  ViemBlockWithTransactions,
-  ViemLog,
-  ViemTransaction,
-  ViemTransactionReceipt,
+  type ViemBlockWithTransactions,
+  type ViemLog,
+  type ViemTransaction,
+  type ViemTransactionReceipt,
 } from "@/lib/viem";
 import {
-  Block as PrismaBlock,
-  Transaction as PrismaTransaction,
-  TransactionReceipt as PrismaTransactionReceipt,
-  Log as PrismaLog,
-  Erc20Transfer as PrismaErc20Transfer,
-  NftTransfer as PrismaNftTransfer,
-  TransactionEnqueued as PrismaTransactionEnqueued,
-  Account as PrismaAccount,
+  type Block as PrismaBlock,
+  type Transaction as PrismaTransaction,
+  type TransactionReceipt as PrismaTransactionReceipt,
+  type Log as PrismaLog,
+  type Erc20Transfer as PrismaErc20Transfer,
+  type NftTransfer as PrismaNftTransfer,
+  type TransactionEnqueued as PrismaTransactionEnqueued,
+  type Account as PrismaAccount,
 } from "@/prisma/generated/client";
 import { l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { prisma } from "@/lib/prisma";

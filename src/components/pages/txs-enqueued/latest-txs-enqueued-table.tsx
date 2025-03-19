@@ -1,5 +1,5 @@
 "use client";
-import { TransactionEnqueued } from "@/lib/types";
+import { type TransactionEnqueued } from "@/lib/types";
 import {
   Table,
   TableBody,

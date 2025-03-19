@@ -1,5 +1,5 @@
 "use client";
-import { Address } from "viem";
+import { type Address } from "viem";
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { TokenTransfer } from "@/components/pages/address/address-token-transfers/fetch-token-transfers";
+import { type TokenTransfer } from "@/components/pages/address/address-token-transfers/fetch-token-transfers";
 import useGlobalContext from "@/components/lib/context/hook";
 import TokenTransfersTableRow from "@/components/pages/address/address-token-transfers/token-transfers-table-row";
 

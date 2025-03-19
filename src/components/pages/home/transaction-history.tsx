@@ -1,5 +1,12 @@
 "use client";
-import { LineChart, Line, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  type TooltipProps,
+} from "recharts";
 import { uniq } from "lodash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";

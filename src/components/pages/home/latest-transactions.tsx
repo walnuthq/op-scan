@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { TransactionWithAccounts } from "@/lib/types";
+import { type TransactionWithAccounts } from "@/lib/types";
 import {
   Card,
   CardContent,

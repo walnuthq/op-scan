@@ -1,6 +1,6 @@
-import { AbiParameter, isAddress } from "viem";
+import { type AbiParameter, isAddress } from "viem";
 import Link from "next/link";
-import { JSONTree, KeyPath } from "react-json-tree";
+import { JSONTree, type KeyPath } from "react-json-tree";
 import { cn } from "@/lib/utils";
 import CopyButton from "@/components/lib/copy-button";
 

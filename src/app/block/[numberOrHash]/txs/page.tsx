@@ -1,5 +1,5 @@
 import { notFound, permanentRedirect } from "next/navigation";
-import { Hash } from "viem";
+import { type Hash } from "viem";
 import { getBlockNumberSafe } from "@/lib/utils";
 import BlockTxs from "@/components/pages/block-txs";
 

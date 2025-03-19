@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { DecodedData } from "@/components/pages/address/address-events/fetch-events";
+import { type DecodedData } from "@/components/pages/address/address-events/fetch-events";
 import {
   Select,
   SelectContent,

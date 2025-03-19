@@ -1,5 +1,5 @@
 "use client";
-import { Block } from "@/lib/types";
+import { type Block } from "@/lib/types";
 import {
   Table,
   TableBody,

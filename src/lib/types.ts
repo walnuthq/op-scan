@@ -1,4 +1,10 @@
-import { Hash, Address, Hex, TransactionType, Abi } from "viem";
+import {
+  type Hash,
+  type Address,
+  type Hex,
+  type TransactionType,
+  type Abi,
+} from "viem";
 
 export type Block = {
   number: bigint;

@@ -1,10 +1,10 @@
 import { isAddress, getAddress } from "viem";
 import VerifyContract from "@/components/pages/verify-contract";
 import {
-  CompilerType,
+  type CompilerType,
   compilerTypeKeys,
   solidityCompilerVersionKeys,
-  SolidityCompilerVersion,
+  type SolidityCompilerVersion,
 } from "@/lib/types";
 
 const VerifyContractPage = async ({

@@ -1,7 +1,7 @@
 "use client";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { Address } from "viem";
+import { type Address } from "viem";
 import RouterTabs from "@/components/lib/router-tabs";
 
 const AddressContractTabs = ({

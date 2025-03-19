@@ -1,4 +1,4 @@
-import { Address, formatUnits } from "viem";
+import { type Address, formatUnits } from "viem";
 import {
   prisma,
   fromPrismaErc20TransferWithToken,

@@ -1,6 +1,6 @@
-import { decodeAbiParameters, Hex, Abi } from "viem";
+import { decodeAbiParameters, type Hex, type Abi } from "viem";
 import { Network } from "lucide-react";
-import { Contract } from "@/lib/types";
+import { type Contract } from "@/lib/types";
 import { getContractMetadata, findAbiConstructor } from "@/lib/utils";
 import PreCard from "@/components/lib/pre-card";
 import DecodedParameterValue from "@/components/lib/decoded-parameter-value";

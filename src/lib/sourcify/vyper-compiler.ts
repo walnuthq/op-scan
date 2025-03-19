@@ -1,7 +1,7 @@
 import {
-  IVyperCompiler,
-  VyperOutput,
-  VyperJsonInput,
+  type IVyperCompiler,
+  type VyperOutput,
+  type VyperJsonInput,
 } from "@ethereum-sourcify/lib-sourcify";
 
 interface VyperCompiler {

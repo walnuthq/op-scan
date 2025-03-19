@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { TransactionEnqueued } from "@/lib/types";
+import { type TransactionEnqueued } from "@/lib/types";
 import { ReceiptText } from "lucide-react";
 import { l1Chain } from "@/lib/chains";
 import { SquareArrowOutUpRight } from "lucide-react";

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Address } from "viem";
+import { type Address } from "viem";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

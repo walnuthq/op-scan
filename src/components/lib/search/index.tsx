@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Address, isAddress, getAddress, Hash } from "viem";
+import { type Address, isAddress, getAddress, type Hash } from "viem";
 import { cn } from "@/lib/utils";
 import {
   Command,

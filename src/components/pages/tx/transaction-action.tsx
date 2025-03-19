@@ -1,6 +1,6 @@
-import { Address, Hex, formatEther } from "viem";
+import { type Address, type Hex, formatEther } from "viem";
 import { ChevronRight } from "lucide-react";
-import { Account } from "@/lib/types";
+import { type Account } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 import AddressLink from "@/components/lib/address-link";

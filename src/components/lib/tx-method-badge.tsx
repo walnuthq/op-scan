@@ -1,7 +1,7 @@
 "use client";
 import { startCase } from "lodash";
 import { cn } from "@/lib/utils";
-import { Account } from "@/lib/types";
+import { type Account } from "@/lib/types";
 import {
   Tooltip,
   TooltipContent,

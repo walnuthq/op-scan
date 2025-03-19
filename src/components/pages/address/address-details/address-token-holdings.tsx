@@ -16,8 +16,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Address } from "viem";
-import { TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
+import { type Address } from "viem";
+import { type TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
 
 type TokenDetails = {
   type: "ERC-20" | "ERC-721" | "ERC-1155";

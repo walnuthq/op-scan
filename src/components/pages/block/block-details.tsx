@@ -3,7 +3,7 @@ import { formatGas } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TimestampListItem from "@/components/lib/timestamp-list-item";
-import { Block } from "@/lib/types";
+import { type Block } from "@/lib/types";
 import BlockHeight from "@/components/pages/block/block-height";
 import BlockExtraData from "@/components/pages/block/block-extra-data";
 import CopyButton from "@/components/lib/copy-button";

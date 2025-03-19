@@ -1,5 +1,5 @@
 "use client";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 import AddressContractInfo from "@/components/pages/address/address-contract/address-contract-code/address-contract-info";
 import AddressContractSources from "@/components/pages/address/address-contract/address-contract-code/address-contract-sources";
 import AddressContractAbi from "@/components/pages/address/address-contract/address-contract-code/address-contract-abi";

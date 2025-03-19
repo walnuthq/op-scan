@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Address } from "viem";
+import { type Address } from "viem";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";

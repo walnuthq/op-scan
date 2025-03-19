@@ -1,6 +1,6 @@
 "use client";
-import { Address } from "viem";
-import { TransactionWithReceiptAndAccounts } from "@/lib/types";
+import { type Address } from "viem";
+import { type TransactionWithReceiptAndAccounts } from "@/lib/types";
 import {
   Table,
   TableBody,

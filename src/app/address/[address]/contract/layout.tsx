@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { getAddress } from "viem";
 import { Card, CardContent } from "@/components/ui/card";
 import fetchAccount from "@/lib/fetch-account";

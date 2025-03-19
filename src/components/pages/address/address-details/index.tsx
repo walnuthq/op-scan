@@ -4,8 +4,8 @@ import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatAddress, formatEther, formatPrice } from "@/lib/utils";
 import AddressTokenHoldings from "@/components/pages/address/address-details/address-token-holdings";
-import { TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { type TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 import CopyButton from "@/components/lib/copy-button";
 
 const AddressDetails = ({

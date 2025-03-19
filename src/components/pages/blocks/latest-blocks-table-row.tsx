@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
-import { Block } from "@/lib/types";
+import { type Block } from "@/lib/types";
 import { formatTimestamp, formatGas } from "@/lib/utils";
 
 const LatestBlocksTableRow = ({

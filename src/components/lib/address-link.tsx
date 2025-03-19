@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Address } from "viem";
+import { type Address } from "viem";
 import { SquareArrowOutUpRight } from "lucide-react";
 import {
   Tooltip,

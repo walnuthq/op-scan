@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 import { Trash } from "lucide-react";
 import {
-  FieldTemplateProps,
-  ObjectFieldTemplateProps,
-  ArrayFieldTemplateProps,
-  SubmitButtonProps,
+  type FieldTemplateProps,
+  type ObjectFieldTemplateProps,
+  type ArrayFieldTemplateProps,
+  type SubmitButtonProps,
 } from "@rjsf/utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

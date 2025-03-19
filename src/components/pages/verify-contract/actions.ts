@@ -1,9 +1,9 @@
 "use server";
 import {
-  Address,
-  Abi,
-  AbiFunction,
-  AbiEvent,
+  type Address,
+  type Abi,
+  type AbiFunction,
+  type AbiEvent,
   toFunctionSignature,
   toFunctionSelector,
   toEventSignature,
@@ -11,13 +11,17 @@ import {
 } from "viem";
 import { redirect } from "next/navigation";
 import {
-  JsonInput,
+  type JsonInput,
   checkFilesWithMetadata,
   verifyDeployed,
-  Status,
+  type Status,
 } from "@ethereum-sourcify/lib-sourcify";
 import { prisma } from "@/lib/prisma";
-import { EvmVersion, CompilerType, SolidityCompilerVersion } from "@/lib/types";
+import {
+  type EvmVersion,
+  type CompilerType,
+  type SolidityCompilerVersion,
+} from "@/lib/types";
 import { solc, vyper, sourcifyChain } from "@/lib/sourcify";
 
 export const submitContractDetails = async ({

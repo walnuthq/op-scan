@@ -1,4 +1,4 @@
-import { Hex } from "viem";
+import { type Hex } from "viem";
 import PreCard from "@/components/lib/pre-card";
 import DescriptionListItem from "@/components/lib/description-list-item";
 

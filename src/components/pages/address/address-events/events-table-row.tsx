@@ -2,7 +2,7 @@ import Link from "next/link";
 import DecodedLog from "@/components/pages/address/address-events/decoded-log";
 import { formatTimestamp } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
-import { Event } from "@/components/pages/address/address-events/fetch-events";
+import { type Event } from "@/components/pages/address/address-events/fetch-events";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 import CopyButton from "@/components/lib/copy-button";
 

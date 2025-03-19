@@ -1,7 +1,7 @@
-import { RJSFSchema, UiSchema } from "@rjsf/utils";
-import { AbiParameter } from "viem";
+import { type RJSFSchema, type UiSchema } from "@rjsf/utils";
+import { type AbiParameter } from "viem";
 import { range } from "lodash";
-import { JSONSchema7Definition } from "json-schema";
+import { type JSONSchema7Definition } from "json-schema";
 
 const inputToSchemaDefinition = (input: AbiParameter) => {
   const result: JSONSchema7Definition = {

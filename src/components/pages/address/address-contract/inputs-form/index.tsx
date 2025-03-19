@@ -1,11 +1,11 @@
-import { useState, Dispatch, SetStateAction } from "react";
-import { AbiFunction, Address } from "viem";
+import { useState, type Dispatch, type SetStateAction } from "react";
+import { type AbiFunction, type Address } from "viem";
 import { useWriteContract } from "wagmi";
 import { BadgeX } from "lucide-react";
 import Form from "@rjsf/core";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import validator from "@rjsf/validator-ajv8";
-import { Contract } from "@/lib/types";
+import { type Contract } from "@/lib/types";
 import { l2PublicClient } from "@/lib/chains";
 import {
   inputsToSchema,

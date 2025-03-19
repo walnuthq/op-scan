@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Box } from "lucide-react";
-import { Block } from "@/lib/types";
+import { type Block } from "@/lib/types";
 import {
   Card,
   CardContent,

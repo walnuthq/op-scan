@@ -1,5 +1,5 @@
 "use server";
-import { Address, Hash } from "viem";
+import { type Address, type Hash } from "viem";
 import { prisma } from "@/lib/prisma";
 
 export const searchBlock = async (number: bigint) => {

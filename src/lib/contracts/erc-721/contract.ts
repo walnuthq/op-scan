@@ -1,4 +1,4 @@
-import { getContract, Address, erc721Abi } from "viem";
+import { getContract, type Address, erc721Abi } from "viem";
 import { l2PublicClient } from "@/lib/chains";
 
 const getErc721Contract = (address: Address) =>

@@ -1,4 +1,4 @@
-import { Abi } from "viem";
+import { type Abi } from "viem";
 import { useTheme } from "next-themes";
 import { ListChecks } from "lucide-react";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";

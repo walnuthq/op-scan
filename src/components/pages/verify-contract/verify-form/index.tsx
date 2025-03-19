@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Address } from "viem";
+import { type Address } from "viem";
 import { z } from "zod";
 import { BadgeX } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,9 +11,9 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import {
-  CompilerType,
+  type CompilerType,
   evmVersionKeys,
-  SolidityCompilerVersion,
+  type SolidityCompilerVersion,
 } from "@/lib/types";
 import { verifyContract } from "@/components/pages/verify-contract/actions";
 import VerifyContractVerifyFormSingleFile from "@/components/pages/verify-contract/verify-form/single-file";

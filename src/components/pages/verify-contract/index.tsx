@@ -1,10 +1,10 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import { Separator } from "@/components/ui/separator";
 import VerifyContractInfo from "@/components/pages/verify-contract/info";
 import VerifyContractWizard from "@/components/pages/verify-contract/wizard";
 import VerifyContractDetailsForm from "@/components/pages/verify-contract/details-form";
 import VerifyContractVerifyForm from "@/components/pages/verify-contract/verify-form";
-import { CompilerType, SolidityCompilerVersion } from "@/lib/types";
+import { type CompilerType, type SolidityCompilerVersion } from "@/lib/types";
 
 const VerifyContract = async ({
   address,

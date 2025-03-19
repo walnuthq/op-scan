@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { NFTMetadata } from "@/lib/types";
+import { type NFTMetadata } from "@/lib/types";
 
 const NftLink = ({
   metadata: { address, name, symbol, imageUrl, tokenId },

@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import Link from "next/link";
 
 const AddressContractVerify = ({ address }: { address: Address }) => (

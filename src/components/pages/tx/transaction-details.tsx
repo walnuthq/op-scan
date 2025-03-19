@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { formatEther, formatGwei, formatGas, formatPrice } from "@/lib/utils";
-import { Erc20TransferWithToken } from "@/lib/types";
+import { type Erc20TransferWithToken } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import EthereumIcon from "@/components/lib/ethereum-icon";
 import { Separator } from "@/components/ui/separator";
-import { TransactionWithReceiptAndAccounts } from "@/lib/types";
+import { type TransactionWithReceiptAndAccounts } from "@/lib/types";
 import TxStatusBadge from "@/components/lib/tx-status-badge";
 import TimestampListItem from "@/components/lib/timestamp-list-item";
 import TransactionAction from "@/components/pages/tx/transaction-action";

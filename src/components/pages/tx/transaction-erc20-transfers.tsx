@@ -1,7 +1,7 @@
 import { formatUnits } from "viem";
 import { ChevronRight } from "lucide-react";
 import AddressLink from "@/components/lib/address-link";
-import { Erc20TransferWithToken } from "@/lib/types";
+import { type Erc20TransferWithToken } from "@/lib/types";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
 const TransactionErc20Transfers = ({

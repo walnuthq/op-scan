@@ -1,6 +1,6 @@
-import { Address } from "viem";
-import { Metadata } from "@ethereum-sourcify/lib-sourcify";
-import { Contract } from "@/lib/types";
+import { type Address } from "viem";
+import { type Metadata } from "@ethereum-sourcify/lib-sourcify";
+import { type Contract } from "@/lib/types";
 
 type SourcifyContractFile = {
   name: string;

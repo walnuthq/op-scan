@@ -1,8 +1,8 @@
-import { Hash } from "viem";
+import { type Hash } from "viem";
 import { l2PublicClient } from "@/lib/chains";
 import {
-  Erc20TransferWithToken,
-  TransactionWithReceiptAndAccounts,
+  type Erc20TransferWithToken,
+  type TransactionWithReceiptAndAccounts,
 } from "@/lib/types";
 import { fromViemTransactionWithReceipt } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";

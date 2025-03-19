@@ -1,5 +1,5 @@
 "use client";
-import { TransactionWithReceiptAndAccounts } from "@/lib/types";
+import { type TransactionWithReceiptAndAccounts } from "@/lib/types";
 import {
   Table,
   TableHeader,

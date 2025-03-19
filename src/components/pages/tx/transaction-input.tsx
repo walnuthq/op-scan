@@ -1,5 +1,5 @@
-import { Hex } from "viem";
-import { Account } from "@/lib/types";
+import { type Hex } from "viem";
+import { type Account } from "@/lib/types";
 import PreCard from "@/components/lib/pre-card";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
