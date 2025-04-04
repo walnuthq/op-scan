@@ -1,9 +1,15 @@
-import { Hash, Address, Hex, TransactionType, getAddress } from "viem";
 import {
-  Block,
-  BlockWithTransactionsAndReceipts,
-  Transaction,
-  TransactionWithReceipt,
+  type Hash,
+  type Address,
+  type Hex,
+  type TransactionType,
+  getAddress,
+} from "viem";
+import {
+  type Block,
+  type BlockWithTransactionsAndReceipts,
+  type Transaction,
+  type TransactionWithReceipt,
 } from "@/lib/types";
 
 export type ViemBlock = {

@@ -24,7 +24,8 @@ const CardHeaderFooterContent = ({
   <>
     <div className="space-y-0.5">
       <p className="text-sm">
-        More than {formatNumber(totalCount)} transactions found
+        More than {formatNumber(totalCount)} transaction
+        {totalCount === 1 ? "" : "s"} found
       </p>
       <p className="text-xs">(Showing the last 500k records)</p>
     </div>

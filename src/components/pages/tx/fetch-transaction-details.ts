@@ -1,8 +1,8 @@
-import { Hash } from "viem";
+import { type Hash } from "viem";
 import { l2PublicClient } from "@/lib/chains";
 import {
-  Erc20TransferWithToken,
-  TransactionWithReceiptAndAccounts,
+  type Erc20TransferWithToken,
+  type TransactionWithReceiptAndAccounts,
 } from "@/lib/types";
 import { fromViemTransactionWithReceipt } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
@@ -13,6 +13,7 @@ import {
 } from "@/lib/prisma";
 import { parseErc20Transfers } from "@/lib/utils";
 import getErc20Contract from "@/lib/contracts/erc-20/contract";
+import { l2Chain } from "@/lib/chains";
 
 type FetchTransactionDetailsReturnType = {
   transaction: TransactionWithReceiptAndAccounts | null;
@@ -26,7 +27,7 @@ const fetchTransactionDetailsFromDatabase = async (
   try {
     const [transaction, confirmations] = await Promise.all([
       prisma.transaction.findUnique({
-        where: { hash },
+        where: { hash_chainId: { hash, chainId: l2Chain.id } },
         include: {
           receipt: {
             include: { erc20Transfers: { include: { token: true } } },
@@ -51,6 +52,7 @@ const fetchTransactionDetailsFromDatabase = async (
       ),
     };
   } catch (error) {
+    console.error(error);
     return { transaction: null, confirmations: BigInt(0), erc20Transfers: [] };
   }
 };
@@ -100,6 +102,7 @@ const fetchTransactionDetailsFromJsonRpc = async (
       erc20Transfers: erc20TransfersWithToken,
     };
   } catch (error) {
+    console.error(error);
     return { transaction: null, confirmations: BigInt(0), erc20Transfers: [] };
   }
 };

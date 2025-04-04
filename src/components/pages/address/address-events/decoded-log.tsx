@@ -1,6 +1,6 @@
 import { concat } from "viem";
 import { cn } from "@/lib/utils";
-import { Event } from "@/components/pages/address/address-events/fetch-events";
+import { type Event } from "@/components/pages/address/address-events/fetch-events";
 import DecodedLogEvent from "@/components/pages/address/address-events/decoded-log-event";
 import DecodedLogData from "@/components/pages/address/address-events/decoded-log-data";
 

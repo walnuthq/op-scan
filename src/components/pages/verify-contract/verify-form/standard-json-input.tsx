@@ -1,5 +1,8 @@
-import { z } from "zod";
-import { UseFormReturn, UseFormRegisterReturn } from "react-hook-form";
+import { type z } from "zod";
+import {
+  type UseFormReturn,
+  type UseFormRegisterReturn,
+} from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   AccordionContent,
@@ -14,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { formSchema } from "@/components/pages/verify-contract/verify-form";
+import { type formSchema } from "@/components/pages/verify-contract/verify-form";
 
 const VerifyContractVerifyFormStandardJsonInput = ({
   form,
@@ -31,7 +34,7 @@ const VerifyContractVerifyFormStandardJsonInput = ({
           <FormField
             control={form.control}
             name="standardJsonInput"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>
                   Please select the Standard-Input-Json (*.json) file to upload

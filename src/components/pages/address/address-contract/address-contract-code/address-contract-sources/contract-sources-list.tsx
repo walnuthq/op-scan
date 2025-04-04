@@ -1,5 +1,5 @@
 import { Accordion } from "@/components/ui/accordion";
-import { ContractSources } from "@/lib/types";
+import { type ContractSources } from "@/lib/types";
 import ContractSourceItem from "@/components/pages/address/address-contract/address-contract-code/address-contract-sources/contract-source-item";
 
 const ContractSourcesList = ({ sources }: { sources: ContractSources }) => (

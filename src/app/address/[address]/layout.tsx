@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { getAddress } from "viem";
 import { l2PublicClient } from "@/lib/chains";
 import { Separator } from "@/components/ui/separator";

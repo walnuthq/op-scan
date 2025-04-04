@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -9,7 +9,7 @@ const PreCard = ({
   className?: string;
   children: ReactNode;
 }) => (
-  <Card className="w-full bg-background">
+  <Card className="bg-background w-full">
     <CardContent className="p-4">
       <pre className={cn("font-mono text-sm", className)}>{children}</pre>
     </CardContent>

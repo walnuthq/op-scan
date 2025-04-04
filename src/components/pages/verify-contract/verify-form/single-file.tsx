@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { UseFormReturn } from "react-hook-form";
+import { type z } from "zod";
+import { type UseFormReturn } from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   AccordionContent,
@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { formSchema } from "@/components/pages/verify-contract/verify-form";
+import { type formSchema } from "@/components/pages/verify-contract/verify-form";
 
 const VerifyContractVerifyFormSingleFile = ({
   form,

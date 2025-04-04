@@ -1,19 +1,20 @@
-import { Address } from "viem";
-import { AccountWithTransactionAndToken } from "@/lib/types";
+import { type Address } from "viem";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 import {
   prisma,
+  fromPrismaAccountWithRollupConfig,
   fromPrismaAccountWithTransactionAndToken,
   fromPrismaTransaction,
 } from "@/lib/prisma";
-import { l2PublicClient } from "@/lib/chains";
+import { l2PublicClient, l2Chain } from "@/lib/chains";
 import { fetchContract } from "@/lib/fetch-contract";
 
 const fetchAccountFromDatabase = async (
   address: Address,
 ): Promise<AccountWithTransactionAndToken> => {
-  const [prismaAccount, prismaTransaction] = await Promise.all([
+  const [prismaAccount, prismaTransaction, prismaAccounts] = await Promise.all([
     prisma.account.findUnique({
-      where: { address },
+      where: { address_chainId: { address, chainId: l2Chain.id } },
       include: {
         transaction: true,
         erc20Token: true,
@@ -22,8 +23,12 @@ const fetchAccountFromDatabase = async (
       },
     }),
     prisma.transaction.findFirst({
-      where: { to: address },
+      where: { to: address, chainId: l2Chain.id },
       orderBy: [{ blockNumber: "asc" }, { transactionIndex: "asc" }],
+    }),
+    prisma.account.findMany({
+      where: { address, NOT: { chainId: l2Chain.id } },
+      include: { rollupConfig: true },
     }),
   ]);
   if (!prismaAccount) {
@@ -36,13 +41,16 @@ const fetchAccountFromDatabase = async (
       ? await fetchContract(address)
       : null;
   const fundingTransaction =
-    prismaTransaction && fromPrismaTransaction(prismaTransaction);
+    account.bytecode === null
+      ? prismaTransaction && fromPrismaTransaction(prismaTransaction)
+      : null;
   const transaction = account.transaction ?? fundingTransaction;
   return {
     ...account,
     contract,
     transactionHash: transaction ? transaction.hash : null,
     transaction,
+    accounts: prismaAccounts.map(fromPrismaAccountWithRollupConfig),
   };
 };
 

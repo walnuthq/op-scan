@@ -1,6 +1,6 @@
-import { AbiFunction, Address } from "viem";
-import { Dispatch, SetStateAction } from "react";
-import { Contract } from "@/lib/types";
+import { type AbiFunction, type Address } from "viem";
+import { type Dispatch, type SetStateAction } from "react";
+import { type Contract } from "@/lib/types";
 import {
   AccordionContent,
   AccordionItem,

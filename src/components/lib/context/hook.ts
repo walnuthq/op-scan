@@ -1,9 +1,9 @@
 import { useContext } from "react";
 
-import Context from "@/components/lib/context";
+import GlobalContext from "@/components/lib/context";
 
 const useGlobalContext = () => {
-  const { state, dispatch } = useContext(Context);
+  const { state, dispatch } = useContext(GlobalContext);
   const toggleTimestampFormattedAsDate = (): void =>
     dispatch({
       type: "TOGGLE_TIMESTAMP_FORMATTED_AS_DATE",

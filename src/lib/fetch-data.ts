@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { l1PublicClient, l2PublicClient } from "@/lib/chains";
+import { l1PublicClient, l2PublicClient, l2Chain } from "@/lib/chains";
 
 export const fetchL2BlockNumberFromJsonRpc = () =>
   l2PublicClient.getBlockNumber();
@@ -8,6 +8,7 @@ export const fetchL2BlockNumberFromDatabase = async () => {
   const {
     _max: { number: latestBlockNumber },
   } = await prisma.block.aggregate({
+    where: { chainId: l2Chain.id },
     _max: { number: true },
   });
   return latestBlockNumber ?? fetchL2BlockNumberFromJsonRpc();
@@ -24,6 +25,7 @@ export const fetchL1BlockNumberFromDatabase = async () => {
   const {
     _max: { number: latestBlockNumber },
   } = await prisma.l1Block.aggregate({
+    where: { chainId: l2Chain.id },
     _max: { number: true },
   });
   return latestBlockNumber ?? fetchL1BlockNumberFromJsonRpc();

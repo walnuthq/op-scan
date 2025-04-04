@@ -5,7 +5,7 @@ import { formatNumber } from "@/lib/utils";
 
 const LatestL1TxBatch = () => (
   <Card className="relative pl-8">
-    <Gauge className="absolute left-4 top-6 size-6" />
+    <Gauge className="absolute top-6 left-4 size-6" />
     <CardHeader className="pb-2">
       <CardTitle className="flex flex-row items-center justify-between">
         <div className="text-sm font-medium">Latest L1 TXN batch</div>

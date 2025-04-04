@@ -1,5 +1,4 @@
 "use client";
-import { Address } from "viem";
 import {
   Table,
   TableBody,
@@ -8,22 +7,26 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { TokenTransfer } from "@/components/pages/address/address-token-transfers/fetch-token-transfers";
+import { type TokenTransfer } from "@/components/pages/address/address-token-transfers/fetch-token-transfers";
 import useGlobalContext from "@/components/lib/context/hook";
 import TokenTransfersTableRow from "@/components/pages/address/address-token-transfers/token-transfers-table-row";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 
 const TokenTransfersTable = ({
   tokenTransfers,
-  address,
+  account,
 }: {
   tokenTransfers: TokenTransfer[];
-  address: Address;
+  account: AccountWithTransactionAndToken;
 }) => {
   const {
     state: { timestampFormattedAsDate, usdValueShown },
     toggleTimestampFormattedAsDate,
     toggleUSDValueShown,
   } = useGlobalContext();
+  const withDestSrcChain = tokenTransfers.some(
+    ({ destination, source }) => destination || source,
+  );
   return (
     <Table>
       <TableHeader>
@@ -33,7 +36,7 @@ const TokenTransfersTable = ({
           <TableHead>Block</TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleTimestampFormattedAsDate}
             >
@@ -43,9 +46,15 @@ const TokenTransfersTable = ({
           <TableHead>From</TableHead>
           <TableHead />
           <TableHead>To</TableHead>
+          {withDestSrcChain && (
+            <>
+              <TableHead />
+              <TableHead>Chain</TableHead>
+            </>
+          )}
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleUSDValueShown}
             >
@@ -69,7 +78,8 @@ const TokenTransfersTable = ({
               tokenTransfer={tokenTransfer}
               timestampFormattedAsDate={timestampFormattedAsDate}
               usdValueShown={usdValueShown}
-              address={address}
+              account={account}
+              withDestSrcChain={withDestSrcChain}
             />
           ))
         )}

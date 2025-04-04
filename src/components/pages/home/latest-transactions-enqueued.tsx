@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { TransactionEnqueued } from "@/lib/types";
+import { type TransactionEnqueued } from "@/lib/types";
 import { ReceiptText } from "lucide-react";
 import { l1Chain } from "@/lib/chains";
 import { SquareArrowOutUpRight } from "lucide-react";
@@ -17,15 +17,15 @@ const LatestTransactionEnqueued = ({
 }: {
   transaction: TransactionEnqueued;
 }) => (
-  <div className="flex items-center gap-4 pt-6">
-    <div className="hidden h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground 2xl:flex">
+  <div className="flex items-center gap-4 pb-6 last:pb-0">
+    <div className="bg-accent text-accent-foreground hidden h-9 w-9 items-center justify-center rounded-lg 2xl:flex">
       <ReceiptText className="h-5 w-5" />
     </div>
     <div className="grid gap-1">
       <div className="flex items-center gap-1 text-sm">
         Block#
         <a
-          className="flex max-w-60 items-center gap-1 truncate text-primary hover:brightness-150 md:max-w-96 xl:max-w-60"
+          className="text-primary flex max-w-60 items-center gap-1 truncate hover:brightness-150 md:max-w-96 xl:max-w-60"
           href={`${l1Chain.blockExplorers.default.url}/block/${transaction.l1BlockNumber}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -38,7 +38,7 @@ const LatestTransactionEnqueued = ({
         <div className="flex items-center gap-1">
           L1 Tx#
           <a
-            className="flex items-center gap-1 text-primary hover:brightness-150"
+            className="text-primary flex items-center gap-1 hover:brightness-150"
             href={`${l1Chain.blockExplorers.default.url}/tx/${transaction.l1TxHash}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -52,7 +52,7 @@ const LatestTransactionEnqueued = ({
         <div className="flex items-center gap-1">
           L2 Tx#
           <Link
-            className="max-w-28 truncate text-primary hover:brightness-150 md:max-w-36 xl:max-w-28"
+            className="text-primary max-w-28 truncate hover:brightness-150 md:max-w-36 xl:max-w-28"
             href={`/tx/${transaction.l2TxHash}`}
           >
             {transaction.l2TxHash}
@@ -83,7 +83,7 @@ const LatestTransactionsEnqueued = ({
     <CardFooter className="flex justify-center border-t">
       <Link
         href="/txs-enqueued"
-        className="pt-6 text-primary hover:brightness-150"
+        className="text-primary pt-6 hover:brightness-150"
       >
         View all L1 → L2 transactions →
       </Link>

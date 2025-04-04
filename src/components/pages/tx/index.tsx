@@ -1,4 +1,4 @@
-import { Hash } from "viem";
+import { type Hash } from "viem";
 import { notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

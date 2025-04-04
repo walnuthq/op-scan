@@ -1,4 +1,4 @@
-import { Hash } from "viem";
+import { type Hash } from "viem";
 import Tx from "@/components/pages/tx";
 
 const TxPage = async ({ params }: { params: Promise<{ hash: string }> }) => {

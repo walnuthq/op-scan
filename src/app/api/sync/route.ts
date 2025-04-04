@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   fetchL2BlockNumberFromJsonRpc,
@@ -7,6 +7,7 @@ import {
   fetchL1BlockNumberFromDatabase,
 } from "@/lib/fetch-data";
 import { indexL1Block, indexL2Block } from "@/lib/indexer";
+import { l2Chain } from "@/lib/chains";
 
 export const GET = async (request: NextRequest) => {
   const authHeader = request.headers.get("authorization");
@@ -38,10 +39,10 @@ export const GET = async (request: NextRequest) => {
       --blockNumber
     ) {
       const block = await prisma.block.findUnique({
-        where: { number: blockNumber },
+        where: { number_chainId: { number: blockNumber, chainId: l2Chain.id } },
       });
       if (!block) {
-        await indexL2Block(blockNumber);
+        await indexL2Block(blockNumber, l2Chain.id);
         l2BlocksIndexed.push(Number(blockNumber));
       }
     }
@@ -51,10 +52,10 @@ export const GET = async (request: NextRequest) => {
       --blockNumber
     ) {
       const block = await prisma.l1Block.findUnique({
-        where: { number: blockNumber },
+        where: { number_chainId: { number: blockNumber, chainId: l2Chain.id } },
       });
       if (!block) {
-        await indexL1Block(blockNumber);
+        await indexL1Block(blockNumber, l2Chain.id);
         l1BlocksIndexed.push(Number(blockNumber));
       }
     }

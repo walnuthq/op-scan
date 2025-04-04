@@ -1,24 +1,29 @@
 "use server";
 import {
-  Address,
-  Abi,
-  AbiFunction,
-  AbiEvent,
+  type Address,
+  type Abi,
+  type AbiFunction,
+  type AbiEvent,
   toFunctionSignature,
   toFunctionSelector,
   toEventSignature,
   toEventHash,
 } from "viem";
 import { redirect } from "next/navigation";
-import { CompilerType, CompilerVersion, EvmVersion } from "@/lib/types";
 import {
-  JsonInput,
-  checkFiles,
+  type JsonInput,
+  checkFilesWithMetadata,
   verifyDeployed,
-  Status,
+  type Status,
 } from "@ethereum-sourcify/lib-sourcify";
 import { prisma } from "@/lib/prisma";
-import { solc, sourcifyChain } from "@/lib/sourcify";
+import {
+  type EvmVersion,
+  type CompilerType,
+  type SolidityCompilerVersion,
+} from "@/lib/types";
+import { solc, vyper, sourcifyChain } from "@/lib/sourcify";
+import { l2Chain } from "@/lib/chains";
 
 export const submitContractDetails = async ({
   address,
@@ -27,7 +32,7 @@ export const submitContractDetails = async ({
 }: {
   address: Address;
   type: CompilerType;
-  version: CompilerVersion;
+  version: SolidityCompilerVersion;
 }) =>
   redirect(
     `/verify-contract?address=${address}&type=${type}&version=${encodeURIComponent(version)}`,
@@ -143,7 +148,7 @@ export const verifyContract = async ({
 }: {
   address: Address;
   type: CompilerType;
-  version: CompilerVersion;
+  version: SolidityCompilerVersion;
   singleFile: string;
   standardJsonInput: string;
   optimizerEnabled: "yes" | "no";
@@ -160,7 +165,9 @@ export const verifyContract = async ({
   });
   const [compiled, account] = await Promise.all([
     solc.compile(version, solcJsonInput, true),
-    prisma.account.findUnique({ where: { address } }),
+    prisma.account.findUnique({
+      where: { address_chainId: { address, chainId: l2Chain.id } },
+    }),
   ]);
   const [firstPath] = Object.keys(solcJsonInput.sources);
   if (!firstPath) {
@@ -186,7 +193,11 @@ export const verifyContract = async ({
     path: source.path,
     buffer: Buffer.from(source.content),
   }));
-  const [checkedContract] = await checkFiles(solc, pathBuffers);
+  const [checkedContract] = await checkFilesWithMetadata(
+    solc,
+    vyper,
+    pathBuffers,
+  );
   if (!checkedContract) {
     throw new Error("No match found");
   }
@@ -226,9 +237,9 @@ export const verifyContract = async ({
   const signatures = signaturesFromAbi(contract.abi);
   await prisma.$transaction([
     prisma.account.upsert({
-      where: { address },
-      create: accountUpsert,
-      update: accountUpsert,
+      where: { address_chainId: { address, chainId: l2Chain.id } },
+      create: { ...accountUpsert, chainId: l2Chain.id },
+      update: { ...accountUpsert, chainId: l2Chain.id },
     }),
     ...signatures.map((signature) =>
       prisma.signature.upsert({

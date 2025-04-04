@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import {
   Card,
   CardHeader,
@@ -42,7 +42,7 @@ const AddressTokenTransfers = async ({
   address: Address;
   page: number;
 }) => {
-  const { tokenTransfers, totalCount } = await fetchTokenTransfers(
+  const { tokenTransfers, totalCount, account } = await fetchTokenTransfers(
     address,
     page,
   );
@@ -58,7 +58,7 @@ const AddressTokenTransfers = async ({
       <CardContent className="px-0">
         <TokenTransfersTable
           tokenTransfers={tokenTransfers}
-          address={address}
+          account={account}
         />
       </CardContent>
       <CardFooter className="flex flex-col items-start justify-start md:flex-row md:items-center md:justify-between">

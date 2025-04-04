@@ -1,4 +1,4 @@
-import { CompilerType } from "@/lib/types";
+import { type CompilerType } from "@/lib/types";
 
 const VerifyContractInfo = ({
   step,

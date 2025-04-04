@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ContractSource } from "@/lib/types";
+import { type ContractSource } from "@/lib/types";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import virtualizedRenderer from "react-syntax-highlighter-virtualized-renderer";
 import solidity from "react-syntax-highlighter/dist/esm/languages/prism/solidity";

@@ -1,6 +1,6 @@
 "use client";
-import { AbiFunction, Address } from "viem";
-import { Contract } from "@/lib/types";
+import { type AbiFunction, type Address } from "viem";
+import { type Contract } from "@/lib/types";
 import { appKit } from "@/components/lib/providers";
 import { Accordion } from "@/components/ui/accordion";
 import ReadWriteFunction from "@/components/pages/address/address-contract/read-write-function";

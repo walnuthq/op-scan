@@ -14,7 +14,7 @@ const LatestBlockAndTxs = ({
   tps: number;
 }) => (
   <Card className="relative pl-8">
-    <Server className="absolute left-4 top-6 size-6" />
+    <Server className="absolute top-6 left-4 size-6" />
     <CardHeader className="pb-2">
       <CardTitle className="flex flex-row items-center justify-between">
         <div className="text-sm font-medium">Latest block</div>
@@ -29,7 +29,7 @@ const LatestBlockAndTxs = ({
         >
           {blockNumber.toString()}
         </Link>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-muted-foreground text-xs">
           ({l2BlockTime}.0s)
         </span>
       </div>
@@ -37,7 +37,7 @@ const LatestBlockAndTxs = ({
         <Link href="/txs" className="text-primary hover:brightness-150">
           {formatNumber(transactionsCount, { notation: "compact" })}
         </Link>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-muted-foreground text-xs">
           ({tps.toFixed(1)} TPS)
         </span>
       </div>

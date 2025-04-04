@@ -27,7 +27,10 @@ yarn-error.log*
 
 # env files (can opt-in for commiting if needed)
 .env*
-!.env.local.example
+!.env.local.op-chain-a
+!.env.local.op-chain-b
+!.env.local.op-mainnet
+!.env.local.op-sepolia
 
 # vercel
 .vercel
@@ -39,3 +42,4 @@ next-env.d.ts
 # prisma
 prisma/generated
 prisma/dev.db
+prisma/supersim.db

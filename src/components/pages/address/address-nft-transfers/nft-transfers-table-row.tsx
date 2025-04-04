@@ -1,10 +1,10 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import Link from "next/link";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatTimestamp } from "@/lib/utils";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
-import { NftTransfer } from "@/components/pages/address/address-nft-transfers/fetch-nft-transfers";
+import { type NftTransfer } from "@/components/pages/address/address-nft-transfers/fetch-nft-transfers";
 import AddressLink from "@/components/lib/address-link";
 import CopyButton from "@/components/lib/copy-button";
 import TxTypeBadge from "@/components/lib/tx-type-badge";
@@ -26,7 +26,7 @@ const NftTransfersTableRow = ({
         <div className="flex items-center gap-2">
           <Link
             href={`/tx/${nftTransfer.transactionHash}`}
-            className="truncate text-primary hover:brightness-150"
+            className="text-primary truncate hover:brightness-150"
           >
             {nftTransfer.transactionHash}
           </Link>

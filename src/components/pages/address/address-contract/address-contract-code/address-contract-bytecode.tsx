@@ -1,4 +1,4 @@
-import { Hex } from "viem";
+import { type Hex } from "viem";
 import { SquareCode } from "lucide-react";
 import PreCard from "@/components/lib/pre-card";
 import CopyButton from "@/components/lib/copy-button";
@@ -12,7 +12,7 @@ const AddressContractBytecode = ({ bytecode }: { bytecode: Hex }) => (
       </div>
       <CopyButton content="Copy Bytecode" copy={bytecode} />
     </div>
-    <PreCard className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
+    <PreCard className="max-h-64 overflow-y-auto break-words whitespace-pre-wrap">
       {bytecode}
     </PreCard>
   </div>

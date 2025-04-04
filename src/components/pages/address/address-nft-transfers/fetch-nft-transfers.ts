@@ -1,10 +1,11 @@
-import { Address, Hash } from "viem";
+import { type Address, type Hash } from "viem";
 import { txsPerPage } from "@/lib/constants";
-import { NFTMetadata, NftTransferWithToken } from "@/lib/types";
+import { type NFTMetadata, type NftTransferWithToken } from "@/lib/types";
 import { prisma, fromPrismaNftTransferWithToken } from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
 import getErc721Contract from "@/lib/contracts/erc-721/contract";
 import getErc1155Contract from "@/lib/contracts/erc-1155/contract";
+import { l2Chain } from "@/lib/chains";
 
 export type NftTransfer = {
   transactionHash: Hash;
@@ -101,7 +102,10 @@ const fetchNFTMetadata = async (nftTransfer: NftTransferWithToken) => {
 };
 
 export const fetchNftTransfers = async (address: Address, page: number) => {
-  const where = { OR: [{ to: address }, { from: address }] };
+  const where = {
+    OR: [{ to: address }, { from: address }],
+    chainId: l2Chain.id,
+  };
   const [prismaNftTransfers, totalCount] = await Promise.all([
     prisma.nftTransfer.findMany({
       where,

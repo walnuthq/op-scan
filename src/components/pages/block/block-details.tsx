@@ -3,7 +3,7 @@ import { formatGas } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import TimestampListItem from "@/components/lib/timestamp-list-item";
-import { Block } from "@/lib/types";
+import { type Block } from "@/lib/types";
 import BlockHeight from "@/components/pages/block/block-height";
 import BlockExtraData from "@/components/pages/block/block-extra-data";
 import CopyButton from "@/components/lib/copy-button";
@@ -21,7 +21,7 @@ const BlockDetails = ({
     <DescriptionListItem title="Transactions">
       <Link
         href={`/block/${block.number}/txs`}
-        className="mr-1 text-primary hover:brightness-150"
+        className="text-primary mr-1 hover:brightness-150"
       >
         {block.transactionsCount} transaction
         {block.transactionsCount === 1 ? "" : "s"}
@@ -31,7 +31,7 @@ const BlockDetails = ({
     <Separator />
     <DescriptionListItem title="Gas Used">
       {formatGas(block.gasUsed).value}
-      <span className="ml-1 text-muted-foreground">
+      <span className="text-muted-foreground ml-1">
         ({formatGas(block.gasUsed, block.gasLimit).percentageFormatted})
       </span>
     </DescriptionListItem>

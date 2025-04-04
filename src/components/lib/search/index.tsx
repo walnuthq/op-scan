@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Address, isAddress, getAddress, Hash } from "viem";
+import { type Address, isAddress, getAddress, type Hash } from "viem";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -31,7 +31,7 @@ const Search = ({
   const [blockResult, setBlockResult] = useState<bigint | null>(null);
   const [addressResult, setAddressResult] = useState<Address | null>(null);
   const [transactionResult, setTransactionResult] = useState<Hash | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (!shortcut) {
       return;

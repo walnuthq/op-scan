@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   addDays,
@@ -10,6 +10,7 @@ import {
 import { UTCDate } from "@date-fns/utc";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import { transactionsHistoryCount } from "@/lib/constants";
+import { l2Chain } from "@/lib/chains";
 
 const getDates = () =>
   eachDayOfInterval({
@@ -33,7 +34,7 @@ const fetchTransactionsHistoryCount = async () => {
     )
     .join(",");
   const rawResult = await prisma.$queryRawUnsafe(
-    `SELECT ${queryCounts} FROM "Transaction";`,
+    `SELECT ${queryCounts} FROM "Transaction" WHERE "chainId" = ${l2Chain.id};`,
   );
   const result = rawResult as Record<number, bigint>[];
   const firstResult = result[0];
@@ -61,7 +62,7 @@ export const GET = async (request: NextRequest) => {
       await Promise.all([
         fetchPrices(),
         fetchTransactionsHistoryCount(),
-        prisma.transaction.count(),
+        prisma.transaction.count({ where: { chainId: l2Chain.id } }),
       ]);
     const transactionsHistory = [
       { date: new UTCDate(0), price: 0, transactions: transactionsCount },
@@ -74,9 +75,11 @@ export const GET = async (request: NextRequest) => {
     await prisma.$transaction(
       transactionsHistory.map((transactionsHistoryItem) =>
         prisma.transactionsHistory.upsert({
-          where: { date: transactionsHistoryItem.date },
-          create: transactionsHistoryItem,
-          update: transactionsHistoryItem,
+          where: {
+            date_chainId: { date: transactionsHistoryItem.date, chainId: 1 },
+          },
+          create: { ...transactionsHistoryItem, chainId: l2Chain.id },
+          update: { ...transactionsHistoryItem, chainId: l2Chain.id },
         }),
       ),
     );

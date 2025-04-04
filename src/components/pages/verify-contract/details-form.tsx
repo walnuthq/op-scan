@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Address } from "viem";
+import { type Address } from "viem";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,16 +23,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { compilerTypes, compilerTypeKeys, compilerVersions } from "@/lib/types";
+import {
+  compilerTypes,
+  compilerTypeKeys,
+  solidityCompilerVersionKeys,
+} from "@/lib/types";
 import { submitContractDetails } from "@/components/pages/verify-contract/actions";
 
 const [firstCompilerTypeKey, ...otherCompilerTypeKeys] = compilerTypeKeys;
-const [firstCompilerVersionKey, ...otherCompilerVersionKeys] = compilerVersions;
+const [firstCompilerVersionKey, ...otherCompilerVersionKeys] =
+  solidityCompilerVersionKeys;
 
 const formSchema = z.object({
   address: z.string().startsWith("0x").length(42),
   type: z.enum([firstCompilerTypeKey!, ...otherCompilerTypeKeys]),
-  version: z.enum([firstCompilerVersionKey, ...otherCompilerVersionKeys]),
+  version: z.enum([firstCompilerVersionKey!, ...otherCompilerVersionKeys]),
 });
 
 const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
@@ -82,7 +87,7 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
                   <FormLabel>Please select Compiler Type</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Please Select" />
                       </SelectTrigger>
                     </FormControl>
@@ -106,12 +111,12 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
                   <FormLabel>Please select Compiler Version</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Please Select" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {compilerVersions.map((compilerVersion) => (
+                      {solidityCompilerVersionKeys.map((compilerVersion) => (
                         <SelectItem
                           key={compilerVersion}
                           value={compilerVersion}
@@ -126,7 +131,7 @@ const VerifyContractDetailsForm = ({ address }: { address?: Address }) => {
               )}
             />
             <div className="flex justify-between">
-              <Button type="submit" variant="destructive" disabled={loading}>
+              <Button type="submit" disabled={loading}>
                 {loading && <ReloadIcon className="mr-2 size-4 animate-spin" />}
                 {loading ? "Loading…" : "Continue"}
               </Button>

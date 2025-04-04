@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { TransactionWithReceiptAndAccounts } from "@/lib/types";
+import { type TransactionWithReceiptAndAccounts } from "@/lib/types";
 import { formatTimestamp, formatEther, formatGwei } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
@@ -27,7 +27,7 @@ const BlockTxsTableRow = ({
         <div className="flex items-center gap-2">
           <Link
             href={`/tx/${transaction.hash}`}
-            className="truncate text-primary hover:brightness-150"
+            className="text-primary truncate hover:brightness-150"
           >
             {transaction.hash}
           </Link>

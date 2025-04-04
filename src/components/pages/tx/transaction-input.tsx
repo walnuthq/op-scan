@@ -1,5 +1,5 @@
-import { Hex } from "viem";
-import { Account } from "@/lib/types";
+import { type Hex } from "viem";
+import { type Account } from "@/lib/types";
 import PreCard from "@/components/lib/pre-card";
 import DescriptionListItem from "@/components/lib/description-list-item";
 
@@ -35,7 +35,7 @@ const TransactionInput = ({
   account?: Account;
 }) => (
   <DescriptionListItem title="Input Data">
-    <PreCard className="max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
+    <PreCard className="max-h-64 overflow-y-auto break-words whitespace-pre-wrap">
       {getPlaceholder(signature, input, account)}
     </PreCard>
   </DescriptionListItem>

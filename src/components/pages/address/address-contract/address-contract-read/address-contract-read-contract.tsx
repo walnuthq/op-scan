@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { difference } from "lodash";
-import { AbiFunction, Address } from "viem";
-import { Contract } from "@/lib/types";
+import { type AbiFunction, type Address } from "viem";
+import { type Contract } from "@/lib/types";
 import { Accordion } from "@/components/ui/accordion";
 import ReadWriteFunction from "@/components/pages/address/address-contract/read-write-function";
 import { l2PublicClient } from "@/lib/chains";

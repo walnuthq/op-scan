@@ -1,5 +1,5 @@
 "use client";
-import { Block } from "@/lib/types";
+import { type Block } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ const LatestBlocksTable = ({ blocks }: { blocks: Block[] }) => {
           <TableHead>Block</TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleTimestampFormattedAsDate}
             >

@@ -1,11 +1,11 @@
 import { getContract } from "viem";
-import abi from "@/lib/contracts/portal/abi";
+import abi from "@/lib/contracts/optimism-portal2/abi";
 import { l1PublicClient } from "@/lib/chains";
 
-const portal = getContract({
+const optimismPortal = getContract({
   address: process.env.NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS,
   abi,
   client: l1PublicClient,
 });
 
-export default portal;
+export default optimismPortal;

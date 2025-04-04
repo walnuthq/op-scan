@@ -1,6 +1,6 @@
 import { BadgeCheck } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { ContractInfo } from "@/lib/types";
+import { type ContractInfo } from "@/lib/types";
 
 const AddressContractInfo = ({ info }: { info: ContractInfo }) => (
   <div className="space-y-4">

@@ -4,9 +4,10 @@ import {
   fromPrismaTransactionWithReceiptAndAccounts,
 } from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
+import { l2Chain } from "@/lib/chains";
 
 const fetchTransactions = async (start: bigint, page: number) => {
-  const where = { blockNumber: { lte: start } };
+  const where = { blockNumber: { lte: start }, chainId: l2Chain.id };
   const [transactions, totalCount] = await Promise.all([
     prisma.transaction.findMany({
       where,

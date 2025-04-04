@@ -7,7 +7,7 @@ OP Scan is a transaction explorer tailored specifically for the [OP Stack](https
 # 🦄 How OP Scan Differs from Other Explorers
 
 1. **Lightweight**: The code and dependencies are designed to be minimalistic. This ensures minimal resource consumption, allowing anyone to run it locally alongside an OP Stack node when working on a rollup.
-2. **OP Stack Native**: This explorer is purpose-built for the OP Stack. It ensures 100% compatibility with rollups in Optimism’s Superchain.
+2. **OP Stack Native**: This explorer is purpose-built for the OP Stack. It ensures 100% compatibility with Optimism rollups and provides additional support for Superchain features.
 3. **Scalable**: Despite its lightweight design, the explorer is built to handle any scale.
 4. **Open Source**: All code is open source from day one. This alignment with the community allows anyone to contribute or fork the repository to meet their specific needs.
 
@@ -44,70 +44,26 @@ Install the dependencies:
 pnpm install
 ```
 
-Copy `.env.local.example` into `.env.local` at the root of your repository and populate it with your own values.
-In particular, configure both L1 and L2 chains:
+Copy `.env.local.op-sepolia` into `.env.local` at the root of your repository as a starting point.
+
+```sh
+cp .env.local.op-sepolia .env.local
+```
+
+You'll need to populate your environment variables with your own values to properly configure your L1 and L2 chains:
 
 ```
 NEXT_PUBLIC_L1_CHAIN_ID="11155111"
 NEXT_PUBLIC_L1_NAME="Sepolia"
 NEXT_PUBLIC_L1_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com"
-L1_RPC_WS="wss://ethereum-sepolia-rpc.publicnode.com"
 NEXT_PUBLIC_L2_CHAIN_ID="11155420"
 NEXT_PUBLIC_L2_NAME="OP Sepolia"
 NEXT_PUBLIC_L2_RPC_URL="https://optimism-sepolia-rpc.publicnode.com"
-L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 ```
 
 You can get free node rpcs url by signing up to services such as [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/) or [QuickNode](https://www.quicknode.com/).
 
-For devnet usage, follow [this tutorial](https://docs.optimism.io/stack/dev-node) to run a local development environment that will spawn both L1 and L2 chains.
-Once your OP Stack devnet is ready, copy your L1 (`el-1-geth-lighthouse`) and L2 (`op-el-1-op-geth-op-node-rollup-1`) RPC urls and get the corresponding chain ids using [Foundry's cast](https://book.getfoundry.sh/reference/cast/):
-
-```
-cast chain-id --rpc-url http://127.0.0.1:32771
-cast chain-id --rpc-url http://127.0.0.1:32780
-```
-
-This will give you the following local chain config:
-
-```
-NEXT_PUBLIC_L1_CHAIN_ID="3151908"
-NEXT_PUBLIC_L1_NAME="Goerli"
-NEXT_PUBLIC_L1_RPC_URL="http://127.0.0.1:32771"
-L1_RPC_WS="ws://127.0.0.1:32772"
-NEXT_PUBLIC_L2_CHAIN_ID="12345"
-NEXT_PUBLIC_L2_NAME="rollup-1"
-NEXT_PUBLIC_L2_RPC_URL="http://127.0.0.1:32780"
-L2_RPC_WS="ws://127.0.0.1:32781"
-```
-
-Next you will need to find the L1 contract addresses for both the Optimism Portal and the Cross Domain Messenger.
-You will find the L1CrossDomainMessenger address in your local devnet logs:
-
-```
-- L1CrossDomainMessengerProxy: 0x170d06930Ce8c7487EF12Be36d20C400Eb0fA8B2
-```
-
-Then fetch the Portal address from the Cross Domain Messenger using `cast call`:
-
-```
-cast call 0x170d06930Ce8c7487EF12Be36d20C400Eb0fA8B2 "PORTAL()" --rpc-url http://127.0.0.1:32771
-```
-
-The result being an address, only take the first 20 bytes from the returned value:
-
-```
-0x000000000000000000000000e373471c58424978b4652db046817c209f09e645 -> 0xe373471c58424978b4652db046817c209f09e645
-```
-
-Copy these addresses to your local chain config:
-
-```
-NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS="0x170d06930Ce8c7487EF12Be36d20C400Eb0fA8B2"
-NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS="0xe373471c58424978b4652db046817c209f09e645"
-```
-
-If you don't want to run the explorer with your local chain setup, you will find all the necessary environment variables in `.env.local.example` to configure the explorer with OP Sepolia or OP Mainnet.
+If you don't want to run the explorer with your own chain setup, you will find all the necessary environment variables in `.env.local.op-sepolia` and `.env.local.op-mainnet` to configure the explorer with OP Sepolia or OP Mainnet respectively.
 
 If you want to be able to use the Write Contract feature on verified contracts, you will also need to provide a [Reown](https://docs.reown.com/) project ID.
 
@@ -115,14 +71,44 @@ If you want to be able to use the Write Contract feature on verified contracts, 
 NEXT_PUBLIC_REOWN_PROJECT_ID="REOWN_PROJECT_ID"
 ```
 
+### Usage with Supersim
+
+[Supersim](https://github.com/ethereum-optimism/supersim) is a local development environment tool designed to simulate the Optimism Superchain for developers building multi-chain applications. It provides a simplified way to test and develop applications that interact with multiple chains within the Superchain ecosystem.
+
+OP Scan fully supports this tool out of the box, letting you run explorers against rollups spawned using Supersim.
+
+First, build OP Scan with Supersim support:
+
+```sh
+pnpm build-super-scan
+```
+
+Then start Supersim with autorelay enabled:
+
+```sh
+supersim --interop.autorelay
+```
+
+In a second terminal, launch the indexer:
+
+```sh
+pnpm super-indexer
+```
+
+Finally, in a third terminal launch 2 explorers for the 2 rollups spawned by Supersim using this command:
+
+```sh
+pnpm start-super-scan
+```
+
+You can follow along the [Supersim tutorial](https://github.com/ethereum-optimism/supersim?tab=readme-ov-file#example-b-l2-to-l2-send-an-interoperable-superchainerc20-token-from-chain-901-to-902) to perform a cross-chain ERC20 transaction and explore it at http://localhost:3001 and http://localhost:3002.
+
 ### Indexer Configuration
 
-To run the indexer, first set up your `DATABASE_URL` in `.env.local` (we use SQLite by default, but you can switch to PostgreSQL by changing the Prisma provider in `prisma/schema.prisma`) and configure websocket connections to your L1/L2 chains:
+To run the indexer, first set up your `DATABASE_URL` in `.env.local` (we use SQLite by default, but you can switch to PostgreSQL by changing the Prisma provider in `prisma/schema.prisma`).
 
 ```
 DATABASE_URL="file:dev.db"
-L1_RPC_WS="wss://ethereum-sepolia-rpc.publicnode.com"
-L2_RPC_WS="wss://optimism-sepolia-rpc.publicnode.com"
 ```
 
 Then you can sync your local database with the Prisma schema:
@@ -151,15 +137,15 @@ pnpm prisma:db:push
 ```
 
 Indexing a blockchain puts a heavy load on the RPC endpoint, as you need to perform many JSON-RPC requests to fully index a block (along with transactions and logs).
-When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 5 fallback RPC URLs in case this happens:
+When indexing non-local chains you will probably encounter 429 errors related to rate-limiting, you may provide up to 5 fallback RPC URLs in case this happens.
 
 ```
-NEXT_PUBLIC_L1_FALLBACK1_RPC_URL="https://rpc.ankr.com/eth_sepolia"
-NEXT_PUBLIC_L2_FALLBACK1_RPC_URL="https://rpc.ankr.com/optimism_sepolia"
+NEXT_PUBLIC_L1_FALLBACK1_RPC_URL="https://sepolia.drpc.org"
+NEXT_PUBLIC_L2_FALLBACK1_RPC_URL="https://optimism-sepolia.drpc.org"
 NEXT_PUBLIC_L1_FALLBACK2_RPC_URL="https://endpoints.omniatech.io/v1/eth/sepolia/public"
 NEXT_PUBLIC_L2_FALLBACK2_RPC_URL="https://endpoints.omniatech.io/v1/op/sepolia/public"
-NEXT_PUBLIC_L1_FALLBACK3_RPC_URL="https://sepolia.drpc.org"
-NEXT_PUBLIC_L2_FALLBACK3_RPC_URL="https://optimism-sepolia.drpc.org"
+NEXT_PUBLIC_L1_FALLBACK3_RPC_URL="https://1rpc.io/sepolia"
+NEXT_PUBLIC_L2_FALLBACK3_RPC_URL="https://sepolia.optimism.io"
 NEXT_PUBLIC_L1_FALLBACK4_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/FALLBACK4_API_KEY"
 NEXT_PUBLIC_L2_FALLBACK4_RPC_URL="https://opt-sepolia.g.alchemy.com/v2/FALLBACK4_API_KEY"
 NEXT_PUBLIC_L1_FALLBACK5_RPC_URL="https://sepolia.infura.io/v3/FALLBACK5_API_KEY"
@@ -170,9 +156,10 @@ You can pass several parameters to the indexer to control the indexing range and
 
 - `--l2-from-block` (short `-f`, defaults to latest block) start indexing from this L2 block.
 - `--l2-index-block` (short `-b`) index this particular L2 block number.
+- `--l2-index-delay` (short `-d`, defaults to 2000) delay in ms between indexing 2 L2 blocks to avoid overloading the RPC.
 - `--l1-from-block` (defaults to latest block) start indexing from this L1 block.
 - `--l1-index-block` index this particular L1 block number.
-- `--index-delay` (short `-d`, defaults to 1000) delay in ms between indexing 2 blocks to avoid overloading the RPC.
+- `--l1-index-delay` (defaults to 12000) delay in ms between indexing 2 L1 blocks to avoid overloading the RPC.
 
 Example of running the indexer:
 

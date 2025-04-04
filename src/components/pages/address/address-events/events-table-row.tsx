@@ -2,7 +2,7 @@ import Link from "next/link";
 import DecodedLog from "@/components/pages/address/address-events/decoded-log";
 import { formatTimestamp } from "@/lib/utils";
 import { TableRow, TableCell } from "@/components/ui/table";
-import { Event } from "@/components/pages/address/address-events/fetch-events";
+import { type Event } from "@/components/pages/address/address-events/fetch-events";
 import TxMethodBadge from "@/components/lib/tx-method-badge";
 import CopyButton from "@/components/lib/copy-button";
 
@@ -20,7 +20,7 @@ const EventsTableRow = ({
         <div className="flex items-center gap-2">
           <Link
             href={`/tx/${event.transactionHash}`}
-            className="truncate text-primary hover:brightness-150"
+            className="text-primary truncate hover:brightness-150"
           >
             {event.transactionHash}
           </Link>

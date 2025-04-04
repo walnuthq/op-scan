@@ -1,4 +1,4 @@
-import { getContract, Address } from "viem";
+import { getContract, type Address } from "viem";
 import { l2PublicClient } from "@/lib/chains";
 import abi from "@/lib/contracts/erc-1155/abi";
 

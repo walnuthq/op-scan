@@ -1,5 +1,5 @@
 import { FileCode } from "lucide-react";
-import { ContractInfo, ContractSources } from "@/lib/types";
+import { type ContractInfo, type ContractSources } from "@/lib/types";
 import ContractSourcesList from "@/components/pages/address/address-contract/address-contract-code/address-contract-sources/contract-sources-list";
 
 const AddressContractSources = ({

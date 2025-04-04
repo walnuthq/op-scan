@@ -10,27 +10,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model DeployConfig {
-  l1ChainId Int
-  l2ChainId Int
-
-  @@id([l1ChainId, l2ChainId])
+model RollupConfig {
+  l2ChainId                Int                   @id
+  l2ChainName              String
+  l2ChainRpcUrl            String
+  l2ChainBlockExplorerName String
+  l2ChainBlockExplorerUrl  String
+  l2BlockTime              Int
+  l1ChainId                Int
+  blocks                   Block[]
+  transactions             Transaction[]
+  logs                     Log[]
+  accounts                 Account[]
+  receipts                 TransactionReceipt[]
+  erc20Transfers           Erc20Transfer[]
+  nftTransfers             NftTransfer[]
+  erc20Tokens              Erc20Token[]
+  erc721Tokens             Erc721Token[]
+  erc1155Tokens            Erc1155Token[]
+  transactionsHistory      TransactionsHistory[]
+  transactionsEnqueued     TransactionEnqueued[]
+  l1Blocks                 L1Block[]
 }
 
 model Block {
-  number            BigInt        @id
-  hash              String        @unique
+  number            BigInt
+  hash              String
   timestamp         BigInt
   gasUsed           String
   gasLimit          String
   extraData         String
   parentHash        String
   transactionsCount Int
+  chainId           Int
   transactions      Transaction[]
+  rollupConfig      RollupConfig  @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([number, chainId])
 }
 
 model Transaction {
-  hash                 String              @id
+  hash                 String
   blockNumber          BigInt
   from                 String
   to                   String?
@@ -45,13 +65,17 @@ model Transaction {
   transactionIndex     Int
   input                String
   timestamp            BigInt
-  block                Block               @relation(fields: [blockNumber], references: [number], onDelete: Cascade)
+  chainId              Int
+  block                Block               @relation(fields: [blockNumber, chainId], references: [number, chainId], onDelete: Cascade)
   receipt              TransactionReceipt?
   accounts             Account[]
+  rollupConfig         RollupConfig        @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([hash, chainId])
 }
 
 model TransactionReceipt {
-  transactionHash   String          @id
+  transactionHash   String
   status            Boolean
   from              String
   to                String?
@@ -61,10 +85,14 @@ model TransactionReceipt {
   l1GasPrice        String?
   l1GasUsed         String?
   l1FeeScalar       Int?
-  transaction       Transaction     @relation(fields: [transactionHash], references: [hash], onDelete: Cascade)
+  chainId           Int
+  transaction       Transaction     @relation(fields: [transactionHash, chainId], references: [hash, chainId], onDelete: Cascade)
   logs              Log[]
   erc20Transfers    Erc20Transfer[]
   nftTransfers      NftTransfer[]
+  rollupConfig      RollupConfig    @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([transactionHash, chainId])
 }
 
 model Log {
@@ -77,31 +105,41 @@ model Log {
   transactionHash  String
   removed          Boolean
   topics           String
-  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], onDelete: Cascade)
+  chainId          Int
+  receipt          TransactionReceipt @relation(fields: [transactionHash, chainId], references: [transactionHash, chainId], onDelete: Cascade)
   erc20Transfer    Erc20Transfer?
   nftTransfer      NftTransfer?
+  rollupConfig     RollupConfig       @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
 
-  @@id([blockNumber, transactionIndex, logIndex])
+  @@id([blockNumber, transactionIndex, logIndex, chainId])
 }
 
 model Account {
-  address         String        @id
+  address         String
   bytecode        String?
   transactionHash String?
   contract        String?
-  transaction     Transaction?  @relation(fields: [transactionHash], references: [hash])
+  chainId         Int
+  transaction     Transaction?  @relation(fields: [transactionHash, chainId], references: [hash, chainId])
   erc20Token      Erc20Token?
   erc721Token     Erc721Token?
   erc1155Token    Erc1155Token?
+  rollupConfig    RollupConfig  @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([address, chainId])
 }
 
 model Erc20Token {
-  address   String          @id
-  name      String
-  symbol    String
-  decimals  Int
-  account   Account         @relation(fields: [address], references: [address], onDelete: Cascade)
-  transfers Erc20Transfer[]
+  address      String
+  name         String
+  symbol       String
+  decimals     Int
+  chainId      Int
+  account      Account         @relation(fields: [address, chainId], references: [address, chainId], onDelete: Cascade)
+  transfers    Erc20Transfer[]
+  rollupConfig RollupConfig    @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([address, chainId])
 }
 
 model Erc20Transfer {
@@ -113,25 +151,37 @@ model Erc20Transfer {
   from             String
   to               String
   value            String
-  token            Erc20Token         @relation(fields: [address], references: [address])
-  receipt          TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], onDelete: Cascade)
-  log              Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex], onDelete: Cascade)
+  destination      Int?
+  source           Int?
+  chainId          Int
+  token            Erc20Token         @relation(fields: [address, chainId], references: [address, chainId], onDelete: Cascade)
+  receipt          TransactionReceipt @relation(fields: [transactionHash, chainId], references: [transactionHash, chainId], onDelete: Cascade)
+  log              Log                @relation(fields: [blockNumber, transactionIndex, logIndex, chainId], references: [blockNumber, transactionIndex, logIndex, chainId], onDelete: Cascade)
+  rollupConfig     RollupConfig       @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
 
-  @@id([blockNumber, transactionIndex, logIndex])
+  @@id([blockNumber, transactionIndex, logIndex, chainId])
 }
 
 model Erc721Token {
-  address   String        @id
-  name      String
-  symbol    String
-  account   Account       @relation(fields: [address], references: [address], onDelete: Cascade)
-  transfers NftTransfer[]
+  address      String
+  name         String
+  symbol       String
+  chainId      Int
+  account      Account       @relation(fields: [address, chainId], references: [address, chainId], onDelete: Cascade)
+  transfers    NftTransfer[]
+  rollupConfig RollupConfig  @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([address, chainId])
 }
 
 model Erc1155Token {
-  address   String        @id
-  account   Account       @relation(fields: [address], references: [address], onDelete: Cascade)
-  transfers NftTransfer[]
+  address      String
+  chainId      Int
+  account      Account       @relation(fields: [address, chainId], references: [address, chainId], onDelete: Cascade)
+  transfers    NftTransfer[]
+  rollupConfig RollupConfig  @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([address, chainId])
 }
 
 model NftTransfer {
@@ -147,16 +197,23 @@ model NftTransfer {
   value               String
   erc721TokenAddress  String?
   erc1155TokenAddress String?
-  erc721Token         Erc721Token?       @relation(fields: [erc721TokenAddress], references: [address])
-  erc1155Token        Erc1155Token?      @relation(fields: [erc1155TokenAddress], references: [address])
-  receipt             TransactionReceipt @relation(fields: [transactionHash], references: [transactionHash], onDelete: Cascade)
-  log                 Log                @relation(fields: [blockNumber, transactionIndex, logIndex], references: [blockNumber, transactionIndex, logIndex], onDelete: Cascade)
+  chainId             Int
+  erc721Token         Erc721Token?       @relation(fields: [erc721TokenAddress, chainId], references: [address, chainId])
+  erc1155Token        Erc1155Token?      @relation(fields: [erc1155TokenAddress, chainId], references: [address, chainId])
+  receipt             TransactionReceipt @relation(fields: [transactionHash, chainId], references: [transactionHash, chainId], onDelete: Cascade)
+  log                 Log                @relation(fields: [blockNumber, transactionIndex, logIndex, chainId], references: [blockNumber, transactionIndex, logIndex, chainId], onDelete: Cascade)
+  rollupConfig        RollupConfig       @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
 
-  @@id([blockNumber, transactionIndex, logIndex])
+  @@id([blockNumber, transactionIndex, logIndex, chainId])
 }
 
 model L1Block {
-  number BigInt @id
+  number              BigInt
+  chainId             Int
+  rollupConfig        RollupConfig          @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+  transactionEnqueued TransactionEnqueued[]
+
+  @@id([number, chainId])
 }
 
 model TransactionEnqueued {
@@ -166,8 +223,11 @@ model TransactionEnqueued {
   l1TxHash      String
   l1TxOrigin    String
   gasLimit      String
+  chainId       Int
+  l1Block       L1Block      @relation(fields: [l1BlockNumber, chainId], references: [number, chainId], onDelete: Cascade)
+  rollupConfig  RollupConfig @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
 
-  @@id([l1BlockNumber, l2TxHash])
+  @@id([l1BlockNumber, chainId])
 }
 
 model Signature {
@@ -177,7 +237,11 @@ model Signature {
 }
 
 model TransactionsHistory {
-  date         DateTime @id
+  date         DateTime
   price        Float
   transactions Int
+  chainId      Int
+  rollupConfig RollupConfig @relation(fields: [chainId], references: [l2ChainId], onDelete: Cascade)
+
+  @@id([date, chainId])
 }

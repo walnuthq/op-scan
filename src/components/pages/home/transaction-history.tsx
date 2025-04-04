@@ -1,5 +1,12 @@
 "use client";
-import { LineChart, Line, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  type TooltipProps,
+} from "recharts";
 import { uniq } from "lodash";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
@@ -34,7 +41,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
     }
     const { date, price, transactions } = firstPayload.payload;
     return (
-      <div className="rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md">
+      <div className="bg-popover text-popover-foreground rounded-md border px-3 py-1.5 text-sm shadow-md">
         <p className="text-xs">
           {format(parseISO(date), "EEEE, MMMM d, yyyy")}
         </p>
@@ -50,7 +57,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
 
 const TransactionHistory = ({ data }: { data: DataItem[] }) => (
   <Card>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <CardHeader className="flex flex-row items-center justify-between pb-2">
       <CardTitle className="text-sm font-medium">
         Transaction history in {data.length - 1} days
       </CardTitle>
@@ -62,8 +69,8 @@ const TransactionHistory = ({ data }: { data: DataItem[] }) => (
           transactions: {
             label: "Transactions:",
             theme: {
-              light: "hsl(var(--primary))",
-              dark: "hsl(var(--primary))",
+              light: "var(--primary)",
+              dark: "var(--primary)",
             },
           },
         }}

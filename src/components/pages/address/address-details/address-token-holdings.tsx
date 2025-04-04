@@ -16,8 +16,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Address } from "viem";
-import { TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
+import { type Address } from "viem";
+import { type TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
 
 type TokenDetails = {
   type: "ERC-20" | "ERC-721" | "ERC-1155";
@@ -51,7 +51,7 @@ const Erc20CommandItem = ({
           <p className="truncate text-sm font-semibold">
             {token.name} <span>({token.symbol})</span>
           </p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="text-muted-foreground truncate text-xs">
             {token.amount}
           </p>
         </div>
@@ -61,7 +61,7 @@ const Erc20CommandItem = ({
               <p className="text-sm font-semibold">
                 ${tokenUSDValue.toFixed(2)}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 @{token.price.toFixed(2)}
               </p>
             </div>
@@ -93,14 +93,14 @@ const NFTCommandItem = ({
       <div className="flex w-full justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="truncate text-sm font-semibold">{token.name}</p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="text-muted-foreground truncate text-xs">
             {token.symbol}
           </p>
         </div>
         <div className="min-w-24">
           <div className="flex flex-col gap-1 text-right">
-            <p className="text-xs text-muted-foreground">{token.type}</p>
-            <p className="text-xs text-muted-foreground">x{token.amount}</p>
+            <p className="text-muted-foreground text-xs">{token.type}</p>
+            <p className="text-muted-foreground text-xs">x{token.amount}</p>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@ const AddressTokenHoldings = ({
         >
           <div className="flex items-baseline gap-1">
             ${totalUSDValue.toFixed(2)}
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-xs">
               ({tokensCount} Token{tokensCount === 1 ? "" : "s"})
             </span>
           </div>

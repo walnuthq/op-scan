@@ -7,7 +7,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Event } from "@/components/pages/address/address-events/fetch-events";
+import { type Event } from "@/components/pages/address/address-events/fetch-events";
 import EventsTableRow from "@/components/pages/address/address-events/events-table-row";
 import useGlobalContext from "@/components/lib/context/hook";
 
@@ -24,7 +24,7 @@ const EventsTable = ({ events }: { events: Event[] }) => {
           <TableHead>Block</TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleTimestampFormattedAsDate}
             >

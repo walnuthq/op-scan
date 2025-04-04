@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { type Address } from "viem";
 import DescriptionListItem from "@/components/lib/description-list-item";
 import AddressLink from "@/components/lib/address-link";
 import CopyButton from "@/components/lib/copy-button";

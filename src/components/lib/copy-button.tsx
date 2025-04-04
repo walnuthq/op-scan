@@ -4,10 +4,9 @@ import { Copy, Check } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn, sleep } from "@/lib/utils";
+import { sleep } from "@/lib/utils";
 
 const CopyButton = ({ content, copy }: { content: string; copy: string }) => {
   const [open, setOpen] = useState(false);
@@ -22,19 +21,17 @@ const CopyButton = ({ content, copy }: { content: string; copy: string }) => {
     setCopied(false);
   };
   return (
-    <TooltipProvider>
-      <Tooltip delayDuration={100} open={open} onOpenChange={setOpen}>
-        <TooltipTrigger
-          className="text-muted-foreground hover:text-primary hover:brightness-150"
-          onClick={copied ? undefined : copyText}
-        >
-          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{copied ? "Copied!" : content}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip delayDuration={100} open={open} onOpenChange={setOpen}>
+      <TooltipTrigger
+        className="text-muted-foreground hover:text-primary hover:brightness-150"
+        onClick={copied ? undefined : copyText}
+      >
+        {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{copied ? "Copied!" : content}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

@@ -14,7 +14,7 @@ const EthPrice = ({
     <Image
       src={optimismImg}
       alt="ETH logo"
-      className="absolute left-4 top-6 size-6"
+      className="absolute top-6 left-4 size-6"
     />
     <CardHeader className="pb-2">
       <CardTitle className="text-sm font-medium">OP Price</CardTitle>
@@ -23,7 +23,7 @@ const EthPrice = ({
       <div className="flex items-center gap-1 text-sm font-bold">
         {formatPrice(today)}
         <span
-          className={cn("text-xs text-muted-foreground", {
+          className={cn("text-muted-foreground text-xs", {
             "text-red-500": today - yesterday < 0,
             "text-green-500": today - yesterday > 0,
           })}

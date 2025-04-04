@@ -1,5 +1,5 @@
-import { AbiEvent, Hex, decodeAbiParameters } from "viem";
-import { AbiEventParameter } from "abitype";
+import { type AbiEvent, type Hex, decodeAbiParameters } from "viem";
+import { type AbiEventParameter } from "abitype";
 import {
   Accordion,
   AccordionContent,
@@ -36,7 +36,7 @@ const DecodedParameter = ({
 }) => (
   <div className="flex flex-col gap-1">
     <div className="flex gap-2 font-semibold">
-      <span className="italic text-muted-foreground">{input.type}</span>
+      <span className="text-muted-foreground italic">{input.type}</span>
       <span>{input.name}</span>
     </div>
     <DecodedParameterValue value={value} />
@@ -54,7 +54,7 @@ const DecodedLogEvent = ({
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value={abiEvent.name}>
-        <AccordionTrigger className="justify-start hover:no-underline">
+        <AccordionTrigger className="justify-start gap-0.5 hover:no-underline">
           *** {abiEvent.name}(
           {abiEvent.inputs.map((input, index) => (
             <SignatureParameter

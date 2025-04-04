@@ -5,22 +5,23 @@ import { utc } from "@date-fns/utc";
 import {
   formatEther as viemFormatEther,
   formatGwei as viemFormatGwei,
-  Address,
-  Hex,
-  TransactionType,
-  Log,
+  type Address,
+  type Hex,
+  type TransactionType,
+  type Log,
   getAddress,
   parseEventLogs,
   erc20Abi,
   erc721Abi,
-  Abi,
-  Hash,
+  type Abi,
+  type Hash,
 } from "viem";
-import { AbiConstructor } from "abitype";
+import { type AbiConstructor } from "abitype";
 import { capitalize } from "lodash";
-import { Erc20Transfer, NftTransfer } from "@/lib/types";
+import { type Erc20Transfer, type NftTransfer } from "@/lib/types";
 import erc1155Abi from "@/lib/contracts/erc-1155/abi";
 import { l2PublicClient } from "@/lib/chains";
+import superchainTokenBridgeAbi from "@/lib/contracts/superchain-token-bridge/abi";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -34,6 +35,7 @@ export const getBlockNumberSafe = async (blockHash: Hash) => {
     });
     return block.number;
   } catch (error) {
+    console.error(error);
     return null;
   }
 };
@@ -99,8 +101,8 @@ export const formatTransactionType = (type: TransactionType, typeHex: Hex) => {
   return `${Number(typeHex)} (${typeString})`;
 };
 
-export const parseErc20Transfers = (logs: Log[]): Erc20Transfer[] =>
-  parseEventLogs({
+export const parseErc20Transfers = (logs: Log[]): Erc20Transfer[] => {
+  const erc20Transfers: Erc20Transfer[] = parseEventLogs({
     abi: erc20Abi,
     eventName: "Transfer",
     logs,
@@ -121,8 +123,44 @@ export const parseErc20Transfers = (logs: Log[]): Erc20Transfer[] =>
       from: getAddress(args.from),
       to: getAddress(args.to),
       value: args.value,
+      destination: null,
+      source: null,
     }),
   );
+  parseEventLogs({
+    abi: superchainTokenBridgeAbi,
+    eventName: "SendERC20",
+    logs,
+  }).forEach((sendErc20Log) => {
+    const erc20Transfer = erc20Transfers.find(
+      ({ address, from, value }) =>
+        address === getAddress(sendErc20Log.args.token) &&
+        from === getAddress(sendErc20Log.args.from) &&
+        value === sendErc20Log.args.amount,
+    );
+    if (erc20Transfer) {
+      erc20Transfer.to = getAddress(sendErc20Log.args.to);
+      erc20Transfer.destination = Number(sendErc20Log.args.destination);
+    }
+  });
+  parseEventLogs({
+    abi: superchainTokenBridgeAbi,
+    eventName: "RelayERC20",
+    logs,
+  }).forEach((sendErc20Log) => {
+    const erc20Transfer = erc20Transfers.find(
+      ({ address, to, value }) =>
+        address === getAddress(sendErc20Log.args.token) &&
+        to === getAddress(sendErc20Log.args.to) &&
+        value === sendErc20Log.args.amount,
+    );
+    if (erc20Transfer) {
+      erc20Transfer.from = getAddress(sendErc20Log.args.from);
+      erc20Transfer.source = Number(sendErc20Log.args.source);
+    }
+  });
+  return erc20Transfers;
+};
 
 export const parseErc721Transfers = (logs: Log[]): NftTransfer[] =>
   parseEventLogs({

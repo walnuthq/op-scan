@@ -1,5 +1,5 @@
 "use client";
-import { TransactionEnqueued } from "@/lib/types";
+import { type TransactionEnqueued } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -27,7 +27,7 @@ const LatestTxsEnqueuedTable = ({
           <TableHead>L2 Tx Hash</TableHead>
           <TableHead>
             <a
-              className="cursor-pointer text-primary hover:brightness-150"
+              className="text-primary cursor-pointer hover:brightness-150"
               role="button"
               onClick={toggleTimestampFormattedAsDate}
             >

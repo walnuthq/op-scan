@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Address } from "viem";
+import { type Address } from "viem";
 import { z } from "zod";
 import { BadgeX } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { CompilerType, CompilerVersion, evmVersionKeys } from "@/lib/types";
+import {
+  type CompilerType,
+  evmVersionKeys,
+  type SolidityCompilerVersion,
+} from "@/lib/types";
 import { verifyContract } from "@/components/pages/verify-contract/actions";
 import VerifyContractVerifyFormSingleFile from "@/components/pages/verify-contract/verify-form/single-file";
 import VerifyContractVerifyFormStandardJsonInput from "@/components/pages/verify-contract/verify-form/standard-json-input";
@@ -63,7 +67,7 @@ const VerifyContractVerifyForm = ({
 }: {
   address: Address;
   type: CompilerType;
-  version: CompilerVersion;
+  version: SolidityCompilerVersion;
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -143,7 +147,7 @@ const VerifyContractVerifyForm = ({
             </Alert>
           )}
           <div className="flex justify-center">
-            <Button variant="destructive" type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading}>
               {loading && <ReloadIcon className="mr-2 size-4 animate-spin" />}
               {loading ? "Loading…" : "Verify & Publish"}
             </Button>
