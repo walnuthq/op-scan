@@ -22,6 +22,7 @@ declare global {
       // L1 contract addresses for L2
       readonly NEXT_PUBLIC_OPTIMISM_PORTAL_ADDRESS: `0x${string}`;
       readonly NEXT_PUBLIC_L1_CROSS_DOMAIN_MESSENGER_ADDRESS: `0x${string}`;
+      readonly NEXT_PUBLIC_L1_STANDARD_BRIDGE_ADDRESS: `0x${string}`;
       // constants
       readonly NEXT_PUBLIC_L1_BLOCK_TIME?: string;
       readonly NEXT_PUBLIC_L2_BLOCK_TIME?: string;
@@ -48,6 +49,8 @@ declare global {
       readonly NEXT_PUBLIC_L2_FALLBACK5_RPC_URL?: string;
       // reown
       readonly NEXT_PUBLIC_REOWN_PROJECT_ID: string;
+      // supersim
+      readonly NEXT_PUBLIC_SUPERSIM?: string;
     }
   }
 }

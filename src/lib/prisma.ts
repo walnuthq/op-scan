@@ -34,6 +34,7 @@ import {
   type TransactionEnqueued,
   type Account,
   type AccountWithTransactionAndToken,
+  type AccountWithRollupConfig,
 } from "@/lib/types";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
@@ -219,6 +220,8 @@ export const fromPrismaErc20Transfer = (
   from: erc20Transfer.from as Address,
   to: erc20Transfer.to as Address,
   value: BigInt(erc20Transfer.value),
+  destination: erc20Transfer.destination,
+  source: erc20Transfer.source,
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -344,4 +347,21 @@ export const fromPrismaAccountWithTransactionAndToken = (
   erc1155Token: account.erc1155Token
     ? fromPrismaErc1155Token(account.erc1155Token)
     : null,
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const prismaAccountWithRollupConfig =
+  Prisma.validator<Prisma.AccountDefaultArgs>()({
+    include: { rollupConfig: true },
+  });
+
+type PrismaAccountWithRollupConfig = Prisma.AccountGetPayload<
+  typeof prismaAccountWithRollupConfig
+>;
+
+export const fromPrismaAccountWithRollupConfig = (
+  account: PrismaAccountWithRollupConfig,
+): AccountWithRollupConfig => ({
+  ...fromPrismaAccount(account),
+  rollupConfig: account.rollupConfig,
 });

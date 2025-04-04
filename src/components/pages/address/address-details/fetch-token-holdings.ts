@@ -8,6 +8,7 @@ import getErc20Contract from "@/lib/contracts/erc-20/contract";
 import getErc721Contract from "@/lib/contracts/erc-721/contract";
 import getErc1155Contract from "@/lib/contracts/erc-1155/contract";
 import { fetchSpotPrices } from "@/lib/fetch-data";
+import { l2Chain } from "@/lib/chains";
 
 export type Erc20TokenHolding = {
   address: Address;
@@ -41,17 +42,25 @@ export const fetchTokenHoldings = async (
   const [erc20Transfers, erc721Transfers, erc1155Transfers, prices] =
     await Promise.all([
       prisma.erc20Transfer.findMany({
-        where: { to: address },
+        where: { to: address, chainId: l2Chain.id },
         distinct: ["address"],
         include: { token: true },
       }),
       prisma.nftTransfer.findMany({
-        where: { to: address, erc721Token: { isNot: null } },
+        where: {
+          to: address,
+          erc721Token: { isNot: null },
+          chainId: l2Chain.id,
+        },
         distinct: ["address"],
         include: { erc721Token: true, erc1155Token: true },
       }),
       prisma.nftTransfer.findMany({
-        where: { to: address, erc1155Token: { isNot: null } },
+        where: {
+          to: address,
+          erc1155Token: { isNot: null },
+          chainId: l2Chain.id,
+        },
         distinct: ["address"],
         include: { erc721Token: true, erc1155Token: true },
       }),

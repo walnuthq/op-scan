@@ -7,38 +7,42 @@ import { SquareArrowOutUpRight } from "lucide-react";
 import CopyButton from "@/components/lib/copy-button";
 
 const LatestTxsEnqueuedTableRow = ({
-  transactionEnqueued,
+  transactionEnqueued: {
+    timestamp,
+    l1BlockNumber,
+    l2TxHash,
+    l1TxHash,
+    l1TxOrigin,
+    gasLimit,
+  },
   timestampFormattedAsDate,
 }: {
   transactionEnqueued: TransactionEnqueued;
   timestampFormattedAsDate: boolean;
 }) => {
-  const { distance, utc } = formatTimestamp(transactionEnqueued.timestamp);
+  const { distance, utc } = formatTimestamp(timestamp);
   return (
     <TableRow>
       <TableCell>
         <a
           className="text-primary inline-flex items-center gap-1 truncate hover:brightness-150"
-          href={`${l1Chain.blockExplorers.default.url}/block/${transactionEnqueued.l1BlockNumber}`}
+          href={`${l1Chain.blockExplorers.default.url}/block/${l1BlockNumber}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {transactionEnqueued.l1BlockNumber.toString()}
+          {l1BlockNumber.toString()}
           <SquareArrowOutUpRight className="size-4 shrink-0" />
         </a>
       </TableCell>
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
           <Link
-            href={`/tx/${transactionEnqueued.l2TxHash}`}
+            href={`/tx/${l2TxHash}`}
             className="text-primary truncate text-sm leading-none font-medium hover:brightness-150"
           >
-            {transactionEnqueued.l2TxHash}
+            {l2TxHash}
           </Link>
-          <CopyButton
-            content="Copy L2 Tx Hash"
-            copy={transactionEnqueued.l2TxHash}
-          />
+          <CopyButton content="Copy L2 Tx Hash" copy={l2TxHash} />
         </div>
       </TableCell>
       <TableCell suppressHydrationWarning>
@@ -48,37 +52,31 @@ const LatestTxsEnqueuedTableRow = ({
         <div className="flex items-center gap-2">
           <a
             className="text-primary inline-flex items-center gap-1 truncate hover:brightness-150"
-            href={`${l1Chain.blockExplorers.default.url}/tx/${transactionEnqueued.l1TxHash}`}
+            href={`${l1Chain.blockExplorers.default.url}/tx/${l1TxHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="truncate">{transactionEnqueued.l1TxHash}</span>
+            <span className="truncate">{l1TxHash}</span>
             <SquareArrowOutUpRight className="size-4 shrink-0" />
           </a>
-          <CopyButton
-            content="Copy L1 Tx Hash"
-            copy={transactionEnqueued.l1TxHash}
-          />
+          <CopyButton content="Copy L1 Tx Hash" copy={l1TxHash} />
         </div>
       </TableCell>
       <TableCell className="max-w-40">
         <div className="flex items-center gap-2">
           <a
             className="text-primary inline-flex items-center gap-1 truncate hover:brightness-150"
-            href={`${l1Chain.blockExplorers.default.url}/address/${transactionEnqueued.l1TxOrigin}`}
+            href={`${l1Chain.blockExplorers.default.url}/address/${l1TxOrigin}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="truncate">{transactionEnqueued.l1TxOrigin}</span>
+            <span className="truncate">{l1TxOrigin}</span>
             <SquareArrowOutUpRight className="size-4 shrink-0" />
           </a>
-          <CopyButton
-            content="Copy L1 Tx Origin"
-            copy={transactionEnqueued.l1TxOrigin}
-          />
+          <CopyButton content="Copy L1 Tx Origin" copy={l1TxOrigin} />
         </div>
       </TableCell>
-      <TableCell>{formatGas(transactionEnqueued.gasLimit).value}</TableCell>
+      <TableCell>{formatGas(gasLimit).value}</TableCell>
     </TableRow>
   );
 };

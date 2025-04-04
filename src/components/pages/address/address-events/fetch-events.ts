@@ -13,6 +13,7 @@ import { prisma, fromPrismaLog } from "@/lib/prisma";
 import { loadEvents, loadFunctions } from "@/lib/signatures";
 import fetchAccount from "@/lib/fetch-account";
 import { eventsPerPage } from "@/lib/constants";
+import { l2Chain } from "@/lib/chains";
 
 export type DecodedData = {
   hex: Hex;
@@ -74,7 +75,7 @@ const findAbiEventFromHash = async (
 export const fetchEvents = async (address: Address): Promise<Event[]> => {
   const [logs, account] = await Promise.all([
     prisma.log.findMany({
-      where: { address },
+      where: { address, chainId: l2Chain.id },
       include: { receipt: { include: { transaction: true } } },
       orderBy: [
         { blockNumber: "desc" },

@@ -1,5 +1,4 @@
 "use client";
-import { type Address } from "viem";
 import {
   Table,
   TableBody,
@@ -11,19 +10,23 @@ import {
 import { type TokenTransfer } from "@/components/pages/address/address-token-transfers/fetch-token-transfers";
 import useGlobalContext from "@/components/lib/context/hook";
 import TokenTransfersTableRow from "@/components/pages/address/address-token-transfers/token-transfers-table-row";
+import { type AccountWithTransactionAndToken } from "@/lib/types";
 
 const TokenTransfersTable = ({
   tokenTransfers,
-  address,
+  account,
 }: {
   tokenTransfers: TokenTransfer[];
-  address: Address;
+  account: AccountWithTransactionAndToken;
 }) => {
   const {
     state: { timestampFormattedAsDate, usdValueShown },
     toggleTimestampFormattedAsDate,
     toggleUSDValueShown,
   } = useGlobalContext();
+  const withDestSrcChain = tokenTransfers.some(
+    ({ destination, source }) => destination || source,
+  );
   return (
     <Table>
       <TableHeader>
@@ -43,6 +46,12 @@ const TokenTransfersTable = ({
           <TableHead>From</TableHead>
           <TableHead />
           <TableHead>To</TableHead>
+          {withDestSrcChain && (
+            <>
+              <TableHead />
+              <TableHead>Chain</TableHead>
+            </>
+          )}
           <TableHead>
             <a
               className="text-primary cursor-pointer hover:brightness-150"
@@ -69,7 +78,8 @@ const TokenTransfersTable = ({
               tokenTransfer={tokenTransfer}
               timestampFormattedAsDate={timestampFormattedAsDate}
               usdValueShown={usdValueShown}
-              address={address}
+              account={account}
+              withDestSrcChain={withDestSrcChain}
             />
           ))
         )}

@@ -1,6 +1,7 @@
 import { type Address } from "viem";
 import { type Metadata } from "@ethereum-sourcify/lib-sourcify";
 import { type Contract } from "@/lib/types";
+import { l2Chain } from "@/lib/chains";
 
 type SourcifyContractFile = {
   name: string;
@@ -23,7 +24,7 @@ export const fetchContract = async (
   address: Address,
 ): Promise<Contract | null> => {
   const sourcifyBaseUrl = "https://sourcify.dev/server/files/any";
-  const url = `${sourcifyBaseUrl}/${process.env.NEXT_PUBLIC_L2_CHAIN_ID}/${address}`;
+  const url = `${sourcifyBaseUrl}/${l2Chain.id}/${address}`;
   const response = await fetch(url, { cache: "force-cache" });
   if (!response.ok) {
     return null;

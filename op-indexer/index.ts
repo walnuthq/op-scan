@@ -9,14 +9,62 @@ import {
 import { prisma } from "@/lib/prisma";
 import { l1Chain, l2Chain, l1PublicClient, l2PublicClient } from "@/lib/chains";
 import { indexL1Block, indexL2Block } from "@/lib/indexer";
+import { l2BlockTime } from "@/lib/constants";
+
+const indexChain = (
+  chainId: number,
+  l2ChainId: number,
+  blocksToIndex: Set<bigint>,
+  indexDelay: number,
+  fetchBlockNumberFromJsonRpc: () => Promise<bigint>,
+  fetchBlockNumberFromDatabase: () => Promise<bigint>,
+  indexBlock: (blockNumber: bigint, chainId: number) => Promise<void>,
+) => {
+  setInterval(async () => {
+    const [blockNumberFromJsonRpc, blockNumberFromDatabase] = await Promise.all(
+      [fetchBlockNumberFromJsonRpc(), fetchBlockNumberFromDatabase()],
+    );
+    blocksToIndex = blocksToIndex.union(
+      new Set([
+        ...range(
+          Number(blockNumberFromDatabase) + 1,
+          Number(blockNumberFromJsonRpc),
+        ).map(BigInt),
+      ]),
+    );
+    const [blockNumber] = blocksToIndex;
+    if (blockNumber === undefined) {
+      return;
+    }
+    blocksToIndex.delete(blockNumber);
+    console.info(`Indexing Block #${blockNumber} from Chain ${chainId}`);
+    try {
+      console.time(`${chainId}-${blockNumber}`);
+      await indexBlock(blockNumber, l2ChainId);
+      console.timeEnd(`${chainId}-${blockNumber}`);
+      console.info(`Indexed Block #${blockNumber} from Chain ${chainId}`);
+    } catch (error) {
+      console.error(error);
+      blocksToIndex.add(blockNumber);
+    }
+  }, indexDelay);
+};
 
 const main = async () => {
-  const deployConfig = { l1ChainId: l1Chain.id, l2ChainId: l2Chain.id };
-  // create the OP Stack deploy config
-  await prisma.deployConfig.upsert({
-    where: { l1ChainId_l2ChainId: deployConfig },
-    create: deployConfig,
-    update: deployConfig,
+  const rollupConfig = {
+    l2ChainId: l2Chain.id,
+    l2ChainName: l2Chain.name,
+    l2ChainRpcUrl: l2Chain.rpcUrls.default.http[0],
+    l2ChainBlockExplorerName: l2Chain.blockExplorers.default.name,
+    l2ChainBlockExplorerUrl: l2Chain.blockExplorers.default.url,
+    l2BlockTime,
+    l1ChainId: l1Chain.id,
+  };
+  // create the OP Stack rollup config
+  await prisma.rollupConfig.upsert({
+    where: { l2ChainId: l2Chain.id },
+    create: rollupConfig,
+    update: rollupConfig,
   });
 
   const { values } = parseArgs({
@@ -30,6 +78,7 @@ const main = async () => {
         multiple: true,
         default: [],
       },
+      "l1-index-delay": { type: "string", default: "12000" },
       "l2-from-block": {
         type: "string",
         short: "f",
@@ -40,7 +89,7 @@ const main = async () => {
         multiple: true,
         default: [],
       },
-      "index-delay": { type: "string", short: "d", default: "1000" },
+      "l2-index-delay": { type: "string", short: "d", default: "2000" },
     },
     strict: true,
     allowPositionals: true,
@@ -59,10 +108,7 @@ const main = async () => {
     ? BigInt(values["l1-from-block"])
     : defaultL1FromBlock;
   const indexL1Blocks = values["l1-index-block"];
-  let l1BlocksToIndex = new Set([
-    ...indexL1Blocks.map(BigInt),
-    ...range(Number(l1FromBlock), Number(latestL1BlockNumber) + 1).map(BigInt),
-  ]);
+  const l1IndexDelay = Number(values["l1-index-delay"]);
 
   const defaultL2FromBlock =
     latestL2BlockNumber > BigInt(0)
@@ -72,74 +118,37 @@ const main = async () => {
     ? BigInt(values["l2-from-block"])
     : defaultL2FromBlock;
   const indexL2Blocks = values["l2-index-block"];
-  let l2BlocksToIndex = new Set([
-    ...indexL2Blocks.map(BigInt),
-    ...range(Number(l2FromBlock), Number(latestL2BlockNumber) + 1).map(BigInt),
-  ]);
+  const l2IndexDelay = Number(values["l2-index-delay"]);
 
-  const indexDelay = Number(values["index-delay"]);
+  indexChain(
+    l1Chain.id,
+    l2Chain.id,
+    new Set([
+      ...indexL1Blocks.map(BigInt),
+      ...range(Number(l1FromBlock), Number(latestL1BlockNumber) + 1).map(
+        BigInt,
+      ),
+    ]),
+    l1IndexDelay,
+    fetchL1BlockNumberFromJsonRpc,
+    fetchL1BlockNumberFromDatabase,
+    indexL1Block,
+  );
 
-  setInterval(async () => {
-    const [l1BlockNumberFromJsonRpc, l1BlockNumberFromDatabase] =
-      await Promise.all([
-        fetchL1BlockNumberFromJsonRpc(),
-        fetchL1BlockNumberFromDatabase(),
-      ]);
-    l1BlocksToIndex = l1BlocksToIndex.union(
-      new Set([
-        ...range(
-          Number(l1BlockNumberFromDatabase) + 1,
-          Number(l1BlockNumberFromJsonRpc),
-        ).map(BigInt),
-      ]),
-    );
-    const [blockNumber] = l1BlocksToIndex;
-    if (blockNumber === undefined) {
-      return;
-    }
-    l1BlocksToIndex.delete(blockNumber);
-    console.info(`Indexing L1 Block #${blockNumber}`);
-    try {
-      console.time(`l1-${blockNumber}`);
-      await indexL1Block(blockNumber);
-      console.timeEnd(`l1-${blockNumber}`);
-      console.info(`Indexed L1 Block #${blockNumber}`);
-    } catch (error) {
-      console.error(error);
-      l1BlocksToIndex.add(blockNumber);
-    }
-  }, indexDelay);
-
-  setInterval(async () => {
-    const [l2BlockNumberFromJsonRpc, l2BlockNumberFromDatabase] =
-      await Promise.all([
-        fetchL2BlockNumberFromJsonRpc(),
-        fetchL2BlockNumberFromDatabase(),
-      ]);
-    l2BlocksToIndex = l2BlocksToIndex.union(
-      new Set([
-        ...range(
-          Number(l2BlockNumberFromDatabase) + 1,
-          Number(l2BlockNumberFromJsonRpc),
-        ).map(BigInt),
-      ]),
-    );
-    const [blockNumber] = l2BlocksToIndex;
-    if (blockNumber === undefined) {
-      return;
-    }
-    l2BlocksToIndex.delete(blockNumber);
-    console.info(`Indexing L2 Block #${blockNumber}`);
-    try {
-      console.time(`l2-${blockNumber}`);
-      await indexL2Block(blockNumber);
-      console.timeEnd(`l2-${blockNumber}`);
-      console.info(`Indexed L2 Block #${blockNumber}`);
-    } catch (error) {
-      console.error(error);
-      l2BlocksToIndex.add(blockNumber);
-    }
-  }, indexDelay);
+  indexChain(
+    l2Chain.id,
+    l2Chain.id,
+    new Set([
+      ...indexL2Blocks.map(BigInt),
+      ...range(Number(l2FromBlock), Number(latestL2BlockNumber) + 1).map(
+        BigInt,
+      ),
+    ]),
+    l2IndexDelay,
+    fetchL2BlockNumberFromJsonRpc,
+    fetchL2BlockNumberFromDatabase,
+    indexL2Block,
+  );
 };
 
 main().catch((error) => {

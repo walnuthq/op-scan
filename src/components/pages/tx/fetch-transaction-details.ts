@@ -13,6 +13,7 @@ import {
 } from "@/lib/prisma";
 import { parseErc20Transfers } from "@/lib/utils";
 import getErc20Contract from "@/lib/contracts/erc-20/contract";
+import { l2Chain } from "@/lib/chains";
 
 type FetchTransactionDetailsReturnType = {
   transaction: TransactionWithReceiptAndAccounts | null;
@@ -26,7 +27,7 @@ const fetchTransactionDetailsFromDatabase = async (
   try {
     const [transaction, confirmations] = await Promise.all([
       prisma.transaction.findUnique({
-        where: { hash },
+        where: { hash_chainId: { hash, chainId: l2Chain.id } },
         include: {
           receipt: {
             include: { erc20Transfers: { include: { token: true } } },

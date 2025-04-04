@@ -5,10 +5,12 @@ import {
 } from "@/lib/prisma";
 import { loadFunctions } from "@/lib/signatures";
 import { txsPerPage } from "@/lib/constants";
+import { l2Chain } from "@/lib/chains";
 
 const fetchTransactions = async (address: Address, page: number) => {
   const where = {
     OR: [{ from: address }, { to: address }],
+    chainId: l2Chain.id,
   };
   const [prismaTransactions, totalCount] = await Promise.all([
     prisma.transaction.findMany({

@@ -54,7 +54,7 @@ const DecodedLogEvent = ({
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value={abiEvent.name}>
-        <AccordionTrigger className="justify-start hover:no-underline">
+        <AccordionTrigger className="justify-start gap-0.5 hover:no-underline">
           *** {abiEvent.name}(
           {abiEvent.inputs.map((input, index) => (
             <SignatureParameter

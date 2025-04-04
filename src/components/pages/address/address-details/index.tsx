@@ -7,6 +7,8 @@ import AddressTokenHoldings from "@/components/pages/address/address-details/add
 import { type TokenHoldings } from "@/components/pages/address/address-details/fetch-token-holdings";
 import { type AccountWithTransactionAndToken } from "@/lib/types";
 import CopyButton from "@/components/lib/copy-button";
+import AddressLink from "@/components/lib/address-link";
+import ChainBadge from "@/components/lib/chain-badge";
 
 const AddressDetails = ({
   tokenHoldings,
@@ -120,7 +122,30 @@ const AddressDetails = ({
         <CardHeader>
           <CardTitle>Superchain Info</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4"></CardContent>
+        {account.accounts && account.accounts.length > 0 && (
+          <CardContent className="space-y-4">
+            <p>
+              {account.accounts.length} other address
+              {account.accounts.length === 1 ? "" : "es"} found on the
+              Superchain
+            </p>
+            <ul>
+              {account.accounts.map((account) => (
+                <li
+                  key={account.rollupConfig.l2ChainId}
+                  className="flex items-center gap-1"
+                >
+                  <ChainBadge name={account.rollupConfig.l2ChainName} />
+                  <AddressLink
+                    formatted
+                    address={account.address}
+                    href={`${account.rollupConfig.l2ChainBlockExplorerUrl}/address/${account.address}`}
+                  />
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        )}
       </Card>
     </div>
   );

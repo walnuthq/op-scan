@@ -4,6 +4,8 @@ import { txsPerPage } from "@/lib/constants";
 import { loadFunctions } from "@/lib/signatures";
 import { fetchSpotPrices } from "@/lib/fetch-data";
 import { formatPrice } from "@/lib/utils";
+import { l2Chain } from "@/lib/chains";
+import fetchAccount from "@/lib/fetch-account";
 
 export type TokenTransfer = {
   transactionHash: Hash;
@@ -15,6 +17,8 @@ export type TokenTransfer = {
   from: Address;
   to: Address;
   amount: string;
+  destination: number | null;
+  source: number | null;
   usdValue: string;
   tokenAddress: Address;
 };
@@ -22,25 +26,29 @@ export type TokenTransfer = {
 export const fetchTokenTransfers = async (address: Address, page: number) => {
   const where = {
     OR: [{ from: address }, { to: address }],
+    chainId: l2Chain.id,
   };
-  const [prismaErc20Transfers, totalCount, prices] = await Promise.all([
-    prisma.erc20Transfer.findMany({
-      where,
-      orderBy: [
-        { blockNumber: "desc" },
-        { transactionIndex: "desc" },
-        { logIndex: "desc" },
-      ],
-      take: txsPerPage,
-      skip: (page - 1) * txsPerPage,
-      include: {
-        token: true,
-        receipt: { include: { transaction: true } },
-      },
-    }),
-    prisma.erc20Transfer.count({ where }),
-    fetchSpotPrices(),
-  ]);
+  const [prismaErc20Transfers, totalCount, prices, account] = await Promise.all(
+    [
+      prisma.erc20Transfer.findMany({
+        where,
+        orderBy: [
+          { blockNumber: "desc" },
+          { transactionIndex: "desc" },
+          { logIndex: "desc" },
+        ],
+        take: txsPerPage,
+        skip: (page - 1) * txsPerPage,
+        include: {
+          token: true,
+          receipt: { include: { transaction: true } },
+        },
+      }),
+      prisma.erc20Transfer.count({ where }),
+      fetchSpotPrices(),
+      fetchAccount(address),
+    ],
+  );
   const signatures = await Promise.all(
     prismaErc20Transfers.map(({ receipt }) =>
       loadFunctions(receipt.transaction.input.slice(0, 10)),
@@ -65,10 +73,13 @@ export const fetchTokenTransfers = async (address: Address, page: number) => {
         from: erc20Transfer.from,
         to: erc20Transfer.to,
         amount,
+        destination: erc20Transfer.destination,
+        source: erc20Transfer.source,
         usdValue: formatPrice(Number(amount) * price),
         tokenAddress: erc20Transfer.address,
       };
     }),
     totalCount,
+    account,
   };
 };

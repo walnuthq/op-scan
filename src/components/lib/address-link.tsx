@@ -8,17 +8,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn, formatAddress } from "@/lib/utils";
-import { l1Chain } from "@/lib/chains";
 import useGlobalContext from "@/components/lib/context/hook";
 
 const AddressLink = ({
   address,
   formatted = false,
-  external = false,
+  href,
 }: {
   address: Address;
   formatted?: boolean;
-  external?: boolean;
+  href?: string;
 }) => {
   const {
     state: { hoveredAddress },
@@ -39,9 +38,9 @@ const AddressLink = ({
           },
         )}
       >
-        {external ? (
+        {href ? (
           <a
-            href={`${l1Chain.blockExplorers.default.url}/address/${address}`}
+            href={href}
             className="flex items-center gap-1"
             target="_blank"
             rel="noopener noreferrer"

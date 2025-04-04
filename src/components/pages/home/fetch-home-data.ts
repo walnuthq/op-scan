@@ -14,6 +14,7 @@ import {
 } from "date-fns";
 import { UTCDate } from "@date-fns/utc";
 import { fetchSpotPrices } from "@/lib/fetch-data";
+import { l2Chain } from "@/lib/chains";
 
 const fetchPrices = () =>
   Promise.all([
@@ -36,22 +37,26 @@ const fetchHomeData = async () => {
   ] = await Promise.all([
     fetchPrices(),
     prisma.block.findMany({
+      where: { chainId: l2Chain.id },
       orderBy: { number: "desc" },
       take: 6,
     }),
     prisma.transaction.findMany({
+      where: { chainId: l2Chain.id },
       orderBy: [{ blockNumber: "desc" }, { transactionIndex: "desc" }],
       include: { accounts: true },
       take: 6,
     }),
     prisma.transactionEnqueued.findMany({
+      where: { chainId: l2Chain.id },
       orderBy: [{ l1BlockNumber: "desc" }, { l2TxHash: "asc" }],
       take: 10,
     }),
     prisma.transactionsHistory.findUnique({
-      where: { date: new UTCDate(0) },
+      where: { date_chainId: { date: new UTCDate(0), chainId: l2Chain.id } },
     }),
     prisma.transactionsHistory.findMany({
+      where: { chainId: l2Chain.id },
       orderBy: { date: "desc" },
       take: transactionsHistoryCount + 1,
     }),

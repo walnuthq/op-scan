@@ -96,6 +96,8 @@ export type Erc20Transfer = {
   from: Address;
   to: Address;
   value: bigint;
+  destination: number | null;
+  source: number | null;
 };
 
 export type Erc20TransferWithToken = Erc20Transfer & { token: Erc20Token };
@@ -155,6 +157,7 @@ export type Account = {
   bytecode: Hex | null;
   transactionHash: Hash | null;
   contract: Contract | null;
+  accounts?: AccountWithRollupConfig[];
 };
 
 export type AccountWithTransaction = Account & {
@@ -165,6 +168,20 @@ export type AccountWithTransactionAndToken = AccountWithTransaction & {
   erc20Token: Erc20Token | null;
   erc721Token: Erc721Token | null;
   erc1155Token: Erc1155Token | null;
+};
+
+export type RollupConfig = {
+  l2ChainId: number;
+  l2ChainName: string;
+  l2ChainRpcUrl: string;
+  l2ChainBlockExplorerName: string;
+  l2ChainBlockExplorerUrl: string;
+  l2BlockTime: number;
+  l1ChainId: number;
+};
+
+export type AccountWithRollupConfig = Account & {
+  rollupConfig: RollupConfig;
 };
 
 export type TransactionEnqueued = {

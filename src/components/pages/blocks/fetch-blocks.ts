@@ -1,6 +1,6 @@
 import { range } from "lodash";
 import { blocksPerPage } from "@/lib/constants";
-import { l2PublicClient } from "@/lib/chains";
+import { l2PublicClient, l2Chain } from "@/lib/chains";
 import { prisma, fromPrismaBlock } from "@/lib/prisma";
 import { fromViemBlock } from "@/lib/viem";
 
@@ -8,6 +8,7 @@ const fetchBlocksFromDatabase = async (start: bigint) => {
   const blocks = await prisma.block.findMany({
     where: {
       number: { lte: start, gt: Math.max(Number(start) - blocksPerPage, -1) },
+      chainId: l2Chain.id,
     },
     orderBy: { number: "desc" },
     take: Number(blocksPerPage),

@@ -23,6 +23,7 @@ import {
   type SolidityCompilerVersion,
 } from "@/lib/types";
 import { solc, vyper, sourcifyChain } from "@/lib/sourcify";
+import { l2Chain } from "@/lib/chains";
 
 export const submitContractDetails = async ({
   address,
@@ -164,7 +165,9 @@ export const verifyContract = async ({
   });
   const [compiled, account] = await Promise.all([
     solc.compile(version, solcJsonInput, true),
-    prisma.account.findUnique({ where: { address } }),
+    prisma.account.findUnique({
+      where: { address_chainId: { address, chainId: l2Chain.id } },
+    }),
   ]);
   const [firstPath] = Object.keys(solcJsonInput.sources);
   if (!firstPath) {
@@ -234,9 +237,9 @@ export const verifyContract = async ({
   const signatures = signaturesFromAbi(contract.abi);
   await prisma.$transaction([
     prisma.account.upsert({
-      where: { address },
-      create: accountUpsert,
-      update: accountUpsert,
+      where: { address_chainId: { address, chainId: l2Chain.id } },
+      create: { ...accountUpsert, chainId: l2Chain.id },
+      update: { ...accountUpsert, chainId: l2Chain.id },
     }),
     ...signatures.map((signature) =>
       prisma.signature.upsert({

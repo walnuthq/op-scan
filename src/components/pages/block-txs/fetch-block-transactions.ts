@@ -1,4 +1,4 @@
-import { l2PublicClient } from "@/lib/chains";
+import { l2PublicClient, l2Chain } from "@/lib/chains";
 import { fromViemBlockWithTransactionsAndReceipts } from "@/lib/viem";
 import { loadFunctions } from "@/lib/signatures";
 import {
@@ -8,7 +8,7 @@ import {
 
 const fetchBlockTransactionsFromDatabase = async (number: bigint) => {
   const block = await prisma.block.findUnique({
-    where: { number },
+    where: { number_chainId: { number, chainId: l2Chain.id } },
     include: { transactions: { include: { receipt: true, accounts: true } } },
   });
   if (!block) {
